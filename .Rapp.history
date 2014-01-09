@@ -1,0 +1,1 @@
+phi <- 1 / rgamma(1, alpha.phi, beta.phi)
