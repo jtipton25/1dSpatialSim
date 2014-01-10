@@ -15,16 +15,20 @@ make.field <- function(t, mu, Sig.s, m){
 	mu + t(chol(Sig.s)) %*% rnorm(m)
 }
 
-## make sampling matrix H
+## make sampling matrix H.list
 make.H.list <- function(t, samp, m){
   (1:m)[samp[[t]]]
 }
 
-## make sample data Y
+## make sample data Y.list
 make.Y.list <- function(t, Z, H.list, s2.e = 1){
   Z[, t][H.list[[t]]] + rnorm(length(H.list[[t]]), s2.e)
 }
 
+## make sample spatial covaraites X.list
+make.X.list <- function(s, X, H.list){
+  X[H.list[[s]], ]
+}
 
 
 make.krige.fit <- function(t, Y.list, H.list, locs){
@@ -124,7 +128,7 @@ Sig.s.fit <- vector('list', length = t)
 for(i in 1:t){
   s2.fit[i] <- summary(Z.geo.fit[[i]])$spatial.component[1]
   phi.fit[i] <- summary(Z.geo.fit[[i]])$spatial.component[2]
-  Sig.s.fit[[i]] <- s2.fit[i] * exp( - D / phi.fit[s])
+  Sig.s.fit[[i]] <- s2.fit[i] * exp( - D / phi.fit[i])
 }
 
 ####
@@ -132,17 +136,22 @@ for(i in 1:t){
 ####
 
 s2.e <- 0.01 # sampling error
-samp.size <- sample(140:200, t, replace = TRUE) # sample size
+# samp.size <- sample(140:200, t, replace = TRUE) # sample size varies
+samp.size <- sample(40:200, 1, replace = TRUE) # sample size consistent <- needed for mcmc.spatial
 
 samp <- vector('list', length = t)
 for(i in 1:t){
-  samp[[i]] <- sample(1:m, samp.size[[i]])
+  #samp[[i]] <- sample(1:m, samp.size[[i]])
+  samp[[i]] <- sample(1:m, samp.size)
 }
 
 H.list <- lapply(1:t, make.H.list, samp = samp, m = m)
 Y.list <- lapply(1:t, make.Y.list, Z = Z, H.list = H.list, s2.e = s2.e)
+X.list <- lapply(1:t, make.X.list, X, H.list)
 
-
+##
+## Plot Sample Data
+##
 
 plot.field(Y.list = Y.list, H.list = H.list, locs = locs)
 

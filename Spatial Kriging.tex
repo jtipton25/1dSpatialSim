@@ -58,19 +58,19 @@ For $t = 1, \ldots, T$,
 \begin{align*}
 [\bm{\beta}_t | \cdot] & \propto [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \sigma^2_\epsilon, \phi] [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta]\\
 %
-& \propto e^{ - \frac{1} {2} (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{I})^{ - 1} (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)} e^{ - \frac{1} {2} (\bm{\beta}_t - \bm{\mu}_\beta)^T (\sigma^2_{\beta} \bm{\Lambda})^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)}\\
+& \propto e^{ - \frac{1} {2} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{I})^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} e^{ - \frac{1} {2} (\bm{\beta}_t - \bm{\mu}_\beta)^T (\sigma^2_{\beta} \bm{\Lambda})^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)}\\
 %
-& \propto e^{ - \frac{1} {2} \{\bm{\beta}_t^T (\bm{\tilde{X}}^T \bm{K}_t^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{I})^{ - 1} \bm{K}_t \bm{\tilde{X}} + (\sigma^2_{\beta} \bm{\Lambda})^{ - 1}) \bm{\beta}_t - 2 \bm{\beta}_t^T (\bm{\tilde{X}}^T \bm{K}_t^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{I})^{ - 1} \bm{y}_t + (\sigma^2_{\beta} \bm{\Lambda})^{ - 1} \bm{\mu}_\beta) \} }
+& \propto e^{ - \frac{1} {2} \{\bm{\beta}_t^T (\bm{X}^T \bm{H}_t^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{I})^{ - 1} \bm{H}_t \bm{X} + (\sigma^2_{\beta} \bm{\Lambda})^{ - 1}) \bm{\beta}_t - 2 \bm{\beta}_t^T (\bm{X}^T \bm{H}_t^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{I})^{ - 1} \bm{y}_t + (\sigma^2_{\beta} \bm{\Lambda})^{ - 1} \bm{\mu}_\beta) \} }
 \end{align*}
 %
 which is Normal with mean $ \bm{A}^{ - 1} \bm{b}$ and variance $\bm{A}^{ - 1}$.
 \begin{align*}
-  \bm{A}^{ - 1} & = (\bm{\tilde{X}}^T \bm{K}_t^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{I})^{ - 1} \bm{K}_t \bm{\tilde{X}} + (\sigma^2_{\beta} \bm{\Lambda})^{ - 1})^{ - 1}\\
-  & \approx (\bm{\tilde{X}}^T \bm{K}_t^T (\tilde{\bm{C}} + \sigma^2_\epsilon \bm{I})^{ - 1} \bm{K}_t \bm{\tilde{X}} + (\sigma^2_{\beta} \bm{\Lambda})^{ - 1})^{ - 1}
+  \bm{A}^{ - 1} & = (\bm{X}^T \bm{H}_t^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{I})^{ - 1} \bm{H}_t \bm{X} + (\sigma^2_{\beta} \bm{\Lambda})^{ - 1})^{ - 1}\\
+  & \approx (\bm{X}^T \bm{H}_t^T (\tilde{\bm{C}} + \sigma^2_\epsilon \bm{I})^{ - 1} \bm{H}_t \bm{X} + (\sigma^2_{\beta} \bm{\Lambda})^{ - 1})^{ - 1}
 \end{align*}
 \begin{align*}
-  \bm{b} & = (\bm{\tilde{X}}^T \bm{K}_t^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{I})^{ - 1} \bm{y}_t + (\sigma^2_{\beta} \bm{\Lambda})^{ - 1} \bm{\mu}_\beta)\\
-  & \approx (\bm{\tilde{X}}^T \bm{K}_t^T (\tilde{\bm{C}} + \sigma^2_\epsilon \bm{I})^{ - 1} \bm{y}_t + (\sigma^2_{\beta} \bm{\Lambda})^{ - 1} \bm{\mu}_\beta)
+  \bm{b} & = (\bm{X}^T \bm{H}_t^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{I})^{ - 1} \bm{y}_t + (\sigma^2_{\beta} \bm{\Lambda})^{ - 1} \bm{\mu}_\beta)\\
+  & \approx (\bm{X}^T \bm{H}_t^T (\tilde{\bm{C}} + \sigma^2_\epsilon \bm{I})^{ - 1} \bm{y}_t + (\sigma^2_{\beta} \bm{\Lambda})^{ - 1} \bm{\mu}_\beta)
 \end{align*}
 %
 \subsection{Full Conditional for $\bm{\mu}_\beta$}
@@ -106,11 +106,11 @@ where $|\bm{\Lambda}|$ is the determinant $\det(\bm{\Lambda}) = \prod_{i = 1}^J 
 \begin{align*}
 [\sigma^2_\eta | \cdot] & \propto \prod_{t = 1}^T [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\sigma^2_\eta]\\
 %
-& \propto (\prod_{t = 1}^T |\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)} (\sigma^2_\eta)^{ - \alpha_\eta + 1} e^{ - \frac{\beta_\eta} {\sigma^2_\eta}}\\
+& \propto (\prod_{t = 1}^T |\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} (\sigma^2_\eta)^{ - \alpha_\eta + 1} e^{ - \frac{\beta_\eta} {\sigma^2_\eta}}\\
 %
-& \propto |\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)} (\sigma^2_\eta)^{ - \alpha_\eta + 1} e^{ - \frac{\beta_\eta} {\sigma^2_\eta}}\\
+& \propto |\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} (\sigma^2_\eta)^{ - \alpha_\eta + 1} e^{ - \frac{\beta_\eta} {\sigma^2_\eta}}\\
 %
-& \approx |\tilde{\bm{C}} + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)^T (\tilde{\bm{C}} + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)} (\sigma^2_\eta)^{ - \alpha_\eta + 1} e^{ - \frac{\beta_\eta} {\sigma^2_\eta}}
+& \approx |\tilde{\bm{C}} + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T (\tilde{\bm{C}} + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} (\sigma^2_\eta)^{ - \alpha_\eta + 1} e^{ - \frac{\beta_\eta} {\sigma^2_\eta}}
 \end{align*}
 % 
 which can be sampled using a Metropolis-Hastings step
@@ -120,10 +120,10 @@ which can be sampled using a Metropolis-Hastings step
 \begin{align*}
 [\sigma^2_\epsilon | \cdot] & \propto \prod_{t = 1}^T [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\sigma^2_\epsilon]\\
 %
-& \propto (\prod_{t = 1}^T |\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)} (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}\\
+& \propto (\prod_{t = 1}^T |\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}\\
 %
-& \propto |\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)} (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}\\
-& \approx |\tilde{\bm{C}} + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)^T (\tilde{\bm{C}} + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)} (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}
+& \propto |\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T (\sigma^2_\eta \bm{R}_t(\phi) + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}\\
+& \approx |\tilde{\bm{C}} + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T (\tilde{\bm{C}} + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}
 \end{align*}
 % 
 which can be sampled using a Metropolis-Hastings step
@@ -133,11 +133,11 @@ which can be sampled using a Metropolis-Hastings step
 \begin{align*}
   [\phi | \cdot] & \propto \prod_{t = 1}^T [y_t | \beta_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\phi]\\
 %
-& \propto \prod_{t = 1}^T | \sigma^2_\eta \bm{R}(\phi) + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{1} {2}} e^{ - \frac{1} {2} (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)^T (\sigma^2_\eta \bm{R}(\phi) + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)} \phi^{ - \alpha_\phi + 1} e^{ - \frac{\beta_\phi} {\phi}}\\
+& \propto \prod_{t = 1}^T | \sigma^2_\eta \bm{R}(\phi) + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{1} {2}} e^{ - \frac{1} {2} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T (\sigma^2_\eta \bm{R}(\phi) + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} \phi^{ - \alpha_\phi + 1} e^{ - \frac{\beta_\phi} {\phi}}\\
 %
-& \propto | \sigma^2_\eta \bm{R}(\phi) + \sigma^2_\epsilon \bm{\Lambda}  ]|^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)^T (\sigma^2_\eta \bm{R}(\phi) + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)} \phi^{ - \alpha_\phi + 1} e^{ - \frac{\beta_\phi} {\phi}}\\
+& \propto | \sigma^2_\eta \bm{R}(\phi) + \sigma^2_\epsilon \bm{\Lambda}  ]|^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T (\sigma^2_\eta \bm{R}(\phi) + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} \phi^{ - \alpha_\phi + 1} e^{ - \frac{\beta_\phi} {\phi}}\\
 %
-& \approx | \tilde{\bm{C}} + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)^T (\tilde{\bm{C}} + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{K}_t \bm{\tilde{X}} \bm{\beta}_t)} \phi^{ - \alpha_\phi + 1} e^{ - \frac{\beta_\phi} {\phi}}
+& \approx | \tilde{\bm{C}} + \sigma^2_\epsilon \bm{\Lambda} |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T (\tilde{\bm{C}} + \sigma^2_\epsilon \bm{\Lambda})^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} \phi^{ - \alpha_\phi + 1} e^{ - \frac{\beta_\phi} {\phi}}
 \end{align*}
 % 
 which can be sampled using a Metropolis-Hastings step

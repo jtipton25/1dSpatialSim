@@ -118,17 +118,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
 	  ( - t / 2) * determinant(Sigma[[s]], logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*%
 	    Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
 	}
-
-	make.fort.batch <- function(s, beta, chol.Sigma, ncells){
-	  if(dim(beta)[1] == 1){  
-	    backsolve(chol.Sigma, backsolve(chol.Sigma, X * beta[s], transpose = TRUE) + rnorm(ncells))
-	  } else {
-	    backsolve(chol.Sigma, backsolve(chol.Sigma, X %*% beta[, s], transpose = TRUE) + rnorm(ncells)) 
-	  }
-	}
-
-## Predictive Process
-##  make.fort.batch <- function(s, beta, c, C.star, C.star.inv, sigma.squared.epsilon){#, w.tilde){
+  
+  ##  make.fort.batch <- function(s, beta, c, C.star, C.star.inv, sigma.squared.epsilon){#, w.tilde){
 ##  	w.star <- rmvnorm(1, vec.0, C.star)
 ##    w.tilde <- t(c) %*% C.star.inv %*% t(w.star)
 ##  	if(dim(beta)[1] == 1){
@@ -236,7 +227,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   ##
 
 	for(k in 1:n.mcmc){
-    if(k %% 100 == 0) cat(" ", k) 
+  	if(k %% 100 == 0) cat(" ", k)
 
   	##
   	## Sample Beta
@@ -402,12 +393,16 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   		  		
   		if(mh.phi > runif(1)){
           phi <- phi.star
-          R.list <- R.list.star
+          c <- c.star
+          C.star <- C.star.star
+          C.star.inv <- C.star.star.inv
           Sigma <- Sigma.star
           Sigma.inv <- Sigma.star.inv
           phi.accept <- phi.accept + 1 / n.mcmc
   		}
-    rm(R.list.star)
+    rm(c.star)
+    rm(C.star.star)
+    rm(C.star.star.inv)
     rm(Sigma.star)
     rm(Sigma.star.inv)
     }
@@ -446,32 +441,6 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   ## Simulate random field
   ##
   
-
-    
-    
-  if(k > n.burn){
-    if(k %% 100 == 0){
-      for(s in 1:t){
-        var.save[, s] <- var.save[, s] + apply(var.save.temp[, , s], 2, var) / ((n.mcmc - n.burn) / 100)
-        fort.raster.batch <- matrix(0, ncells, t)
-      }
-      var.save.temp <- array(0, dim = c(100, ncells, t))
-    }
-    Sigma.full <- (sigma.squared.eta * exp( - D / phi) + sigma.squared.beta * diag(ncells))
-    chol.Sigma <- chol(Sigma.full)
-    fort.raster <- fort.raster + (1 / (n.mcmc - n.burn)) * sapply(1:t, make.fort.batch, beta = beta, chol.Sigma = chol.Sigma, ncells = ncells)
-    var.save.temp[k %% 100 + 1, , ] <- fort.raster
-  }
-
-#  temp <- c()
-#  for(j in 1:t){
-#    if(is.null(H.list[[j]]) == FALSE){
-#      temp[j] <- (fort.raster[,j][H.list[[j]]] - y.val[,j][loc.id.val[[j]]])^2 
-#    }
-#  }
-#  MSPE.save <- MSPE.save + mean(na.omit(temp)) / (n.mcmc - n.burn)
-  
-## Predictive Process    
 ##  if(k > n.burn){
 ##    if(k %% 100 == 0){
 ##      for(s in 1:t){
@@ -483,7 +452,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
 ##    fort.raster <- sapply(1:t, make.fort.batch, beta = beta, c = c, C.star = C.star, C.star.inv = C.star.inv, sigma.squared.epsilon = sigma.squared.epsilon)#, w.tilde = w.tilde)
 ##    var.save.temp[k %% 100 + 1, , ] <- fort.raster
 ##  }
-    
+
 #  temp <- c()
 #  for(j in 1:t){
 #    if(is.null(H.list[[j]]) == FALSE){
@@ -491,7 +460,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
 #    }
 #  }
 #  MSPE.save <- MSPE.save + mean(na.omit(temp)) / (n.mcmc - n.burn)
-
+  
   ##
   ## Save variables
   ## 
