@@ -53,11 +53,7 @@ mcmc.1d <- function(Y.list, H.list, locs, n.mcmc, mu.0, Sigma.0, sigma.squared.b
     return(sum(temp))
   }
 
-  make.Sigma <- function(s, Sigma.epsilon, C.star, c){
-    H[[s]] %*% Sigma.beta + Sigma.eta
 
- %*% t(H[[s]]) + Sigma.epsilon[[s]]
-  }
 
   make.Sigma.inv <- function(s, Sigma.epsilon.inv, C.star.inv, c){
     Sigma.epsilon.inv[[s]] - Sigma.epsilon.inv[[s]] %*% H[[s]] %*% t(c) %*% solve(C.star.inv + c %*% t(H[[s]]) %*% Sigma.epsilon.inv[[s]] %*% H[[s]] %*% t(c)) %*% c %*% t(H[[s]]) %*% Sigma.epsilon.inv[[s]]
@@ -104,12 +100,12 @@ mcmc.1d <- function(Y.list, H.list, locs, n.mcmc, mu.0, Sigma.0, sigma.squared.b
 ##  make.fort.batch <- function(s, beta, c, C.star, C.star.inv, sigma.squared.epsilon){#, w.tilde){
 ##  	w.star <- rmvnorm(1, vec.0, C.star)
 ##    w.tilde <- t(c) %*% C.star.inv %*% t(w.star)
-  	if(dim(beta)[1] == 1){
-  		X * beta[s] + w.tilde + rnorm(ncells, 0, sigma.squared.epsilon)
-  	} else {
-  		X %*% beta[, s] + w.tilde + rnorm(ncells, 0, sigma.squared.epsilon)
-  	}
-  }
+##  	if(dim(beta)[1] == 1){
+##  		X * beta[s] + w.tilde + rnorm(ncells, 0, sigma.squared.epsilon)
+##  	} else {
+##  		X %*% beta[, s] + w.tilde + rnorm(ncells, 0, sigma.squared.epsilon)
+##  	}
+##  }
 
   ##
   ## Initialize parameters
