@@ -1,3 +1,7 @@
+##
+## Creates data for use in mcmc.spatial kriging code
+##
+
 rm(list = ls())
 
 ##
@@ -135,7 +139,7 @@ for(i in 1:t){
 ####  Subsample Fields and Create Data Matrix   
 ####
 
-s2.e <- 0.01 # sampling error
+s2.e <- 0.1 # sampling error
 # samp.size <- sample(140:200, t, replace = TRUE) # sample size varies
 samp.size <- sample(40:200, 1, replace = TRUE) # sample size consistent <- needed for mcmc.spatial
 
@@ -154,7 +158,6 @@ X.list <- lapply(1:t, make.X.list, X, H.list)
 ##
 
 plot.field(Y.list = Y.list, H.list = H.list, locs = locs)
-
 #save.image(file = "1dKrige.RData")
 
 ##

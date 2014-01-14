@@ -1,9 +1,10 @@
 ##
-## MCMC pallette algorithm
+## MCMC spatial kriging algorithm
 ##
 ## John Tipton
 ##
-## Created 11.12.2013
+## Created 01.04.2014
+## Last updated 01.14.2014
 ##
 
 ##
@@ -40,14 +41,15 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
 			return(exp(logval))
 	}
 	
-  make.vector <- function(s, beta, Sigma.inv){
-    t(Y.list[[s]] - H[[s]] %*% X %*% beta[, s]) %*% (Sigma.inv[[s]]) %*% (Y.list[[s]] - H[[s]] %*% X %*% beta[, s])
-  }
+#  make.vector <- function(s, beta, Sigma.inv){
+#    t(Y.list[[s]] - H[[s]] %*% X %*% beta[, s]) %*% (Sigma.inv[[s]]) %*% (Y.list[[s]] - H[[s]] %*% X %*% beta[, s])
+#  }
 
   make.sum.sigma.beta <- function(beta, mu.beta){
     temp <- vector(length = t)
     for(s in 1:t){
-    	  temp[s] <- t(beta[, s] - mu.beta) %*% Sigma.beta.inv %*% (beta[, s] - mu.beta)
+    	  #temp[s] <- t(beta[, s] - mu.beta) %*% Sigma.beta.inv %*% (beta[, s] - mu.beta)
+      temp[s] <- t(beta[, s] - mu.beta) %*% (beta[, s] - mu.beta)
     }
     return(sum(temp))
   }
@@ -93,18 +95,26 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   make.R.list <- function(s, sigma.squared.eta, phi, D.list){
     sigma.squared.eta * exp( - D.list[[s]] / phi)
   }
-      
-  make.Sigma.epsilon <- function(s, sigma.squared.epsilon){
+  
+  make.identity.list <- function(s, nt){
     if(length(nt) == 1){
-      sigma.squared.epsilon * diag(nt)
+      diag(nt)
     } else {
-      sigma.squared.epsilon * diag(nt[s])
+      diag(nt[s])
     }
   }
   
-  make.Sigma.epsilon.inv <- function(s, Sigma.epsilon){
-    solve(Sigma.epsilon[[s]])
+  make.Sigma.epsilon <- function(s, sigma.squared.epsilon, I.nt){
+      sigma.squared.epsilon * I.nt[[s]]
   }
+  
+  make.Sigma.epsilon.inv <- function(s, sigma.squared.epsilon, I.nt){
+    1 / sigma.squared.epsilon * I.nt[[s]]
+  }
+  
+#  make.Sigma.beta.det <- function(s, sigma.squared.beta, tau){
+#    (1 / sigma.squared.beta)^tau
+#  }
   
   make.Sigma <- function(s, R.list, Sigma.epsilon){
     R.list[[s]] + Sigma.epsilon[[s]]
@@ -115,8 +125,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   }
   
 	make.mh <- function(s, beta, Sigma, Sigma.inv){
-	  ( - t / 2) * determinant(Sigma[[s]], logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*%
-	    Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
+	  #( - t / 2) * determinant(Sigma[[s]], logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s]) # note, no need to have ( - t / 2) times determinant since this is summed t times
+	  ( - 1 / 2) * determinant(Sigma[[s]], logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
 	}
 
 	make.fort.batch <- function(s, beta, chol.Sigma, ncells){
@@ -161,7 +171,9 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   sigma.squared.beta <- 1 / rgamma(1, alpha.beta, beta.beta)
   Sigma.beta <- sigma.squared.beta * diag(tau)
   Sigma.beta.inv <- solve(Sigma.beta)
-  det.Sigma.beta <- determinant(Sigma.beta.inv, logarithm = FALSE)$modulus[1]
+  #det.Sigma.beta <- determinant(Sigma.beta.inv, logarithm = FALSE)$modulus[1]
+  #det.Sigma.beta <- sapply(1:t, make.Sigma.epsilon.det, sigma.squared.epsilon = sigma.squared.epsilon, nt = nt)
+	#det.Sigma.beta <- sapply(1, make.Sigma.beta.det, sigma.squared.beta = sigma.squared.beta, tau = tau)
   
   sigma.squared.eta <- 1 / rgamma(1, alpha.eta, beta.eta)
   phi <- 1 / rgamma(1, alpha.phi, beta.phi)
@@ -170,10 +182,11 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   R.list <- lapply(1:t, make.R.list, sigma.squared.eta = sigma.squared.eta, phi = phi, D.list = D.list)
     
   sigma.squared.epsilon <- 1 / rgamma(1, alpha.epsilon, beta.epsilon)
-  Sigma.epsilon <- vector('list', length = t)
-  Sigma.epsilon.inv <- vector('list', length = t)
-  Sigma.epsilon <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon)
-  Sigma.epsilon.inv <- lapply(1:t, make.Sigma.epsilon.inv, Sigma.epsilon = Sigma.epsilon)
+#  Sigma.epsilon <- vector('list', length = t)
+#  Sigma.epsilon.inv <- vector('list', length = t)
+  I.nt <- lapply(1:t, make.identity.list, nt = nt)
+  Sigma.epsilon <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
+  Sigma.epsilon.inv <- lapply(1:t, make.Sigma.epsilon.inv, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
 
 
   Sigma.0 <- sigma.squared.0 * diag(tau)
@@ -182,7 +195,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   Sigma <- lapply(1:t, make.Sigma, R.list = R.list, Sigma.epsilon = Sigma.epsilon)
   Sigma.inv <- lapply(1:t, make.Sigma.inv, Sigma = Sigma)
   
-	devs <- rnorm(t)
+  devs <- rnorm(t)
 	Sigma.chol <- chol(Sigma.0)
 	mu.beta <- backsolve(Sigma.chol, backsolve(Sigma.0, mu.0, transpose = TRUE) + devs)
 
@@ -206,7 +219,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
 ##  Sigma.inv <- vector('list', length = t)
 ##  Sigma <- lapply(1:t, make.Sigma, Sigma.epsilon = Sigma.epsilon, C.star = C.star, c = c) 
 ##  Sigma.inv <- lapply(1:t, make.Sigma.inv, Sigma.epsilon.inv = Sigma.epsilon.inv, C.star.inv = C.star.inv, c = c)
-  tHX.list <- vector('list', length = t)
+  tHX.list <- vector('list', length = t) # speeds up computation by not calculating each MCMC step
   HX.list <- vector('list', length = t)
   for(s in 1:t){
   	HX.list[[s]] <-   X[H.list[[s]], ]
@@ -271,10 +284,11 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   	## Sample sigma.squared.beta
   	##
   	
-  	sigma.squared.beta <- 1 / rgamma(1, alpha.beta + t * det.Sigma.beta / 2, 1 / 2 * make.sum.sigma.beta(beta, mu.beta) + beta.beta)  
+    sigma.squared.beta <- 1 / rgamma(1, alpha.beta + t * tau / 2, 1 / 2 * make.sum.sigma.beta(beta, mu.beta) + beta.beta)  
   	Sigma.beta <- sigma.squared.beta * diag(tau)
   	Sigma.beta.inv <- solve(Sigma.beta)
-  	
+  	#det.Sigma.beta <- sapply(1, make.Sigma.beta.det, sigma.squared.beta = sigma.squared.beta, tau = tau)
+    
   	##
     ## Sample sigma.squared.eta
     ##
@@ -297,7 +311,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
     rm(Sigma.star)
     rm(Sigma.star.inv)
     }
-  	rm(sigma.squared.eta.star)  
+  rm(sigma.squared.eta.star)  
 
   	    
 ## Predictive Process
@@ -336,8 +350,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   	
   	    sigma.squared.epsilon.star <- rnorm(1, sigma.squared.epsilon, sigma.squared.epsilon.tune)
   	  	if(sigma.squared.epsilon.star > 0){
-  	    	Sigma.epsilon.star <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon.star)
-  	    	Sigma.epsilon.star.inv <- lapply(1:t, make.Sigma.epsilon.inv, Sigma.epsilon = Sigma.epsilon.star)
+  	    	Sigma.epsilon.star <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon.star, I.nt = I.nt)
+  	    	Sigma.epsilon.star.inv <- lapply(1:t, make.Sigma.epsilon.inv, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
   	    	Sigma.star <- lapply(1:t, make.Sigma, R.list = R.list, Sigma.epsilon = Sigma.epsilon.star)
   	    	Sigma.star.inv <- lapply(1:t, make.Sigma.inv, Sigma = Sigma.star)
           mh.epsilon.1 <-	sum(sapply(1:t, make.mh, beta = beta, Sigma = Sigma.star, Sigma.inv = Sigma.star.inv)) + dinvgamma(sigma.squared.epsilon.star, alpha.epsilon, beta.epsilon, log = TRUE)

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  10 JAN 2014 15:30
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  14 JAN 2014 14:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -215,11 +215,11 @@ e
 Here is how much of TeX's memory you used:
  2541 strings out of 493315
  33880 string characters out of 6137904
- 112491 words of memory out of 5000000
+ 109491 words of memory out of 5000000
  5957 multiletter control sequences out of 15000+600000
  13934 words of font info for 49 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 38i,13n,24p,422b,189s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 38i,12n,24p,410b,189s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2013/texmf-dist/fonts/type
 1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1
 /public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/
@@ -240,7 +240,7 @@ nts/cm/cmr5.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts
 sy10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cms
 y5.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7
 .pfb>
-Output written on "Spatial Kriging.pdf" (3 pages, 179434 bytes).
+Output written on "Spatial Kriging.pdf" (3 pages, 176199 bytes).
 PDF statistics:
  90 PDF objects out of 1000 (max. 8388607)
  65 compressed objects within 1 object stream
