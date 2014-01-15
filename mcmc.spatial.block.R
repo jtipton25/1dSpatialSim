@@ -6,7 +6,9 @@
 ## Created 01.04.2014
 ## Last updated 01.14.2014
 ##
+
 ##
+
 ## Model: y_t = H_t %*% X %*% B_t + espilon_t
 ##
 ##        B_t ~ N(mu_B, Sigma_B) 
@@ -22,7 +24,7 @@
 ## mu_0 and Sigma_0 are hyperparameters
 ##
 
-mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.squared.beta, sigma.squared.eta, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune){
+mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.squared.beta, sigma.squared.eta, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta,  s.star, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune){
 
 ## params = c(mu.0, Sigma.0, alpha.beta, beta.beta, alpha.eta, beta.eta, alpha.epsilon, beta.epsilon, alpha.phi, beta.phi, n.mcmc = 5000)
   
@@ -81,6 +83,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   }
   
 	make.mh <- function(s, beta, Sigma, Sigma.inv){
+	  #( - t / 2) * determinant(Sigma[[s]], logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s]) # note, no need to have ( - t / 2) times determinant since this is summed t times
 	  ( - 1 / 2) * determinant(Sigma[[s]], logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
 	}
 
@@ -91,6 +94,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
 	    backsolve(chol.Sigma, backsolve(chol.Sigma, X %*% beta[, s], transpose = TRUE) + rnorm(ncells)) 
 	  }
 	}
+
 
   ##
   ## Initialize parameters
@@ -272,17 +276,17 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   		mh.phi.2 <- sum(sapply(1:t, make.mh, beta = beta, Sigma = Sigma, Sigma.inv = Sigma.inv)) + dinvgamma(phi, alpha.phi, beta.phi, log = TRUE)
   		mh.phi <- exp(mh.phi.1 - mh.phi.2)
   		  		
-  	if(mh.phi > runif(1)){
-      phi <- phi.star
-      R.list <- R.list.star
-      Sigma <- Sigma.star
-      Sigma.inv <- Sigma.star.inv
-      phi.accept <- phi.accept + 1 / n.mcmc
-  	}
-    rm(R.list.star)
-    rm(Sigma.star)
-    rm(Sigma.star.inv)
-  }
+  		if(mh.phi > runif(1)){
+        phi <- phi.star
+        R.list <- R.list.star
+        Sigma <- Sigma.star
+        Sigma.inv <- Sigma.star.inv
+        phi.accept <- phi.accept + 1 / n.mcmc
+  		}
+      rm(R.list.star)
+      rm(Sigma.star)
+      rm(Sigma.star.inv)
+    }
   rm(phi.star)
     
   	
