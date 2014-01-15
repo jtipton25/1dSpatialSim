@@ -83,6 +83,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   }
   
 	make.mh <- function(s, beta, Sigma, Sigma.inv){
+	  #( - t / 2) * determinant(Sigma[[s]], logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s]) # note, no need to have ( - t / 2) times determinant since this is summed t times
 	  ( - 1 / 2) * determinant(Sigma[[s]], logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
 	}
 
@@ -275,17 +276,17 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   		mh.phi.2 <- sum(sapply(1:t, make.mh, beta = beta, Sigma = Sigma, Sigma.inv = Sigma.inv)) + dinvgamma(phi, alpha.phi, beta.phi, log = TRUE)
   		mh.phi <- exp(mh.phi.1 - mh.phi.2)
   		  		
-  	if(mh.phi > runif(1)){
-      phi <- phi.star
-      R.list <- R.list.star
-      Sigma <- Sigma.star
-      Sigma.inv <- Sigma.star.inv
-      phi.accept <- phi.accept + 1 / n.mcmc
-  	}
-    rm(R.list.star)
-    rm(Sigma.star)
-    rm(Sigma.star.inv)
-  }
+  		if(mh.phi > runif(1)){
+        phi <- phi.star
+        R.list <- R.list.star
+        Sigma <- Sigma.star
+        Sigma.inv <- Sigma.star.inv
+        phi.accept <- phi.accept + 1 / n.mcmc
+  		}
+      rm(R.list.star)
+      rm(Sigma.star)
+      rm(Sigma.star.inv)
+    }
   rm(phi.star)
     
   	

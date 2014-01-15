@@ -12,21 +12,19 @@ dinvgamma = function(x, shape = 1, rate = 1, scale = 1/rate, log = FALSE) {
     return(exp(logval))
 }
 
-##
-## Simulate Data
-##
-
-source('make.spatial.field.R')
-
-m <- 1000 # number of spatial locations
-locs <- seq(0, 1, , m) # spatial coordinate
-X <- cbind(rep(1, m), locs)
-reps <- 100 # number of spatial fields
-beta <- c(0, 2) # beta
-s2.s <- 1
-phi <- 15
-
-
+plot.field <- function(Y.list, H.list, locs, main = "Observed Data", ylab = "Y", xlab = "X"){
+  t <- length(Y.list)
+  min.Y <- min(unlist(lapply(Y.list, min)))
+  max.Y <- max(unlist(lapply(Y.list, max)))
+  idx <- order(locs[H.list[[1]]])
+  plot(Y.list[[1]][idx] ~ locs[H.list[[1]]][idx], type = 'l', ylim = c(min.Y, max.Y), main = main, ylab = ylab, xlab = xlab)
+  if(t > 1){
+    for(i in 2:t){
+      idx <- order(locs[H.list[[i]]])
+      lines(Y.list[[i]][idx] ~ locs[H.list[[i]]][idx], type = 'l', col = i)
+    }
+  }
+}
 
 ##
 ## Initialize priors and tuning paramteters
@@ -49,12 +47,12 @@ beta.phi <- 10
 curve(dinvgamma(x, alpha.phi, beta.phi))
 n.mcmc <- 5000
 
-sigma.squared.beta.tune <- 0.025
-sigma.squared.eta.tune <- 0.125
-sigma.squared.epsilon.tune <- 0.025
+#sigma.squared.beta.tune <- 0.25
+sigma.squared.eta.tune <- 0.75
+sigma.squared.epsilon.tune <- 0.25
 phi.tune <- 0.75
 
-source('mcmc.spatial.R')
+source('mcmc.spatial.univariate.R')
 
 ##
 ## Fit spatial MCMC kriging model
@@ -63,7 +61,7 @@ source('mcmc.spatial.R')
 start <- Sys.time()
 out <- mcmc.1d(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.squared.beta, sigma.squared.eta, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta,  s.star, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
 finish <- Sys.time() - start
-finish #100 iterations takes 8 minutes
+finish #1000 iterations takes 3.75 minutes
 
 ##
 ## Plot output
@@ -80,11 +78,10 @@ matplot(t(out$mu.beta.save), type = 'l')
 plot(out$phi.save, type = 'l', main = paste("accept rate", round(out$phi.accept, 2)))
 abline(h = phi)
 matplot(out$fort.raster, type = 'l')
-plot.field(Z.list, H.list = rep(list(1:length(Z.list[[1]])), reps), locs = locs)
+plot.field(Z.list, H.list = list(rep(1:length(Z.list[[1]]))), locs = locs)
 hist(out$mu.beta.save[1, ])
 abline(v = mean(out$mu.beta.save[1, ]), col = 'red')
 abline(v = quantile(out$mu.beta.save[1, ], probs = c(0.025, 0.975)), col = 'blue')
 hist(out$mu.beta.save[2, ])
 abline(v = mean(out$mu.beta.save[2, ]), col = 'red')
 abline(v = quantile(out$mu.beta.save[2, ], probs = c(0.025, 0.975)), col = 'blue')
-
