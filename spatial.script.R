@@ -20,17 +20,26 @@ dinvgamma = function(x, shape = 1, rate = 1, scale = 1/rate, log = FALSE) {
 
 source('make.spatial.field.R')
 
+<<<<<<< HEAD
 m <- 100 # number of spatial locations
+=======
+m <- 1000 # number of spatial locations
+>>>>>>> 1cdf65f5ac5f5995189ea691d26bbae58da0f0ff
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
 reps <- 100 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
+<<<<<<< HEAD
 phi <- 2
 s2.e <- 0.5
 samp.size <- 40
 
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
+=======
+phi <- 15
+
+>>>>>>> 1cdf65f5ac5f5995189ea691d26bbae58da0f0ff
 
 
 ##
@@ -52,11 +61,19 @@ curve(dinvgamma(x, alpha.epsilon, beta.epsilon))
 alpha.phi <- 10
 beta.phi <- 10
 curve(dinvgamma(x, alpha.phi, beta.phi))
+<<<<<<< HEAD
 n.mcmc <- 50000
 
 sigma.squared.beta.tune <- 0.025
 sigma.squared.eta.tune <- 0.125
 sigma.squared.epsilon.tune <- 0.075
+=======
+n.mcmc <- 5000
+
+sigma.squared.beta.tune <- 0.025
+sigma.squared.eta.tune <- 0.125
+sigma.squared.epsilon.tune <- 0.025
+>>>>>>> 1cdf65f5ac5f5995189ea691d26bbae58da0f0ff
 phi.tune <- 0.75
 
 source('mcmc.spatial.R')
@@ -76,9 +93,12 @@ finish #100 iterations takes 8 minutes
 
 #x11()
 layout(matrix(1:9, nrow = 3))
+<<<<<<< HEAD
 matplot(t(out$mu.beta.save), type = 'l')
 abline(h = beta[1], col = 'black')
 abline(h = beta[2], col = 'red')
+=======
+>>>>>>> 1cdf65f5ac5f5995189ea691d26bbae58da0f0ff
 plot(out$sigma.squared.beta.save, type = 'l')
 plot(out$sigma.squared.epsilon.save, type = 'l', main = paste("accept rate", round(out$epsilon.accept, 2)))
 abline(h = s2.e)
@@ -87,7 +107,11 @@ abline(h = s2.s)
 plot(out$phi.save, type = 'l', main = paste("accept rate", round(out$phi.accept, 2)))
 abline(h = phi)
 matplot(out$fort.raster, type = 'l')
+<<<<<<< HEAD
 plot.field(field$Z.list, H.list = rep(list(1:length(field$Z.list[[1]])), reps), locs = locs)
+=======
+plot.field(Z.list, H.list = rep(list(1:length(Z.list[[1]])), reps), locs = locs)
+>>>>>>> 1cdf65f5ac5f5995189ea691d26bbae58da0f0ff
 hist(out$mu.beta.save[1, ])
 abline(v = mean(out$mu.beta.save[1, ]), col = 'red')
 abline(v = quantile(out$mu.beta.save[1, ], probs = c(0.025, 0.975)), col = 'blue')

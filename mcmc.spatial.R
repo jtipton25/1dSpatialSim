@@ -92,6 +92,10 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
 	  }
 	}
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1cdf65f5ac5f5995189ea691d26bbae58da0f0ff
   ##
   ## Initialize parameters
   ## 
@@ -322,6 +326,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   
 list(beta.save = beta.save, sigma.squared.beta.save = sigma.squared.beta.save, sigma.squared.epsilon.save = sigma.squared.epsilon.save, sigma.squared.eta.save = sigma.squared.eta.save, mu.beta.save = mu.beta.save, n.mcmc = n.mcmc, fort.raster = fort.raster, phi.accept = phi.accept, eta.accept = eta.accept, epsilon.accept = epsilon.accept, phi.save = phi.save, var.save = var.save)#, MSPE.save = MSPE.save)
 }
+<<<<<<< HEAD
 
 ##
 ## Predictive Process
@@ -395,6 +400,81 @@ list(beta.save = beta.save, sigma.squared.beta.save = sigma.squared.beta.save, s
 ##  Sigma.inv <- lapply(1:t, make.Sigma.inv, Sigma.epsilon.inv = Sigma.epsilon.inv, C.star.inv = C.star.inv, c = c)
 
 ## Predictive Process
+=======
+
+##
+## Predictive Process
+##
+
+##  make.mh <- function(s, beta, Sigma.epsilon, Sigma.epsilon.inv, Sigma.inv, C.star, C.star.inv, c){
+##    ( - t / 2) * (determinant(C.star.inv + c %*% t(H[[s]]) %*% Sigma.epsilon.inv[[s]] %*% H[[s]] %*% t(c), logarithm = TRUE)$modulus[1] + 
+##      determinant(C.star, logarithm = TRUE)$modulus[1] + determinant(Sigma.epsilon[[s]], logarithm = TRUE)$modulus[1]) - 
+ ##     1 / 2 * t(Y.list[[s]] - H[[s]] %*% X %*% beta[, s]) %*% (Sigma.inv[[s]]) %*% (Y.list[[s]] - H[[s]] %*% X %*% beta[, s])
+##  }
+
+##  make.c <- function(sigma.squared.eta, phi){
+##    sigma.squared.eta * exp( - D.0 / phi)
+##  }
+  
+##  make.C.star <- function(sigma.squared.eta, phi){
+##    sigma.squared.eta * exp( - D.star / phi)
+##  }
+  
+##  make.C.star.inv <- function(C.star){
+##    solve(C.star)
+##  }
+
+##  make.Sigma <- function(s, Sigma.epsilon, C.star, c){
+##  	H[[s]] %*% t(c) %*% C.star %*% c %*% t(H[[s]]) + Sigma.epsilon[[s]]
+##  }
+  
+##  make.Sigma.inv <- function(s, Sigma.epsilon.inv, C.star.inv, c){
+##    Sigma.epsilon.inv[[s]] - Sigma.epsilon.inv[[s]] %*% H[[s]] %*% t(c) %*% solve(C.star.inv + c %*% t(H[[s]]) %*% Sigma.epsilon.inv[[s]] %*% H[[s]] %*% t(c)) %*% c %*% t(H[[s]]) %*% Sigma.epsilon.inv[[s]]
+##  }
+
+##  make.Sigma.inv <- function(s, Sigma.epsilon.inv, C.star.inv, c){
+## 	Sigma.epsilon.inv[[s]] - Sigma.epsilon.inv[[s]] %*% H[[s]] %*% t(c) %*% solve(C.star.inv + c %*% t(H[[s]]) %*% Sigma.epsilon.inv[[s]] %*% H[[s]] %*% t(c)) %*% c %*% t(H[[s]]) %*% Sigma.epsilon.inv[[s]]
+## }
+
+#  make.vector <- function(s, beta, Sigma.inv){
+#    t(Y.list[[s]] - H[[s]] %*% X %*% beta[, s]) %*% (Sigma.inv[[s]]) %*% (Y.list[[s]] - H[[s]] %*% X %*% beta[, s])
+#  }
+
+#  make.Sigma.beta.det <- function(s, sigma.squared.beta, tau){
+#    (1 / sigma.squared.beta)^tau
+#  }
+
+## Predictive Process
+##  make.fort.batch <- function(s, beta, c, C.star, C.star.inv, sigma.squared.epsilon){#, w.tilde){
+##    w.star <- rmvnorm(1, vec.0, C.star)
+##    w.tilde <- t(c) %*% C.star.inv %*% t(w.star)
+##  	if(dim(beta)[1] == 1){
+##  		X * beta[s] + w.tilde + rnorm(ncells, 0, sigma.squared.epsilon)
+##  	} else {
+##  		X %*% beta[, s] + w.tilde + rnorm(ncells, 0, sigma.squared.epsilon)
+##  	}
+##  }
+
+##  Distance Matrices for Predictive Process
+##  D.star <- as.matrix(dist(s.star))
+##  D.0 <- matrix(nrow = n.knots, ncol = ncells)
+##    for(i in 1:n.knots){
+##    for(j in 1:ncells){
+##      D.0[i, j] <- sqrt((s.star[i] - locs[j])^2)
+##  }
+##  }
+##  vec.0 <- rep(0, n.knots)
+##  C.star <- make.C.star(sigma.squared.eta = sigma.squared.eta, phi = phi)
+##  w.star <- rmvnorm(1, vec.0, C.star)
+##  C.star.inv <- make.C.star.inv(C.star)
+##  c <- 	make.c(sigma.squared.eta, phi)
+##  Sigma <- vector('list', length = t)
+##  Sigma.inv <- vector('list', length = t)
+##  Sigma <- lapply(1:t, make.Sigma, Sigma.epsilon = Sigma.epsilon, C.star = C.star, c = c) 
+##  Sigma.inv <- lapply(1:t, make.Sigma.inv, Sigma.epsilon.inv = Sigma.epsilon.inv, C.star.inv = C.star.inv, c = c)
+
+## Predictive Process
+>>>>>>> 1cdf65f5ac5f5995189ea691d26bbae58da0f0ff
 ##    sigma.squared.eta.star <- rnorm(1, sigma.squared.eta, sigma.squared.eta.tune)
 ##  	if(sigma.squared.eta.star > 0){
 ##      c.star <- make.c(sigma.squared.eta = sigma.squared.eta.star, phi = phi)
