@@ -5,14 +5,8 @@ set.seed(203)
 ## Libraries and Subroutines
 ##
 
-dinvgamma = function(x, shape = 1, rate = 1, scale = 1/rate, log = FALSE) {
-  # return( rate^shape / gamma(shape) * exp( - rate / x) * x^( - shape - 1))
-  logval = shape * log(rate) - lgamma(shape) - rate / x - (shape + 1) * log(x)
-  if (log)
-    return(logval)
-  else
-    return(exp(logval))
-}
+source('dinvgamma.R')
+library(mvtnorm)
 
 ##
 ## Simulate Data
@@ -29,8 +23,8 @@ s2.e <- 0.5
 samp.size <- 40
 
 source('make.spatial.field.R')
-field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
 
+field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
 
 ##
 ## Initialize priors and tuning paramteters
@@ -39,19 +33,25 @@ field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponen
 mu.0 <- c(0, 2)#rep(0, dim(X)[2])
 sigma.squared.0 <- 0.025
 #Sigma.0 <-
-alpha.beta <- 10
-beta.beta <- 10
+alpha.beta <- 2
+beta.beta <- 0.2
 curve(dinvgamma(x, alpha.beta, beta.beta))
-alpha.eta <- 10
-beta.eta <- 10
-curve(dinvgamma(x, alpha.eta, beta.eta))
-alpha.epsilon <- 40
-beta.epsilon <- 20
-curve(dinvgamma(x, alpha.epsilon, beta.epsilon))
+##
+alpha.eta <- 12
+beta.eta <- 12
+curve(dinvgamma(x, alpha.eta, beta.eta), from = 0, to = 6)
+abline(v = s2.s, col = 'red')
+##
+alpha.epsilon <- 3
+beta.epsilon <- 2
+curve(dinvgamma(x, alpha.epsilon, beta.epsilon), from = 0, to = 6)
+abline(v = s2.e, col = 'red')
+##
 alpha.phi <- 10
-beta.phi <- 10
-curve(dinvgamma(x, alpha.phi, beta.phi))
-
+beta.phi <- 20
+curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
+abline(v = phi, col = 'red')
+##
 sigma.squared.beta.tune <- 0.025
 sigma.squared.eta.tune <- 0.125
 sigma.squared.epsilon.tune <- 0.075
@@ -96,3 +96,4 @@ hist(out$mu.beta.save[2, ])
 abline(v = mean(out$mu.beta.save[2, ]), col = 'red')
 abline(v = quantile(out$mu.beta.save[2, ], probs = c(0.025, 0.975)), col = 'blue')
 
+apply(out$mu.beta.save, 1, mean)
