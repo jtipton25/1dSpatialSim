@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+
+=======
+rm(list = ls())
+set.seed(201)
+>>>>>>> 1cdf65f5ac5f5995189ea691d26bbae58da0f0ff
+
 ##
 ## Libraries and Subroutines
 ##
@@ -33,10 +40,19 @@ plot.field <- function(Y.list, H.list, locs, main = "Observed Data", ylab = "Y",
 ####  Simulate 1-D spatial random fields with trend
 ####
 
+<<<<<<< HEAD
 make.spatial.field <- function(reps, X, beta, locs, param = c(s2.s, phi), method = 'exponential', s2.e, samp.size){
   mu <- X %*% beta # mean function
-  ## Exponential Spatial Decay Function s2.s * exp( - D / phi)
+
+  ## Exponentail Spatial Decay Function s2.s * exp( - D / phi)
   if(method == 'exponential'){
+=======
+make.spatial.field <- function(reps, X, beta, locs, param = c(s2.s, phi), method = 'exponential', s2.e, sample.size){}
+  mu <- X %*% beta # mean function
+
+  ## Exponentail Spatial Decay Function s2.s * exp( - D / phi)
+  if(mehod == 'exponential'){
+>>>>>>> 1cdf65f5ac5f5995189ea691d26bbae58da0f0ff
     s2.s <- param[1]
     phi <- param[2]
     D <- as.matrix(dist(locs)) # distance matrix
