@@ -22,7 +22,7 @@
 ## mu_0 and Sigma_0 are hyperparameters
 ##
 
-mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.squared.beta, sigma.squared.eta, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune){
+mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune){
 
 ## params = c(mu.0, Sigma.0, alpha.beta, beta.beta, alpha.eta, beta.eta, alpha.epsilon, beta.epsilon, alpha.phi, beta.phi, n.mcmc = 5000)
   
@@ -92,10 +92,6 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
 	  }
 	}
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 1cdf65f5ac5f5995189ea691d26bbae58da0f0ff
   ##
   ## Initialize parameters
   ## 
@@ -206,7 +202,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   	## Sample sigma.squared.beta
   	##
   	
-    sigma.squared.beta <- 1 / rgamma(1, alpha.beta + 1 / 2 * nt.sum, beta.beta + 1 / 2 * make.sum.sigma.beta(beta, mu.beta))  
+    sigma.squared.beta <- 1 / rgamma(1, alpha.beta +nt.sum / 2, beta.beta + 1 / 2 * make.sum.sigma.beta(beta, mu.beta))  
   	Sigma.beta <- sigma.squared.beta * diag(tau)
   	Sigma.beta.inv <- solve(Sigma.beta)
   	
@@ -326,7 +322,6 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, sigma.square
   
 list(beta.save = beta.save, sigma.squared.beta.save = sigma.squared.beta.save, sigma.squared.epsilon.save = sigma.squared.epsilon.save, sigma.squared.eta.save = sigma.squared.eta.save, mu.beta.save = mu.beta.save, n.mcmc = n.mcmc, fort.raster = fort.raster, phi.accept = phi.accept, eta.accept = eta.accept, epsilon.accept = epsilon.accept, phi.save = phi.save, var.save = var.save)#, MSPE.save = MSPE.save)
 }
-<<<<<<< HEAD
 
 ##
 ## Predictive Process
@@ -400,7 +395,6 @@ list(beta.save = beta.save, sigma.squared.beta.save = sigma.squared.beta.save, s
 ##  Sigma.inv <- lapply(1:t, make.Sigma.inv, Sigma.epsilon.inv = Sigma.epsilon.inv, C.star.inv = C.star.inv, c = c)
 
 ## Predictive Process
-=======
 
 ##
 ## Predictive Process
@@ -474,7 +468,6 @@ list(beta.save = beta.save, sigma.squared.beta.save = sigma.squared.beta.save, s
 ##  Sigma.inv <- lapply(1:t, make.Sigma.inv, Sigma.epsilon.inv = Sigma.epsilon.inv, C.star.inv = C.star.inv, c = c)
 
 ## Predictive Process
->>>>>>> 1cdf65f5ac5f5995189ea691d26bbae58da0f0ff
 ##    sigma.squared.eta.star <- rnorm(1, sigma.squared.eta, sigma.squared.eta.tune)
 ##  	if(sigma.squared.eta.star > 0){
 ##      c.star <- make.c(sigma.squared.eta = sigma.squared.eta.star, phi = phi)
