@@ -1,0 +1,16 @@
+{
+    "contents" : "<<<<<<< HEAD\n\n=======\nrm(list = ls())\nset.seed(201)\n>>>>>>> 1cdf65f5ac5f5995189ea691d26bbae58da0f0ff\n\n##\n## Libraries and Subroutines\n##\n\n## make true spatial field\nmake.Z.list <- function(reps, mu, Sig.s, m){\n  mu + t(chol(Sig.s)) %*% rnorm(m)\n}\n\n## make sampling matrix H\nmake.H.list <- function(reps, samp, m){\n  (1:m)[samp[[reps]]]\n}\n\n## make sample data Y\nmake.Y.list <- function(reps, Z.list, H.list, s2.e = 1){\n  Z.list[[reps]][H.list[[reps]]] + rnorm(length(H.list[[reps]]), s2.e)\n}\n\nplot.field <- function(Y.list, H.list, locs, main = \"Observed Data\", ylab = \"Y\", xlab = \"X\"){\n  reps <- length(Y.list)\n  min.Y <- min(unlist(lapply(Y.list, min)))\n  max.Y <- max(unlist(lapply(Y.list, max)))\n  idx <- order(locs[H.list[[1]]])\n  plot(Y.list[[1]][idx] ~ locs[H.list[[1]]][idx], type = 'l', ylim = c(min.Y, max.Y), main = main, ylab = ylab, xlab = xlab)\n  for(t in 2:reps){\n    idx <- order(locs[H.list[[t]]])\n    lines(Y.list[[t]][idx] ~ locs[H.list[[t]]][idx], type = 'l', col = t)\n  }\n}\n\n####\n####  Simulate 1-D spatial random fields with trend\n####\n\n<<<<<<< HEAD\nmake.spatial.field <- function(reps, X, beta, locs, param = c(s2.s, phi), method = 'exponential', s2.e, samp.size){\n  mu <- X %*% beta # mean function\n\n  ## Exponentail Spatial Decay Function s2.s * exp( - D / phi)\n  if(method == 'exponential'){\n=======\nmake.spatial.field <- function(reps, X, beta, locs, param = c(s2.s, phi), method = 'exponential', s2.e, sample.size){}\n  mu <- X %*% beta # mean function\n\n  ## Exponentail Spatial Decay Function s2.s * exp( - D / phi)\n  if(mehod == 'exponential'){\n>>>>>>> 1cdf65f5ac5f5995189ea691d26bbae58da0f0ff\n    s2.s <- param[1]\n    phi <- param[2]\n    D <- as.matrix(dist(locs)) # distance matrix\n    Sig.s <- s2.s * exp( - D / phi) # spatial covariance matrix\n    Sig.s.inv <- solve(Sig.s) \n  }\n\n  ## Simulate Random Field with nugget\n  Z.list <- lapply(1:reps, make.Z.list, mu = mu, Sig.s = Sig.s, m = m)\n           \n  ##  Subsample Fields    \n  samp <- rep(list(sample(1:m, samp.size)), reps)\n  H.list <- lapply(1:reps, make.H.list, samp = samp, m = m)\n  Y.list <- lapply(1:reps, make.Y.list, Z.list = Z.list, H.list = H.list, s2.e = s2.e)\n  ## write output\n  list(Z.list = Z.list, Y.list = Y.list, H.list = H.list)\n}\n",
+    "created" : 1389800684042.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1459007620",
+    "id" : "A9BB344B",
+    "lastKnownWriteTime" : 1389885848,
+    "path" : "~/1dSpatialSim/make.spatial.field.R",
+    "project_path" : "make.spatial.field.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
