@@ -30,12 +30,24 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   ## Libraries and Subroutines
   ##
 
-  source('dinvgamma.R')
+	dinvgamma = function(x, shape = 1, rate = 1, scale = 1/rate, log = FALSE) {
+		# return( rate^shape / gamma(shape) * exp( - rate / x) * x^( - shape - 1))
+		logval = shape * log(rate) - lgamma(shape) - rate / x - (shape + 1) * log(x)
+		if (log)
+			return(logval)
+		else
+			return(exp(logval))
+	}
 	
-  make.sum.sigma.beta <- function(s, beta, mu.beta){
-    t(beta[, s] - mu.beta) %*% (beta[, s] - mu.beta)
+  make.sum.sigma.beta <- function(beta, mu.beta){
+    temp <- vector(length = t)
+    for(s in 1:t){
+    	  #temp[s] <- t(beta[, s] - mu.beta) %*% Sigma.beta.inv %*% (beta[, s] - mu.beta)
+      temp[s] <- t(beta[, s] - mu.beta) %*% (beta[, s] - mu.beta)
+    }
+    return(sum(temp))
   }
-    
+
   make.D.list <- function(s, H.list, locs){
     as.matrix(dist(locs[H.list[[s]]]))
   }
@@ -72,13 +84,13 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
 	  ( - 1 / 2) * determinant(Sigma[[s]], logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
 	}
 
-#	make.fort.batch <- function(s, beta, chol.Sigma, ncells){
-#	  if(dim(beta)[1] == 1){  
-#	    backsolve(chol.Sigma, backsolve(chol.Sigma, X * beta[s], transpose = TRUE) + rnorm(ncells))
-#	  } else {
-#	    backsolve(chol.Sigma, backsolve(chol.Sigma, X %*% beta[, s], transpose = TRUE) + rnorm(ncells)) 
-#	  }
-#	}
+	make.fort.batch <- function(s, beta, chol.Sigma, ncells){
+	  if(dim(beta)[1] == 1){  
+	    backsolve(chol.Sigma, backsolve(chol.Sigma, X * beta[s], transpose = TRUE) + rnorm(ncells))
+	  } else {
+	    backsolve(chol.Sigma, backsolve(chol.Sigma, X %*% beta[, s], transpose = TRUE) + rnorm(ncells)) 
+	  }
+	}
 
   ##
   ## Initialize parameters
@@ -92,6 +104,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   	nt[s] <- length(Y.list[[s]])
   }
   nt.sum <- sum(nt)
+##  n.knots <- length(s.star) # predictive process
 
   ## Initialze process
   beta <- matrix(0, nrow = tau, ncol = t)
@@ -143,6 +156,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
 	phi.save <- vector(length = n.mcmc) 
   mu.beta.save <- matrix(NA, nrow = tau, ncol = n.mcmc)
   fort.raster <- matrix(0, nrow = ncells, ncol = t)
+  MSPE.save <- 0
   var.save <- matrix(0, nrow = ncells, ncol = t)
   var.save.temp <- array(dim = c(100, ncells, t))
   phi.accept <- 0  
@@ -188,7 +202,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   	## Sample sigma.squared.beta
   	##
   	
-    sigma.squared.beta <- 1 / rgamma(1, alpha.beta + nt.sum / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta, mu.beta)))
+    sigma.squared.beta <- 1 / rgamma(1, alpha.beta +nt.sum / 2, beta.beta + 1 / 2 * make.sum.sigma.beta(beta, mu.beta))  
   	Sigma.beta <- sigma.squared.beta * diag(tau)
   	Sigma.beta.inv <- solve(Sigma.beta)
   	
@@ -269,7 +283,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     rm(Sigma.star)
     rm(Sigma.star.inv)
   }
-  rm(phi.star) 
+  rm(phi.star)
+    
   	
   ##
   ## Simulate random field
@@ -284,9 +299,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
       var.save.temp <- array(0, dim = c(100, ncells, t))
     }
     Sigma.full <- (sigma.squared.eta * exp( - D / phi) + sigma.squared.beta * diag(ncells))
-    #chol.Sigma <- chol(Sigma.full)
-    #fort.raster <- fort.raster + (1 / (n.mcmc - n.burn)) * sapply(1:t, make.fort.batch, beta = beta, chol.Sigma = chol.Sigma, ncells = ncells)
-    rmvnorm(t(X) %*% beta, Sigma.full)
+    chol.Sigma <- chol(Sigma.full)
+    fort.raster <- fort.raster + (1 / (n.mcmc - n.burn)) * sapply(1:t, make.fort.batch, beta = beta, chol.Sigma = chol.Sigma, ncells = ncells)
     var.save.temp[k %% 100 + 1, , ] <- fort.raster
   }
 
@@ -435,7 +449,6 @@ list(beta.save = beta.save, sigma.squared.beta.save = sigma.squared.beta.save, s
 ##  	}
 ##  }
 
-##  n.knots <- length(s.star) # predictive process
 ##  Distance Matrices for Predictive Process
 ##  D.star <- as.matrix(dist(s.star))
 ##  D.0 <- matrix(nrow = n.knots, ncol = ncells)

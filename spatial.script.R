@@ -1,5 +1,5 @@
 rm(list = ls())
-set.seed(203)
+#set.seed(203)
 
 ##
 ## Libraries and Subroutines
@@ -57,7 +57,7 @@ sigma.squared.eta.tune <- 0.125
 sigma.squared.epsilon.tune <- 0.075
 phi.tune <- 0.25
 
-n.mcmc <- 1000
+n.mcmc <- 5000
 
 source('mcmc.spatial.R')
 
@@ -75,25 +75,26 @@ finish #100 iterations takes 8 minutes
 ##
 
 #x11()
+n.burn <- floor(n.mcmc / 10)
 layout(matrix(1:9, nrow = 3))
-matplot(t(out$mu.beta.save), type = 'l')
+matplot(t(out$mu.beta.save[, n.burn:n.mcmc]), type = 'l')
 abline(h = beta[1], col = 'black')
 abline(h = beta[2], col = 'red')
-plot(out$sigma.squared.beta.save, type = 'l')
-plot(out$sigma.squared.epsilon.save, type = 'l', main = paste("accept rate", round(out$epsilon.accept, 2)))
+plot(out$sigma.squared.beta.save[n.burn:n.mcmc], type = 'l')
+plot(out$sigma.squared.epsilon.save[n.burn:n.mcmc], type = 'l', main = paste("accept rate", round(out$epsilon.accept, 2)))
 abline(h = s2.e)
-plot(out$sigma.squared.eta.save, type = 'l', main = paste("accept rate", round(out$eta.accept, 2)))
+plot(out$sigma.squared.eta.save[n.burn:n.mcmc], type = 'l', main = paste("accept rate", round(out$eta.accept, 2)))
 abline(h = s2.s)
-plot(out$phi.save, type = 'l', main = paste("accept rate", round(out$phi.accept, 2)))
+plot(out$phi.save[n.burn:n.mcmc], type = 'l', main = paste("accept rate", round(out$phi.accept, 2)))
 abline(h = phi)
 matplot(out$fort.raster, type = 'l')
 plot.field(field$Z.list, H.list = rep(list(1:length(field$Z.list[[1]])), reps), locs = locs)
 #plot.field(Z.list, H.list = rep(list(1:length(Z.list[[1]])), reps), locs = locs)
-hist(out$mu.beta.save[1, ])
-abline(v = mean(out$mu.beta.save[1, ]), col = 'red')
+hist(out$mu.beta.save[1, n.burn:n.mcmc])
+abline(v = beta[1], col = 'red')
 abline(v = quantile(out$mu.beta.save[1, ], probs = c(0.025, 0.975)), col = 'blue')
-hist(out$mu.beta.save[2, ])
-abline(v = mean(out$mu.beta.save[2, ]), col = 'red')
+hist(out$mu.beta.save[2, n.burn:n.mcmc])
+abline(v = beta[2], col = 'red')
 abline(v = quantile(out$mu.beta.save[2, ], probs = c(0.025, 0.975)), col = 'blue')
 
 apply(out$mu.beta.save, 1, mean)
