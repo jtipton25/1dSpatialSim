@@ -85,8 +85,6 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     temp[H.list[[s]]] <- Y.list[[s]]
     return(temp)
   }
-#Z.pred.2[ - H.list[[t1]], t1] = mu[ - H.list[[t1]] ] + Sig.s[ - H.list[[t1] ], H.list[[t1]] ] %*% Sig.s.inv[H.list[[t1]], H.list[[t1]] ] %*% (Y.list[[t1]] - mu[H.list[[t1]] ])
-#Z.pred.2[H.list[[t1]], t1] = Y.list[[t1]]
 
   ##
   ## Initialize parameters
