@@ -56,9 +56,9 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     sigma.squared.epsilon * I.nt[[s]]
   }
   
-  make.Sigma.epsilon.inv <- function(s, sigma.squared.epsilon, I.nt){
-    1 / sigma.squared.epsilon * I.nt[[s]]
-  }
+  #make.Sigma.epsilon.inv <- function(s, sigma.squared.epsilon, I.nt){
+  #  1 / sigma.squared.epsilon * I.nt[[s]]
+  #}
     
   make.Sigma <- function(s, R.list, Sigma.epsilon){
     R.list[[s]] + Sigma.epsilon[[s]]
@@ -79,6 +79,14 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
 #	    backsolve(chol.Sigma, backsolve(chol.Sigma, X %*% beta[, s], transpose = TRUE) + rnorm(ncells)) 
 #	  }
 #	}
+  make.fort.batch <- function(s, beta, H.list, Y.list, Sigma.full, ncells){
+    temp <- vector(length = ncells)
+    temp[ - H.list[[s]]] <- X[ - H.list[[s]], ] %*% beta[, s] + Sigma.full[ - H.list[[s]], H.list[[s]]] %*% solve(Sigma.full[H.list[[s]], H.list[[s]]]) %*% (Y.list[[s]] - X[H.list[[s]], ] %*% beta[, s])
+    temp[H.list[[s]]] <- Y.list[[s]]
+    return(temp)
+  }
+#Z.pred.2[ - H.list[[t1]], t1] = mu[ - H.list[[t1]] ] + Sig.s[ - H.list[[t1] ], H.list[[t1]] ] %*% Sig.s.inv[H.list[[t1]], H.list[[t1]] ] %*% (Y.list[[t1]] - mu[H.list[[t1]] ])
+#Z.pred.2[H.list[[t1]], t1] = Y.list[[t1]]
 
   ##
   ## Initialize parameters
@@ -110,7 +118,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   sigma.squared.epsilon <- 1 / rgamma(1, alpha.epsilon, beta.epsilon)
   I.nt <- lapply(1:t, make.identity.list, nt = nt)
   Sigma.epsilon <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
-  Sigma.epsilon.inv <- lapply(1:t, make.Sigma.epsilon.inv, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
+  #Sigma.epsilon.inv <- lapply(1:t, make.Sigma.epsilon.inv, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
 
   Sigma.0 <- sigma.squared.0 * diag(tau)
   Sigma.0.inv <- solve(Sigma.0)
@@ -155,7 +163,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
 
 	for(k in 1:n.mcmc){
     if(k %% 100 == 0) cat(" ", k) 
-
+    
   	##
   	## Sample Beta
   	##
@@ -223,7 +231,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     sigma.squared.epsilon.star <- rnorm(1, sigma.squared.epsilon, sigma.squared.epsilon.tune)
     if(sigma.squared.epsilon.star > 0){
       Sigma.epsilon.star <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon.star, I.nt = I.nt)
-      Sigma.epsilon.star.inv <- lapply(1:t, make.Sigma.epsilon.inv, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
+      #Sigma.epsilon.star.inv <- lapply(1:t, make.Sigma.epsilon.inv, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
       Sigma.star <- lapply(1:t, make.Sigma, R.list = R.list, Sigma.epsilon = Sigma.epsilon.star)
       Sigma.star.inv <- lapply(1:t, make.Sigma.inv, Sigma = Sigma.star)
       mh.epsilon.1 <-	sum(sapply(1:t, make.mh, beta = beta, Sigma = Sigma.star, Sigma.inv = Sigma.star.inv)) + dinvgamma(sigma.squared.epsilon.star, alpha.epsilon, beta.epsilon, log = TRUE)
@@ -233,13 +241,13 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   	  if(mh.epsilon > runif(1)){
         sigma.squared.epsilon <- sigma.squared.epsilon.star
   	    Sigma.epsilon <- Sigma.epsilon.star
-  	  	Sigma.epsilon.inv <- Sigma.epsilon.star.inv
+  	  	#Sigma.epsilon.inv <- Sigma.epsilon.star.inv
   	  	Sigma <- Sigma.star
   	    Sigma.inv <- Sigma.star.inv
         epsilon.accept <- epsilon.accept + 1 / n.mcmc
   	  }
   	  rm(Sigma.epsilon.star)
-  	  rm(Sigma.epsilon.star.inv)
+  	  #rm(Sigma.epsilon.star.inv)
     	rm(Sigma.star)
     	rm(Sigma.star.inv)
   	}
@@ -283,10 +291,11 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
       }
       var.save.temp <- array(0, dim = c(100, ncells, t))
     }
-    Sigma.full <- (sigma.squared.eta * exp( - D / phi) + sigma.squared.beta * diag(ncells))
+    Sigma.full <- (sigma.squared.eta * exp( - D / phi))# + sigma.squared.epsilon * diag(ncells))
+    fort.raster <- fort.raster + 1 / (n.mcmc - n.burn) * sapply(1:t, make.fort.batch, beta = beta, H.list = H.list, Y.list = Y.list, Sigma.full = Sigma.full, ncells = ncells)
     #chol.Sigma <- chol(Sigma.full)
     #fort.raster <- fort.raster + (1 / (n.mcmc - n.burn)) * sapply(1:t, make.fort.batch, beta = beta, chol.Sigma = chol.Sigma, ncells = ncells)
-    rmvnorm(t(X) %*% beta, Sigma.full)
+    #rmvnorm(t(X) %*% beta, Sigma.full)
     var.save.temp[k %% 100 + 1, , ] <- fort.raster
   }
 

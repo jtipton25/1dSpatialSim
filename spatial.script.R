@@ -53,13 +53,13 @@ curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 abline(v = phi, col = 'red')
 ##
 sigma.squared.beta.tune <- 0.025
-sigma.squared.eta.tune <- 0.125
+sigma.squared.eta.tune <- 0.25
 sigma.squared.epsilon.tune <- 0.075
-phi.tune <- 0.25
+phi.tune <- 0.45
 
-n.mcmc <- 1000
+n.mcmc <- 5000
 
-source('mcmc.spatial.R')
+source('mcmc.spatial.edit.R')
 
 ##
 ## Fit spatial MCMC kriging model
@@ -68,32 +68,34 @@ source('mcmc.spatial.R')
 start <- Sys.time()
 out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
 finish <- Sys.time() - start
-finish #100 iterations takes 8 minutes
+finish #500 iterations takes 8 minutes
 
 ##
 ## Plot output
 ##
 
+n.burn <- floor(n.mcmc / 10)
 #x11()
 layout(matrix(1:9, nrow = 3))
-matplot(t(out$mu.beta.save), type = 'l')
+matplot(t(out$mu.beta.save)[(n.burn + 1):n.mcmc, ], type = 'l')
 abline(h = beta[1], col = 'black')
 abline(h = beta[2], col = 'red')
-plot(out$sigma.squared.beta.save, type = 'l')
-plot(out$sigma.squared.epsilon.save, type = 'l', main = paste("accept rate", round(out$epsilon.accept, 2)))
-abline(h = s2.e)
-plot(out$sigma.squared.eta.save, type = 'l', main = paste("accept rate", round(out$eta.accept, 2)))
-abline(h = s2.s)
-plot(out$phi.save, type = 'l', main = paste("accept rate", round(out$phi.accept, 2)))
-abline(h = phi)
+plot(out$sigma.squared.beta.save[(n.burn + 1):n.mcmc], type = 'l')
+plot(out$sigma.squared.epsilon.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$epsilon.accept, 2)))
+abline(h = s2.e, col = 'red')
+plot(out$sigma.squared.eta.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$eta.accept, 2)))
+abline(h = s2.s, col = 'red')
+plot(out$phi.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$phi.accept, 2)))
+abline(h = phi, col = 'red')
 matplot(out$fort.raster, type = 'l')
 plot.field(field$Z.list, H.list = rep(list(1:length(field$Z.list[[1]])), reps), locs = locs)
 #plot.field(Z.list, H.list = rep(list(1:length(Z.list[[1]])), reps), locs = locs)
-hist(out$mu.beta.save[1, ])
-abline(v = mean(out$mu.beta.save[1, ]), col = 'red')
+hist(out$mu.beta.save[1, ][(n.burn + 1):n.mcmc])
+abline(v = beta[1], col = 'red')
 abline(v = quantile(out$mu.beta.save[1, ], probs = c(0.025, 0.975)), col = 'blue')
-hist(out$mu.beta.save[2, ])
-abline(v = mean(out$mu.beta.save[2, ]), col = 'red')
+hist(out$mu.beta.save[2, ][(n.burn + 1):n.mcmc])
+abline(v = beta[2], col = 'red')
 abline(v = quantile(out$mu.beta.save[2, ], probs = c(0.025, 0.975)), col = 'blue')
 
 apply(out$mu.beta.save, 1, mean)
+
