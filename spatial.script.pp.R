@@ -7,6 +7,9 @@ set.seed(203)
 
 source('dinvgamma.R')
 library(mvtnorm)
+source('make.output.plot.R')
+source('mcmc.spatial.pp.R')
+source('make.spatial.field.R')
 
 ##
 ## Simulate Data
@@ -22,8 +25,6 @@ phi <- 2
 s2.e <- 0.5
 samp.size <- 40
 
-source('make.spatial.field.R')
-
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
 
 ##
@@ -32,7 +33,7 @@ field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponen
 
 mu.0 <- c(0, 2)#rep(0, dim(X)[2])
 sigma.squared.0 <- 0.025
-#Sigma.0 <-
+#Sigma.0 <- sigma.squared.0 * diag(dim(X)[2])
 alpha.beta <- 2
 beta.beta <- 0.2
 curve(dinvgamma(x, alpha.beta, beta.beta))
@@ -53,13 +54,11 @@ curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 abline(v = phi, col = 'red')
 ##
 sigma.squared.beta.tune <- 0.000025
-sigma.squared.eta.tune <- 0.075
-sigma.squared.epsilon.tune <- 0.0025
-phi.tune <- 0.075
+sigma.squared.eta.tune <- 0.00075
+sigma.squared.epsilon.tune <- 0.000025
+phi.tune <- 0.75
 
-n.mcmc <- 2500
-
-source('mcmc.spatial.pp.R')
+n.mcmc <- 5000
 
 ##
 ## Knots for predictive process
@@ -75,35 +74,13 @@ start <- Sys.time()
 out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune, s.star)
 finish <- Sys.time() - start
 finish 
+
 #500 iterations takes 2.21 minutes for m = 100 and reps = 100
-#500 iterations takes  minutes for m = 1000 and reps = 100
+#500 iterations takes 3.6 minutes for m = 1000 and resps = 100
 
 ##
 ## Plot output
 ##
 
-n.burn <- floor(n.mcmc / 10)
-#x11()
-layout(matrix(1:9, nrow = 3))
-matplot(t(out$mu.beta.save)[(n.burn + 1):n.mcmc, ], type = 'l')
-abline(h = beta[1], col = 'black')
-abline(h = beta[2], col = 'red')
-plot(out$sigma.squared.beta.save[(n.burn + 1):n.mcmc], type = 'l')
-plot(out$sigma.squared.epsilon.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$epsilon.accept, 2)))
-abline(h = s2.e, col = 'red')
-plot(out$sigma.squared.eta.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$eta.accept, 2)))
-abline(h = s2.s, col = 'red')
-plot(out$phi.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$phi.accept, 2)))
-abline(h = phi, col = 'red')
-matplot(out$fort.raster, type = 'l')
-plot.field(field$Z.list, H.list = rep(list(1:length(field$Z.list[[1]])), reps), locs = locs)
-#plot.field(Z.list, H.list = rep(list(1:length(Z.list[[1]])), reps), locs = locs)
-hist(out$mu.beta.save[1, ][(n.burn + 1):n.mcmc])
-abline(v = beta[1], col = 'red')
-abline(v = quantile(out$mu.beta.save[1, ], probs = c(0.025, 0.975)), col = 'blue')
-hist(out$mu.beta.save[2, ][(n.burn + 1):n.mcmc])
-abline(v = beta[2], col = 'red')
-abline(v = quantile(out$mu.beta.save[2, ], probs = c(0.025, 0.975)), col = 'blue')
-
+make.output.plot(out)
 apply(out$mu.beta.save, 1, mean)
-

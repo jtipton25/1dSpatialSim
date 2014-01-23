@@ -13,7 +13,7 @@
 \usepackage{natbib}
 \def\bm#1{\mbox{\boldmath $#1$}}
  
-\title{Spatial Geostatistical Model}
+\title{Spatial Predictive Process Model}
 \author{John Tipton}
 \date{\today}
 \begin{document}
@@ -54,7 +54,11 @@
 \phi & \sim IG(\alpha_\phi, \beta_\phi)
 \end{align*}
 %
-where $\bm{I}_\beta$ is the identity matrix of size $\tau \times \tau$ where $\tau$ is the number of parameters in $\bm{\beta}_t$, $\bm{I}_t$ is the identity matrix of size $n_t \times n_t$ and $n_t$ is the number of samples of $y_t$ at time $t$ and $\bm{D}_t$ is the distance matrix between locations observed at time $t$.
+where $\bm{I}_\beta$ is the identity matrix of size $\tau \times \tau$ where $\tau$ is the number of parameters in $\bm{\beta}_t$, $\bm{I}_t$ is the identity matrix of size $n_t \times n_t$ and $n_t$ is the number of samples of $y_t$ at time $t$ and $\bm{D}_t$ is the distance matrix between locations observed at time $t$. Define $\bm{\Sigma} = \bm{\Sigma}_\eta + \bm{\Sigma}_\epsilon$
+%
+\section{Predictive Process}
+%
+For large dimensional spatial processes it can be computationally expensive to invert $\bm{\Sigma}$. This motivates the use of a predictive process $\tilde{\bm{\eta}}$ to approximate $\bm{\eta}$ over a set of knots $\tilde{S}$ where $\tilde{\bm{\eta}} = \bm{r}(\bm{s}, \bm{s}^* | \sigma^2_\eta, \phi)^T \bm{R}^{* - 1}(\bm{s}^*, \bm{s}^*  | \sigma^2_\eta, \phi) \bm{\eta}*$. The covariance between the desired locations $\bm{s} \in S$ and the set of knots $\bm{s}^* \in \tilde{S}$ is $\bm{r}(\bm{s}, \bm{s}^* | \sigma^2_\eta, \phi)$. The covariance matrix over the set of knots is $\bm{R}^{* - 1}(\bm{s}^*, \bm{s}^*  | \sigma^2_\eta, \phi)$. The lower dimensional $\bm{\eta}^* \sim \mbox{MVN}(\bm{0}, \bm{R}^{* - 1}(\bm{s}^*, \bm{s}^*  | \sigma^2_\eta, \phi) )$.
 %
 \section{Posterior}
 %
