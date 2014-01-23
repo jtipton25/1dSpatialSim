@@ -37,7 +37,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   ##
   
   make.mh <- function(s, beta, Sigma.epsilon, Sigma.epsilon.inv, Sigma.inv, C.star, C.star.inv, c){
-    ( - t / 2) * (determinant(C.star.inv + c[, H.list[[s]]] %*% Sigma.epsilon.inv[[s]] %*% t(c[, H.list[[s]]]), logarithm = TRUE)$modulus[1] + determinant(C.star, logarithm = TRUE)$modulus[1] + determinant(Sigma.epsilon[[s]], logarithm = TRUE)$modulus[1]) - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% (Sigma.inv[[s]]) %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
+    cH.list <- c[, H.list[[s]]]
+    ( - 1 / 2) * (determinant(C.star.inv + cH.list %*% Sigma.epsilon.inv[[s]] %*% t(cH.list), logarithm = TRUE)$modulus[1] + determinant(C.star, logarithm = TRUE)$modulus[1] + determinant(Sigma.epsilon[[s]], logarithm = TRUE)$modulus[1]) - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% (Sigma.inv[[s]]) %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
   }
     
     make.identity.list <- function(s, nt){
@@ -74,11 +75,13 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   }
   
   make.Sigma <- function(s, Sigma.epsilon, C.star, c, H.list){
-    (t(c) %*% C.star %*% c)[H.list[[s]], H.list[[s]]] + Sigma.epsilon[[s]]
+    cH.list <- c[, H.list[[s]]]
+    (t(cH.list) %*% C.star %*% cH.list) + Sigma.epsilon[[s]]
   }
   
   make.Sigma.inv <- function(s, Sigma.epsilon.inv, C.star.inv, c, H.list){
-    Sigma.epsilon.inv[[s]] - Sigma.epsilon.inv[[s]] %*% t(c[, H.list[[s]]]) %*% solve(C.star.inv + c[, H.list[[s]]] %*% Sigma.epsilon.inv[[s]] %*% t(c[, H.list[[s]]])) %*% c[, H.list[[s]]] %*% Sigma.epsilon.inv[[s]]
+    cH.list <- c[, H.list[[s]]]
+    Sigma.epsilon.inv[[s]] - Sigma.epsilon.inv[[s]] %*% t(cH.list) %*% solve(C.star.inv + cH.list %*% Sigma.epsilon.inv[[s]] %*% t(cH.list)) %*% cH.list %*% Sigma.epsilon.inv[[s]]
   }
   
 #   make.Sigma.inv <- function(s, Sigma.epsilon.inv, C.star.inv, c){
@@ -195,8 +198,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   ##
 
 	for(k in 1:n.mcmc){
-    #if(k %% 100 == 0) cat(" ", k) 
-    cat(" ", k)
+    if(k %% 100 == 0) cat(" ", k) 
     
   	##
   	## Sample Beta

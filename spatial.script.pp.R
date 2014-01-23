@@ -52,12 +52,12 @@ beta.phi <- 20
 curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 abline(v = phi, col = 'red')
 ##
-sigma.squared.beta.tune <- 0.00025
-sigma.squared.eta.tune <- 0.0025
-sigma.squared.epsilon.tune <- 0.00075
-phi.tune <- 0.0045
+sigma.squared.beta.tune <- 0.000025
+sigma.squared.eta.tune <- 0.075
+sigma.squared.epsilon.tune <- 0.0025
+phi.tune <- 0.075
 
-n.mcmc <- 500
+n.mcmc <- 2500
 
 source('mcmc.spatial.pp.R')
 
