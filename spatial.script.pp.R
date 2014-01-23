@@ -53,12 +53,11 @@ beta.phi <- 20
 curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 abline(v = phi, col = 'red')
 ##
-sigma.squared.beta.tune <- 0.000025
-sigma.squared.eta.tune <- 0.00075
-sigma.squared.epsilon.tune <- 0.000025
+sigma.squared.eta.tune <- 0.0075
+sigma.squared.epsilon.tune <- 0.025
 phi.tune <- 0.75
 
-n.mcmc <- 5000
+n.mcmc <- 500
 
 ##
 ## Knots for predictive process
