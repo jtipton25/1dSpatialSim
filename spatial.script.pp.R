@@ -52,24 +52,31 @@ beta.phi <- 20
 curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 abline(v = phi, col = 'red')
 ##
-sigma.squared.beta.tune <- 0.025
-sigma.squared.eta.tune <- 0.25
-sigma.squared.epsilon.tune <- 0.075
-phi.tune <- 0.45
+sigma.squared.beta.tune <- 0.00025
+sigma.squared.eta.tune <- 0.0025
+sigma.squared.epsilon.tune <- 0.00075
+phi.tune <- 0.0045
 
 n.mcmc <- 500
 
-source('mcmc.spatial.R')
+source('mcmc.spatial.pp.R')
+
+##
+## Knots for predictive process
+##
+
+s.star <- seq(0.1, 0.9, 0.1)
 
 ##
 ## Fit spatial MCMC kriging model
 ##
 
 start <- Sys.time()
-out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
+out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune, s.star)
 finish <- Sys.time() - start
-finish #500 iterations takes 2.23 minutes for m = 100 and reps = 100
-#500 iterations takes 5.3 minutes for m = 1000 and reps = 100
+finish 
+#500 iterations takes 2.21 minutes for m = 100 and reps = 100
+#500 iterations takes  minutes for m = 1000 and reps = 100
 
 ##
 ## Plot output
@@ -98,5 +105,5 @@ hist(out$mu.beta.save[2, ][(n.burn + 1):n.mcmc])
 abline(v = beta[2], col = 'red')
 abline(v = quantile(out$mu.beta.save[2, ], probs = c(0.025, 0.975)), col = 'blue')
 
-apply(out$mu.beta.save[, (n.burn + 1):n.mcmc], 1, mean)
+apply(out$mu.beta.save, 1, mean)
 

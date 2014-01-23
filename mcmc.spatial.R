@@ -4,7 +4,7 @@
 ## John Tipton
 ##
 ## Created 01.04.2014
-## Last updated 01.14.2014
+## Last updated 01.22.2014
 ##
 ##
 ## Model: y_t = H_t %*% X %*% B_t + espilon_t
@@ -72,13 +72,6 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
 	  ( - 1 / 2) * determinant(Sigma[[s]], logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
 	}
 
-#	make.fort.batch <- function(s, beta, chol.Sigma, ncells){
-#	  if(dim(beta)[1] == 1){  
-#	    backsolve(chol.Sigma, backsolve(chol.Sigma, X * beta[s], transpose = TRUE) + rnorm(ncells))
-#	  } else {
-#	    backsolve(chol.Sigma, backsolve(chol.Sigma, X %*% beta[, s], transpose = TRUE) + rnorm(ncells)) 
-#	  }
-#	}
   make.fort.batch <- function(s, beta, H.list, Y.list, Sigma.full, ncells){
     temp <- vector(length = ncells)
     temp[ - H.list[[s]]] <- X[ - H.list[[s]], ] %*% beta[, s] + Sigma.full[ - H.list[[s]], H.list[[s]]] %*% solve(Sigma.full[H.list[[s]], H.list[[s]]]) %*% (Y.list[[s]] - X[H.list[[s]], ] %*% beta[, s])
