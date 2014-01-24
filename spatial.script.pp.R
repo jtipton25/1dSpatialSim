@@ -18,7 +18,7 @@ source('make.spatial.field.R')
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 100 # number of spatial fields
+reps <- 10 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 2
@@ -68,6 +68,8 @@ s.star <- seq(0.1, 0.9, 0.1)
 ##
 ## Fit spatial MCMC kriging model
 ##
+
+## Something is happening to sigma.squared.epsilon.save that is driving it to 0...
 
 start <- Sys.time()
 out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune, s.star)

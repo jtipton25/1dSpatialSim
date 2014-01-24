@@ -1,5 +1,5 @@
 rm(list = ls())
-set.seed(203)
+set.seed(1)
 
 ##
 ## Libraries and Subroutines
@@ -8,6 +8,7 @@ set.seed(203)
 source('dinvgamma.R')
 source('make.output.plot.R')
 library(mvtnorm)
+source('make.spatial.field.R')
 
 ##
 ## Simulate Data
@@ -19,13 +20,14 @@ X <- cbind(rep(1, m), locs)
 reps <- 100 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
-phi <- 2
-s2.e <- 0.5
+phi <- 0.25
+s2.e <- 0.001
 samp.size <- 40
 
-source('make.spatial.field.R')
-
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
+
+plot.field(field$Z.list, field$H.list, locs, main = "Actual data")
+plot.field(field$Y.list, field$H.list, locs)
 
 ##
 ## Initialize priors and tuning paramteters
@@ -58,7 +60,7 @@ sigma.squared.eta.tune <- 0.25
 sigma.squared.epsilon.tune <- 0.075
 phi.tune <- 0.45
 
-n.mcmc <- 500
+n.mcmc <- 5000
 
 source('mcmc.spatial.R')
 
@@ -77,5 +79,22 @@ finish #500 iterations takes 2.23 minutes for m = 100 and reps = 100
 ##
 
 make.output.plot(out)
-apply(out$mu.beta.save[, (n.burn + 1):n.mcmc], 1, mean)
+## identifiability between beta_0 and sigma.squared.epsilon???
+matplot(out$beta.save[1, , (n.mcmc / 10 + 1):n.mcmc], type = 'l')
+matplot(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc], type = 'l')
 
+apply(out$mu.beta.save, (n.mcmc / 10 + 1):n.mcmc], 1, mean)
+dev.off()
+matplot(out$fort.raster, type = 'l')
+
+
+## identifiability between beta_0 and sigma.squared.epsilon???
+matplot(out$beta.save[1, , (n.mcmc / 10 + 1):n.mcmc], type = 'l')
+matplot(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc], type = 'l')
+
+coef <- matrix(nrow = reps, ncol = 2)
+for(i in 1:reps){
+  coef[i, ] <- lm(field$Y.list[[i]] ~ locs[field$H.list[[i]]])$coef
+}
+apply(coef, 2, mean)
+summary(coef)

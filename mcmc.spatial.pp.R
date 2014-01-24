@@ -53,13 +53,13 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
      t(beta[, s] - mu.beta) %*% (beta[, s] - mu.beta)
    }
   
-    make.Sigma.epsilon <- function(s, sigma.squared.epsilon, I.nt){
-      sigma.squared.epsilon * I.nt[[s]]
-    }
+  make.Sigma.epsilon <- function(s, sigma.squared.epsilon, I.nt){
+    sigma.squared.epsilon * I.nt[[s]]
+  }
     
-    make.Sigma.epsilon.inv <- function(s, sigma.squared.epsilon, I.nt){
-      1 / sigma.squared.epsilon * I.nt[[s]]
-    }
+  make.Sigma.epsilon.inv <- function(s, sigma.squared.epsilon, I.nt){
+    1 / sigma.squared.epsilon * I.nt[[s]]
+  }
   
   
   make.c <- function(sigma.squared.eta, phi){
