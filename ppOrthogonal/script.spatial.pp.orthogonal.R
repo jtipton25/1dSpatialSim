@@ -5,11 +5,14 @@ set.seed(203)
 ## Libraries and Subroutines
 ##
 
+setwd('~/1dSpatialSim/')
 source('dinvgamma.R')
-library(mvtnorm)
+source('rMVN.R')
+#library(mvtnorm)
 source('make.output.plot.R')
-source('mcmc.spatial.pp.R')
 source('make.spatial.field.R')
+setwd('~/1dSpatialSim/ppOrthogonal/')
+source('mcmc.spatial.pp.orthogonal.R')
 
 ##
 ## Simulate Data
@@ -18,7 +21,7 @@ source('make.spatial.field.R')
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 10 # number of spatial fields
+reps <- 100 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 2
@@ -54,10 +57,10 @@ curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 abline(v = phi, col = 'red')
 ##
 sigma.squared.eta.tune <- 0.0075
-sigma.squared.epsilon.tune <- 0.025
-phi.tune <- 0.75
+sigma.squared.epsilon.tune <- 0.00025
+phi.tune <- 0.0075
 
-n.mcmc <- 500
+n.mcmc <- 200
 
 ##
 ## Knots for predictive process
@@ -71,17 +74,32 @@ s.star <- seq(0.1, 0.9, 0.1)
 
 ## Something is happening to sigma.squared.epsilon.save that is driving it to 0...
 
+##
+## Profile the code
+##
+Rprof(filename = 'Rprof.pp.out', line.profiling = TRUE)
 start <- Sys.time()
 out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune, s.star)
 finish <- Sys.time() - start
 finish 
+Rprof(NULL)
+
+summaryRprof(filename = 'Rprof.pp.out', lines = 'show')
 
 #500 iterations takes 2.21 minutes for m = 100 and reps = 100
-#500 iterations takes 3.6 minutes for m = 1000 and resps = 100
+#500 iterations takes 3.6 minutes for m = 1000 and reps = 100
 
 ##
 ## Plot output
 ##
 
 make.output.plot(out)
-apply(out$mu.beta.save, 1, mean)
+matplot(out$beta.save[1, , (n.mcmc / 10 + 1):n.mcmc], type = 'l', ylim = c(min(out$beta.save[, , (n.mcmc / 10 + 1):n.mcmc]), max(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc])))
+matplot(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc], type = 'l', add = TRUE)
+
+apply(out$mu.beta.save[, (n.mcmc / 10 + 1):n.mcmc], 1, mean)
+matplot(out$fort.raster, type = 'l', main = 'Posterior Predictive')
+
+MSPE <- (out$fort.raster - matrix(unlist(field$Z.list), nrow = m, byrow = FALSE))^2
+matplot(MSPE, type = 'l', main = 'MSPE')
+

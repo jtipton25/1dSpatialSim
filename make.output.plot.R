@@ -5,7 +5,7 @@
 make.output.plot <- function(out){
   n.burn <- floor(n.mcmc / 10)
   #x11()
-  layout(matrix(1:12, nrow = 3))
+  layout(matrix(1:16, nrow = 4))
   #
   matplot(t(out$mu.beta.save)[(n.burn + 1):n.mcmc, ], type = 'l')
   abline(h = beta[1], col = 'black')
@@ -24,10 +24,10 @@ make.output.plot <- function(out){
   #
   matplot(out$fort.raster, type = 'l')
   #
-  plot.field(field$Z.list, field$H.list, locs = locs, main = "True Surface")
+  plot.Z.field(field$Z.list, locs = locs, main = "True Surface")
   #
   #
-  plot.field(field$Y.list, field$H.list, locs = locs)
+  plot.Y.field(field$Y.list, field$H.list, locs = locs)
   #
   hist(out$mu.beta.save[1, ][(n.burn + 1):n.mcmc])
   abline(v = beta[1], col = 'red')
