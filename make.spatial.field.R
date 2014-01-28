@@ -13,11 +13,21 @@ make.H.list <- function(reps, samp, m){
 }
 
 ## make sample data Y
-make.Y.list <- function(reps, Z.list, H.list, s2.e = 1){
+make.Y.list <- function(reps, Z.list, H.list, s2.e){
   Z.list[[reps]][H.list[[reps]]] + rnorm(length(H.list[[reps]]), s2.e)
 }
 
-plot.field <- function(Y.list, H.list, locs, main = "Observed Data", ylab = "Y", xlab = "X"){
+plot.Z.field <- function(Z.list, locs, main = "Observed Data", ylab = "Y", xlab = "X"){
+  reps <- length(Z.list)
+  min.Z <- min(unlist(lapply(Z.list, min)))
+  max.Z <- max(unlist(lapply(Z.list, max)))
+  plot(Z.list[[1]] ~ locs, type = 'l', ylim = c(min.Z, max.Z), main = main, ylab = ylab, xlab = xlab)
+  for(t in 2:reps){
+    lines(Z.list[[t]] ~ locs, type = 'l', col = t)
+  }
+}
+
+plot.Y.field <- function(Y.list, H.list, locs, main = "Observed Data", ylab = "Y", xlab = "X"){
   reps <- length(Y.list)
   min.Y <- min(unlist(lapply(Y.list, min)))
   max.Y <- max(unlist(lapply(Y.list, max)))

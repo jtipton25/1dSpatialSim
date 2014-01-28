@@ -4,11 +4,13 @@ set.seed(1)
 ##
 ## Libraries and Subroutines
 ##
-
+setwd('~/1dSpatialSim/')
 source('dinvgamma.R')
 source('make.output.plot.R')
 library(mvtnorm)
 source('make.spatial.field.R')
+setwd('~/1dSpatialSim/spatialSmoothing/')
+source('mcmc.spatial.R')
 
 ##
 ## Simulate Data
@@ -21,13 +23,14 @@ reps <- 100 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
-s2.e <- 0.001
+s2.e <- 0.01
 samp.size <- 40
 
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
 
-plot.field(field$Z.list, field$H.list, locs, main = "Actual data")
-plot.field(field$Y.list, field$H.list, locs)
+layout(matrix(1:2, ncol = 2))
+plot.Z.field(field$Z.list, locs, main = "Actual data")
+plot.Y.field(field$Y.list, field$H.list, locs)
 
 ##
 ## Initialize priors and tuning paramteters
@@ -62,8 +65,6 @@ phi.tune <- 0.45
 
 n.mcmc <- 5000
 
-source('mcmc.spatial.R')
-
 ##
 ## Fit spatial MCMC kriging model
 ##
@@ -80,21 +81,11 @@ finish #500 iterations takes 2.23 minutes for m = 100 and reps = 100
 
 make.output.plot(out)
 ## identifiability between beta_0 and sigma.squared.epsilon???
-matplot(out$beta.save[1, , (n.mcmc / 10 + 1):n.mcmc], type = 'l')
-matplot(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc], type = 'l')
+matplot(out$beta.save[1, , (n.mcmc / 10 + 1):n.mcmc], type = 'l', ylim = c(min(out$beta.save[, , (n.mcmc / 10 + 1):n.mcmc]), max(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc])))
+matplot(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc], type = 'l', add = TRUE)
 
-apply(out$mu.beta.save, (n.mcmc / 10 + 1):n.mcmc], 1, mean)
-dev.off()
-matplot(out$fort.raster, type = 'l')
+apply(out$mu.beta.save[, (n.mcmc / 10 + 1):n.mcmc], 1, mean)
+matplot(out$fort.raster, type = 'l', main = 'Posterior Predictive')
 
-
-## identifiability between beta_0 and sigma.squared.epsilon???
-matplot(out$beta.save[1, , (n.mcmc / 10 + 1):n.mcmc], type = 'l')
-matplot(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc], type = 'l')
-
-coef <- matrix(nrow = reps, ncol = 2)
-for(i in 1:reps){
-  coef[i, ] <- lm(field$Y.list[[i]] ~ locs[field$H.list[[i]]])$coef
-}
-apply(coef, 2, mean)
-summary(coef)
+MSPE <- (out$fort.raster - matrix(unlist(field$Z.list), nrow = m, byrow = FALSE))^2
+matplot(MSPE, type = 'l', main = 'MSPE')
