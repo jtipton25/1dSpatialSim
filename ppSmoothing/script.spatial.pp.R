@@ -21,12 +21,14 @@ locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
 reps <- 10 # number of spatial fields
 beta <- c(0, 2) # beta
-s2.s <- 1
-phi <- 2
-s2.e <- 0.5
+s2.s <- 3
+phi <- 0.25
+s2.e <- 1
 samp.size <- 40
 
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
+plot.Y.field(field$Y.list, field$H.list, locs)
+plot.Z.field(field$Z.list, locs)
 
 ##
 ## Initialize priors and tuning paramteters
@@ -58,7 +60,7 @@ sigma.squared.eta.tune <- 0.0075
 sigma.squared.epsilon.tune <- 0.005
 phi.tune <- 0.75
 
-n.mcmc <- 500
+n.mcmc <- 2000
 
 ##
 ## Knots for predictive process
