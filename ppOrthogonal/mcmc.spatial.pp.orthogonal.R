@@ -37,9 +37,11 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   ##
   
   ## determinants are the slow part... maybe block update to lessen number of computations or speed up by shortcuts
-  make.mh <- function(s, beta, Sigma.epsilon, Sigma.epsilon.inv, Sigma.inv, C.star, C.star.inv, c){
+#   make.mh <- function(s, beta, Sigma.epsilon, Sigma.epsilon.inv, Sigma.inv, C.star, C.star.inv, c){
+  make.mh <- function(s, beta, sigma.squared.epsilon, Sigma.inv, C.star, C.star.inv, c){
     cH.list <- c[, H.list[[s]]]
-    ( - 1 / 2) * (determinant(C.star.inv + cH.list %*% Sigma.epsilon.inv[[s]] %*% t(cH.list), logarithm = TRUE)$modulus[1] + determinant(C.star, logarithm = TRUE)$modulus[1] + determinant(Sigma.epsilon[[s]], logarithm = TRUE)$modulus[1]) - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% (Sigma.inv[[s]]) %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
+#     ( - 1 / 2) * (determinant(C.star.inv + cH.list %*% Sigma.epsilon.inv[[s]] %*% t(cH.list), logarithm = TRUE)$modulus[1] + determinant(C.star, logarithm = TRUE)$modulus[1] + determinant(Sigma.epsilon[[s]], logarithm = TRUE)$modulus[1]) - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% (Sigma.inv[[s]]) %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
+  ( - 1 / 2) * (determinant(C.star.inv + 1 / sigma.squared.epsilon * cH.list %*% t(cH.list), logarithm = TRUE)$modulus[1] + determinant(C.star, logarithm = TRUE)$modulus[1] + nt[[s]] * log(sigma.squared.epsilon)) - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% (Sigma.inv[[s]]) %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
   }
     
     make.identity.list <- function(s, nt){
@@ -342,8 +344,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
         C.star.star.inv <- make.C.star.inv(C.star = C.star.star)
         Sigma.star <- lapply(1:t, make.Sigma, Sigma.epsilon = Sigma.epsilon.star, C.star = C.star.star, c = c.star, H.list = H.list)
         Sigma.star.inv <- lapply(1:t, make.Sigma.inv,  Sigma.epsilon = Sigma.epsilon.star, C.star.inv = C.star.star.inv, c = c.star, H.list = H.list)
-        mh.1 <-	sum(sapply(1:t, make.mh, beta = beta, Sigma.epsilon = Sigma.epsilon.star, Sigma.epsilon.inv = Sigma.epsilon.star.inv, Sigma.inv = Sigma.star.inv, C.star = C.star.star, C.star.inv = C.star.star.inv, c = c.star)) + dinvgamma(sigma.squared.eta.star, alpha.eta, beta.eta, log = TRUE) + dinvgamma(sigma.squared.epsilon.star, alpha.epsilon, beta.epsilon, log = TRUE) + dinvgamma(phi.star, alpha.phi, beta.phi, log = TRUE)
-        mh.2 <- sum(sapply(1:t, make.mh, beta = beta, Sigma.epsilon = Sigma.epsilon, Sigma.epsilon.inv = Sigma.epsilon.inv, Sigma.inv = Sigma.inv, C.star = C.star, C.star.inv = C.star.inv, c = c)) + dinvgamma(sigma.squared.eta, alpha.eta, beta.eta, log = TRUE) + dinvgamma(sigma.squared.epsilon, alpha.epsilon, beta.epsilon, log = TRUE) + dinvgamma(phi, alpha.phi, beta.phi, log = TRUE)
+        mh.1 <-	sum(sapply(1:t, make.mh, beta = beta, sigma.squared.epsilon = sigma.squared.epsilon, Sigma.inv = Sigma.star.inv, C.star = C.star.star, C.star.inv = C.star.star.inv, c = c.star)) + dinvgamma(sigma.squared.eta.star, alpha.eta, beta.eta, log = TRUE) + dinvgamma(sigma.squared.epsilon.star, alpha.epsilon, beta.epsilon, log = TRUE) + dinvgamma(phi.star, alpha.phi, beta.phi, log = TRUE)
+        mh.2 <- sum(sapply(1:t, make.mh, beta = beta, sigma.squared.epsilon = sigma.squared.epsilon, Sigma.inv = Sigma.inv, C.star = C.star, C.star.inv = C.star.inv, c = c)) + dinvgamma(sigma.squared.eta, alpha.eta, beta.eta, log = TRUE) + dinvgamma(sigma.squared.epsilon, alpha.epsilon, beta.epsilon, log = TRUE) + dinvgamma(phi, alpha.phi, beta.phi, log = TRUE)
         mh <- exp(mh.1 - mh.2)
         	  	
         if(mh > runif(1)){
@@ -384,6 +386,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
          var.save.temp <- array(0, dim = c(100, ncells, t))
        }
        fort.raster <- sapply(1:t, make.fort.batch, beta = beta, c = c, C.star = C.star, C.star.inv = C.star.inv, sigma.squared.epsilon = sigma.squared.epsilon)#, w.tilde = w.tilde)
+#       fort.raster <- sapply(1:t, make.fort.batch, beta = beta, c = c, C.star = C.star, C.star.inv = C.star.inv, sigma.squared.epsilon = sigma.squared.epsilon)#, w.tilde = w.tilde)
        var.save.temp[k %% 100 + 1, , ] <- fort.raster
      }
 ##
