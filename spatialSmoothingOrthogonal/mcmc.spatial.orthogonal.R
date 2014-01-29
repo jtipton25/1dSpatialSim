@@ -114,6 +114,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   	nt[s] <- length(Y.list[[s]])
   }
   nt.sum <- sum(nt)
+  I.nt <- lapply(1:t, make.identity.list, nt = nt)
   tHX.list <- vector('list', length = t) # speeds up computation by not calculating each MCMC step
   HX.list <- vector('list', length = t)
   for(s in 1:t){
@@ -124,7 +125,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   L.list <- lapply(1:t, make.L.list, I.nt = I.nt, HX.list = HX.list, tHX.list = tHX.list)
   tL.list <- lapply(1:t, make.tL.list, L.list = L.list)
   LtL.list <- lapply(1:t, make.LtL.list, L.list = L.list, tL.list = tL.list)
-  
+#   tLL.list <- lapply(1:t, make.tLL.list, L.list = L.list, tL.list = tL.list)  
   ## Initialze process
   beta <- matrix(0, nrow = tau, ncol = t)
   
@@ -138,9 +139,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   D <- as.matrix(dist(locs))
   D.list <- lapply(1:t, make.D.list, H.list = H.list, locs = locs)
   R.list <- lapply(1:t, make.R.list, sigma.squared.eta = sigma.squared.eta, phi = phi, D.list = D.list, LtL.list = LtL.list)
-    
+  
   sigma.squared.epsilon <- 1 / rgamma(1, alpha.epsilon, beta.epsilon)
-  I.nt <- lapply(1:t, make.identity.list, nt = nt)
   Sigma.epsilon <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
   #Sigma.epsilon.inv <- lapply(1:t, make.Sigma.epsilon.inv, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
 
@@ -268,8 +268,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   	
     phi.star <- rnorm(1, phi, phi.tune)
   	if(phi.star > 0){
-      R.list.star <- lapply(1:t, make.R.list, sigma.squared.eta = sigma.squared.eta, phi = phi.star, D.list = D.list, LtL.list = LtL.list)	  
-  	  Sigma.star <- lapply(1:t, make.Sigma, R.list = R.list.star, Sigma.epsilon = Sigma.epsilon)
+      R.list.star <- lapply(1:t, make.R.list, sigma.squared.eta = sigma.squared.eta, phi = phi.star, D.list = D.list, LtL.list = LtL.list)
+      Sigma.star <- lapply(1:t, make.Sigma, R.list = R.list.star, Sigma.epsilon = Sigma.epsilon)
   	  Sigma.star.inv <- lapply(1:t, make.Sigma.inv, Sigma = Sigma.star)
       mh.phi.1 <-	sum(sapply(1:t, make.mh, beta = beta, Sigma = Sigma.star, Sigma.inv = Sigma.star.inv)) + dinvgamma(phi.star, alpha.phi, beta.phi, log = TRUE)
   		mh.phi.2 <- sum(sapply(1:t, make.mh, beta = beta, Sigma = Sigma, Sigma.inv = Sigma.inv)) + dinvgamma(phi, alpha.phi, beta.phi, log = TRUE)

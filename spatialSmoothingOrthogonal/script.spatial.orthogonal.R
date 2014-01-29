@@ -28,6 +28,9 @@ samp.size <- 40
 
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
 
+Y.list <- field$Y.list
+H.list <- field$H.list
+
 layout(matrix(1:2, ncol = 2))
 plot.Z.field(field$Z.list, locs, main = "Actual data")
 plot.Y.field(field$Y.list, field$H.list, locs)
