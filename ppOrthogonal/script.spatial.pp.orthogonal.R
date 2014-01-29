@@ -72,6 +72,8 @@ s.star <- seq(0.1, 0.9, 0.1)
 ## Fit spatial MCMC kriging model
 ##
 
+Y.list <- field$Y.list
+H.list <- field$H.list
 ## Something is happening to sigma.squared.epsilon.save that is driving it to 0...
 
 ##
