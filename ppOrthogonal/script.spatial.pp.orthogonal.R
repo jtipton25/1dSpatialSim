@@ -56,11 +56,11 @@ beta.phi <- 20
 curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 abline(v = phi, col = 'red')
 ##
-sigma.squared.eta.tune <- 0.0075
-sigma.squared.epsilon.tune <- 0.00025
-phi.tune <- 0.0075
+sigma.squared.eta.tune <- 0.00075
+sigma.squared.epsilon.tune <- 0.000025
+phi.tune <- 0.00075
 
-n.mcmc <- 200
+n.mcmc <- 1000
 
 ##
 ## Knots for predictive process
@@ -104,4 +104,4 @@ matplot(out$fort.raster, type = 'l', main = 'Posterior Predictive')
 
 MSPE <- (out$fort.raster - matrix(unlist(field$Z.list), nrow = m, byrow = FALSE))^2
 matplot(MSPE, type = 'l', main = 'MSPE')
-
+out$accept
