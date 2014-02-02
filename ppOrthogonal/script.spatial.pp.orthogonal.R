@@ -56,11 +56,11 @@ beta.phi <- 20
 curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 abline(v = phi, col = 'red')
 ##
-sigma.squared.eta.tune <- 0.00075
-sigma.squared.epsilon.tune <- 0.000025
-phi.tune <- 0.00075
+sigma.squared.eta.tune <- 0.0075
+sigma.squared.epsilon.tune <- 0.00075
+phi.tune <- 0.5
 
-n.mcmc <- 1000
+n.mcmc <- 2000
 
 ##
 ## Knots for predictive process
@@ -79,16 +79,16 @@ H.list <- field$H.list
 ##
 ## Profile the code
 ##
-Rprof(filename = 'Rprof.pp.out', line.profiling = TRUE)
+# Rprof(filename = 'Rprof.pp.out', line.profiling = TRUE)
 start <- Sys.time()
 out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune, s.star)
 finish <- Sys.time() - start
 finish 
-Rprof(NULL)
+# Rprof(NULL)
 
-summaryRprof(filename = 'Rprof.pp.out', lines = 'show')
+# summaryRprof(filename = 'Rprof.pp.out', lines = 'show')
 
-#500 iterations takes 2.21 minutes for m = 100 and reps = 100
+# 500 iterations takes 2.21 minutes for m = 100 and reps = 100
 #500 iterations takes 3.6 minutes for m = 1000 and reps = 100
 
 ##

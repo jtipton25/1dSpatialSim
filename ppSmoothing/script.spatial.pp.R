@@ -54,17 +54,19 @@ beta.phi <- 20
 curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 abline(v = phi, col = 'red')
 ##
-sigma.squared.eta.tune <- 0.0075
-sigma.squared.epsilon.tune <- 0.005
-phi.tune <- 0.75
-
-n.mcmc <- 500
 
 ##
 ## Knots for predictive process
 ##
 
 s.star <- seq(0.1, 0.9, 0.1)
+
+
+sigma.squared.eta.tune <- 0.275
+sigma.squared.epsilon.tune <- 0.0020
+phi.tune <- 1.250
+
+n.mcmc <- 2000
 
 ##
 ## Fit spatial MCMC kriging model
