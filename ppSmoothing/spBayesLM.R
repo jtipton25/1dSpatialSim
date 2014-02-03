@@ -29,6 +29,10 @@ R <- exp(-phi*D)
 w <- rmvn(1, rep(0,n), sigma.sq*R)
 y <- rnorm(n, X%*%B + w, sqrt(tau.sq))
 
+idx <- order(X[, 2])
+plot(y[idx] ~ X[, 2][idx], type = 'l')
+
+
 n.samples <- 2000
 
 starting <- list("phi"=3/0.5, "sigma.sq"=50, "tau.sq"=1)
@@ -100,4 +104,5 @@ round(summary(window(m.1$p.theta.samples, start=burn.in))$quantiles[,c(3,1,5)],2
 round(summary(window(m.2$p.theta.samples, start=burn.in))$quantiles[,c(3,1,5)],2)
 
 ## End(Not run)
+
 

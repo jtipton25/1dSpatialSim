@@ -19,7 +19,7 @@ source('mcmc.spatial.pp.R')
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 10 # number of spatial fields
+reps <- 1 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 3
 phi <- 0.25
@@ -56,21 +56,15 @@ beta.phi <- 20
 curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 abline(v = phi, col = 'red')
 ##
-<<<<<<< HEAD
-=======
 sigma.squared.eta.tune <- 0.0075
 sigma.squared.epsilon.tune <- 0.005
 phi.tune <- 0.75
-
-n.mcmc <- 2000
->>>>>>> ae9f45be14a84e4b3ed1fb3ad6e85972af2e197f
 
 ##
 ## Knots for predictive process
 ##
 
 s.star <- seq(0.1, 0.9, 0.1)
-
 
 sigma.squared.eta.tune <- 0.275
 sigma.squared.epsilon.tune <- 0.0020
