@@ -97,7 +97,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   
   ## Initialize parameter model
   sigma.squared.beta <- 1 / rgamma(1, alpha.beta, beta.beta)
-  Sigma.beta <- sigma.squared.beta * diag(tau)
+  I.beta <- diag(tau)
+  Sigma.beta <- sigma.squared.beta * I.beta
   Sigma.beta.inv <- solve(Sigma.beta)
   
   sigma.squared.eta <- 1 / rgamma(1, alpha.eta, beta.eta)
@@ -108,10 +109,11 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     
   sigma.squared.epsilon <- 1 / rgamma(1, alpha.epsilon, beta.epsilon)
   I.nt <- lapply(1:t, make.identity.list, nt = nt)
+  I.full <- diag(ncells)
   Sigma.epsilon <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
   #Sigma.epsilon.inv <- lapply(1:t, make.Sigma.epsilon.inv, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
 
-  Sigma.0 <- sigma.squared.0 * diag(tau)
+  Sigma.0 <- sigma.squared.0 * I.beta
   Sigma.0.inv <- solve(Sigma.0)
 
   Sigma <- lapply(1:t, make.Sigma, R.list = R.list, Sigma.epsilon = Sigma.epsilon)
@@ -180,7 +182,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   	##
   	
     sigma.squared.beta <- 1 / rgamma(1, alpha.beta + nt.sum / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta, mu.beta = mu.beta)))
-  	Sigma.beta <- sigma.squared.beta * diag(tau)
+  	Sigma.beta <- sigma.squared.beta * I.beta
   	Sigma.beta.inv <- solve(Sigma.beta)
   	
   	##
@@ -274,7 +276,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
       }
       var.save.temp <- array(0, dim = c(100, ncells, t))
     }
-    Sigma.full <- (sigma.squared.eta * exp( - D / phi))# + sigma.squared.epsilon * diag(ncells))
+#     Sigma.full <- (sigma.squared.eta * exp( - D / phi))# + sigma.squared.epsilon * diag(ncells))
+    Sigma.full <- (sigma.squared.eta * exp( - D / phi)) + sigma.squared.epsilon * I.full
     fort.raster <- fort.raster + 1 / (n.mcmc - n.burn) * sapply(1:t, make.fort.batch, beta = beta, H.list = H.list, Y.list = Y.list, Sigma.full = Sigma.full, ncells = ncells)
     #chol.Sigma <- chol(Sigma.full)
     #fort.raster <- fort.raster + (1 / (n.mcmc - n.burn)) * sapply(1:t, make.fort.batch, beta = beta, chol.Sigma = chol.Sigma, ncells = ncells)

@@ -61,7 +61,6 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     1 / sigma.squared.epsilon * I.nt[[s]]
   }
   
-  
   make.c <- function(sigma.squared.eta, phi){
     sigma.squared.eta * exp( - D.0 / phi)
   }
@@ -129,9 +128,10 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   beta <- matrix(0, nrow = tau, ncol = t)
   
   ## Initialize parameter model
+  I.beta <- diag(tau)
   sigma.squared.beta <- 1 / rgamma(1, alpha.beta, beta.beta)
-  Sigma.beta <- sigma.squared.beta * diag(tau)
-  Sigma.beta.inv <- solve(Sigma.beta)
+  Sigma.beta <- sigma.squared.beta * I.beta
+  Sigma.beta.inv <- 1 / sigma.squared.beta * I.beta
   
   sigma.squared.eta <- 1 / rgamma(1, alpha.eta, beta.eta)
   phi <- 1 / rgamma(1, alpha.phi, beta.phi)
@@ -144,7 +144,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   Sigma.epsilon <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
   Sigma.epsilon.inv <- lapply(1:t, make.Sigma.epsilon.inv, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
 
-  Sigma.0 <- sigma.squared.0 * diag(tau)
+  Sigma.0 <- sigma.squared.0 * I.beta
   Sigma.0.inv <- solve(Sigma.0)
 
   vec.0 <- rep(0, n.knots)
@@ -162,7 +162,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
 	Sigma.chol <- chol(Sigma.0)
 	mu.beta <- backsolve(Sigma.chol, backsolve(Sigma.0, mu.0, transpose = TRUE) + devs)
 
-  n.burn <- floor(n.mcmc / 10)
+  n.burn <- floor(n.mcmc / 5) + 1
   fort.raster.batch <- matrix(0, ncells, t)   
 
   tHX.list <- vector('list', length = t) # speeds up computation by not calculating each MCMC step
@@ -228,8 +228,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   	## Sample sigma.squared.beta
   	##
   	
-    sigma.squared.beta <- 1 / rgamma(1, alpha.beta + nt.sum / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta, mu.beta)))
-  	Sigma.beta <- sigma.squared.beta * diag(tau)
+    sigma.squared.beta <- 1 / rgamma(1, alpha.beta + nt.sum / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta, mu.beta = mu.beta)))
+  	Sigma.beta <- sigma.squared.beta * I.beta
   	Sigma.beta.inv <- solve(Sigma.beta)
   	
   	##
@@ -338,7 +338,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
          }
          var.save.temp <- array(0, dim = c(100, ncells, t))
        }
-       fort.raster <- sapply(1:t, make.fort.batch, beta = beta, c = c, C.star = C.star, C.star.inv = C.star.inv, sigma.squared.epsilon = sigma.squared.epsilon)#, w.tilde = w.tilde)
+       fort.raster <- fort.raster + 1 / (n.mcmc - n.burn) * sapply(1:t, make.fort.batch, beta = beta, c = c, C.star = C.star, C.star.inv = C.star.inv, sigma.squared.epsilon = sigma.squared.epsilon)#, w.tilde = w.tilde)
        var.save.temp[k %% 100 + 1, , ] <- fort.raster
      }
 ##

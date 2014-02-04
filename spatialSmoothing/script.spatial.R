@@ -61,7 +61,7 @@ abline(v = phi, col = 'red')
 sigma.squared.beta.tune <- 0.025
 sigma.squared.eta.tune <- 0.25
 sigma.squared.epsilon.tune <- 0.075
-phi.tune <- 0.45
+phi.tune <- 0.25
 
 n.mcmc <- 5000
 

@@ -1,5 +1,5 @@
 rm(list = ls())
-set.seed(203)
+set.seed(1)
 
 ##
 ## Libraries and Subroutines
@@ -19,11 +19,11 @@ source('mcmc.spatial.pp.R')
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 1 # number of spatial fields
+reps <- 100 # number of spatial fields
 beta <- c(0, 2) # beta
-s2.s <- 3
+s2.s <- 1
 phi <- 0.25
-s2.e <- 1
+s2.e <- 0.01
 samp.size <- 40
 
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
@@ -83,8 +83,9 @@ out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha
 finish <- Sys.time() - start
 finish 
 
-#500 iterations takes 2.21 minutes for m = 100 and reps = 100
-#500 iterations takes 3.6 minutes for m = 1000 and resps = 100
+#500 iterations takes 3.6 minutes for m = 1000 and reps = 100
+
+## 5000 iterations takes 1.64 hours for spatial process
 
 ##
 ## Plot output
