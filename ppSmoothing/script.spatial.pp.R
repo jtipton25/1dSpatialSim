@@ -19,7 +19,7 @@ source('mcmc.spatial.pp.R')
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 100 # number of spatial fields
+reps <- 10 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
@@ -29,6 +29,9 @@ samp.size <- 40
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
 plot.Y.field(field$Y.list, field$H.list, locs)
 plot.Z.field(field$Z.list, locs)
+
+Y.list <- field$Y.list
+H.list <- field$H.list
 
 ##
 ## Initialize priors and tuning paramteters
@@ -68,9 +71,9 @@ s.star <- seq(0.1, 0.9, 0.1)
 
 sigma.squared.eta.tune <- 0.275
 sigma.squared.epsilon.tune <- 0.0020
-phi.tune <- 1.250
+phi.tune <- 0.50
 
-n.mcmc <- 2000
+n.mcmc <- 5000
 
 ##
 ## Fit spatial MCMC kriging model
@@ -79,13 +82,14 @@ n.mcmc <- 2000
 ## Something is happening to sigma.squared.epsilon.save that is driving it to 0...
 
 start <- Sys.time()
+# Rprof(file = 'spatial.pp.Rprof.out')
 out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune, s.star)
+# Rprof(NULL)
+# summaryRprof('spatial.pp.Rprof.out')
 finish <- Sys.time() - start
 finish 
 
-#500 iterations takes 3.6 minutes for m = 1000 and reps = 100
-
-## 5000 iterations takes 1.64 hours for spatial process
+## 5000 iterations takes 4.45 minutes for predictive process for m = 1000 and reps = 10
 
 ##
 ## Plot output

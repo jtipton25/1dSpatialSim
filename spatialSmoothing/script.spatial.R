@@ -19,7 +19,7 @@ source('mcmc.spatial.R')
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 100 # number of spatial fields
+reps <- 10 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
@@ -72,8 +72,9 @@ n.mcmc <- 5000
 start <- Sys.time()
 out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
 finish <- Sys.time() - start
-finish #500 iterations takes 2.23 minutes for m = 100 and reps = 100
-#500 iterations takes 5.3 minutes for m = 1000 and reps = 100
+finish 
+
+#5000 iterations takes 12.15 minutes for m = 1000 and reps = 10
 
 ##
 ## Plot output
