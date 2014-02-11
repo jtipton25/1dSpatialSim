@@ -9,9 +9,8 @@ source('dinvgamma.R')
 library(mvtnorm)
 source('make.output.plot.R')
 source('make.spatial.field.pca.R')
-setwd('~/1dSpatialSim/ppSmoothing//')
+setwd('~/1dSpatialSim/ppSmoothing/pca/')
 source('mcmc.pca.spatial.pp.R')
-# source('mcmc.spatial.pp.R')
 
 ##
 ## Simulate Data
@@ -20,7 +19,7 @@ source('mcmc.pca.spatial.pp.R')
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 200 # number of spatial fields
+reps <- 20 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
@@ -28,15 +27,15 @@ s2.e <- 0.01
 samp.size <- 5:40
 
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
-plot.Y.field(field$Y.list, field$H.list, locs)
-plot.Z.field(field$Z.list, locs)
+plot.Y.field(field$Y.list[1:(reps / 2)], field$H.list[1:(reps / 2)], locs)
+plot.Z.field(field$Z.list[(reps / 2 + 1):reps], locs, main = "Full Data")
 
-Y.list <- field$Y.list[1:100]
-H.list <- field$H.list[1:100]
-Z.list <- field$Z.list[101:200]
+Y.list <- field$Y.list[1:(reps / 2)]
+H.list <- field$H.list[1:(reps / 2)]
+Z.list <- field$Z.list[(reps / 2 + 1):reps]
 
-matplot(matrix(unlist(Z.list), ncol = 100, byrow = FALSE), type = 'l')
-X <- matrix(unlist(Z.list), ncol = 100, byrow = FALSE)
+matplot(matrix(unlist(Z.list), ncol = reps / 2, byrow = FALSE), type = 'l')
+X <- matrix(unlist(Z.list), ncol = reps / 2, byrow = FALSE)
 num.pca <- 3
 
 ##
@@ -76,11 +75,11 @@ phi.tune <- 0.75
 
 s.star <- seq(0.1, 0.9, 0.1)
 
-sigma.squared.eta.tune <- 0.00275
-sigma.squared.epsilon.tune <- 0.0020
-phi.tune <- 0.0050
+sigma.squared.eta.tune <- 0.275
+sigma.squared.epsilon.tune <- 0.080
+phi.tune <- 5.00
 
-n.mcmc <- 1000
+n.mcmc <- 5000
 
 ##
 ## Fit spatial MCMC kriging model
@@ -102,3 +101,5 @@ finish
 
 make.output.plot(out)
 apply(out$mu.beta.save, 1, mean)
+
+matplot((out$fort.raster - matrix(unlist(field$Z.list[1:(reps / 2)]), nrow = m))^2, type = 'l') ## prediction error
