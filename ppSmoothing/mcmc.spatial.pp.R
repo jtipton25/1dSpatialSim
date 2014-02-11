@@ -22,7 +22,11 @@
 ## mu_0 and Sigma_0 are hyperparameters
 ##
 
-mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune, s.star){
+mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, 
+                    alpha.epsilon, beta.epsilon, alpha.beta, 
+                    beta.beta, alpha.phi, beta.phi, mu.beta, 
+                    sigma.squared.eta.tune, sigma.squared.epsilon.tune, 
+                    phi.tune, s.star){
 
   ##
   ## Libraries and Subroutines
