@@ -71,8 +71,8 @@ phi.tune <- 0.75
 s.star <- seq(0.1, 0.9, 0.1)
 
 sigma.squared.eta.tune <- 0.0275
-sigma.squared.epsilon.tune <- 0.0020
-phi.tune <- 0.050
+sigma.squared.epsilon.tune <- 0.020
+phi.tune <- 0.50
 
 n.mcmc <- 2000
 
