@@ -20,7 +20,7 @@ source('mcmc.pca.spatial.pp.R')
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 200 # number of spatial fields
+reps <- 500 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
@@ -29,14 +29,14 @@ samp.size <- 5:40
 
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
 plot.Y.field(field$Y.list, field$H.list, locs)
-plot.Z.field(field$Z.list, locs)
+plot.Z.field(field$Z.list[(floor(reps / 2)+1):reps], locs, main = "True Data")
 
-Y.list <- field$Y.list[1:100]
-H.list <- field$H.list[1:100]
-Z.list <- field$Z.list[101:200]
+Y.list <- field$Y.list[1:floor(reps / 2)]
+H.list <- field$H.list[1:floor(reps / 2)]
+Z.list <- field$Z.list[(floor(reps / 2)+1):reps]
 
-matplot(matrix(unlist(Z.list), ncol = 100, byrow = FALSE), type = 'l')
-X <- matrix(unlist(Z.list), ncol = 100, byrow = FALSE)
+X <- matrix(unlist(Z.list), nrow = 1000, byrow = FALSE)
+matplot(X, type = 'l')
 num.pca <- 3
 
 ##
@@ -49,22 +49,15 @@ Sigma.0 <- sigma.squared.0 * diag(num.pca)
 #Sigma.0 <- sigma.squared.0 * diag(dim(X)[2])
 alpha.beta <- 2
 beta.beta <- 0.2
-curve(dinvgamma(x, alpha.beta, beta.beta))
 ##
 alpha.eta <- 12
 beta.eta <- 12
-curve(dinvgamma(x, alpha.eta, beta.eta), from = 0, to = 6)
-abline(v = s2.s, col = 'red')
 ##
 alpha.epsilon <- 3
 beta.epsilon <- 2
-curve(dinvgamma(x, alpha.epsilon, beta.epsilon), from = 0, to = 6)
-abline(v = s2.e, col = 'red')
 ##
 alpha.phi <- 10
 beta.phi <- 20
-curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
-abline(v = phi, col = 'red')
 ##
 sigma.squared.eta.tune <- 0.0075
 sigma.squared.epsilon.tune <- 0.005
@@ -76,9 +69,9 @@ phi.tune <- 0.75
 
 s.star <- seq(0.1, 0.9, 0.1)
 
-sigma.squared.eta.tune <- 0.00275
+sigma.squared.eta.tune <- 0.0275
 sigma.squared.epsilon.tune <- 0.0020
-phi.tune <- 0.0050
+phi.tune <- 2.50
 
 n.mcmc <- 1000
 
@@ -99,6 +92,12 @@ finish
 ##
 ## Plot output
 ##
-
-make.output.plot(out)
+x11();make.output.plot(out)
 apply(out$mu.beta.save, 1, mean)
+
+mean(out$phi.save[(n.mcmc / 5 + 1):n.mcmc])
+phi
+mean(out$sigma.squared.epsilon.save[(n.mcmc / 5 + 1):n.mcmc])
+s2.e
+mean(out$sigma.squared.eta.save[(n.mcmc / 5 + 1):n.mcmc])
+s2.s
