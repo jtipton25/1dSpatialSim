@@ -269,20 +269,21 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   ##
     
   if(k > n.burn){
-    if(k %% 100 == 0){
-      for(s in 1:t){
-        var.save[, s] <- var.save[, s] + apply(var.save.temp[, , s], 2, var) / ((n.mcmc - n.burn) / 100)
-        fort.raster.batch <- matrix(0, ncells, t)
+    if(k %% 10 == 0){
+      Sigma.full <- (sigma.squared.eta * exp( - D / phi)) + sigma.squared.epsilon * I.full
+      fort.raster <- fort.raster + 1 / (n.mcmc - n.burn) * sapply(1:t, make.fort.batch, beta = beta, H.list = H.list, Y.list = Y.list, Sigma.full = Sigma.full, ncells = ncells)
+        if(k %% 1000 == 0){
+        var.save.temp[100, , ] <- fort.raster
+      } else {
+        var.save.temp[(k %% 1000) / 10, , ] <- fort.raster
       }
-      var.save.temp <- array(0, dim = c(100, ncells, t))
     }
-#     Sigma.full <- (sigma.squared.eta * exp( - D / phi))# + sigma.squared.epsilon * diag(ncells))
-    Sigma.full <- (sigma.squared.eta * exp( - D / phi)) + sigma.squared.epsilon * I.full
-    fort.raster <- fort.raster + 1 / (n.mcmc - n.burn) * sapply(1:t, make.fort.batch, beta = beta, H.list = H.list, Y.list = Y.list, Sigma.full = Sigma.full, ncells = ncells)
-    #chol.Sigma <- chol(Sigma.full)
-    #fort.raster <- fort.raster + (1 / (n.mcmc - n.burn)) * sapply(1:t, make.fort.batch, beta = beta, chol.Sigma = chol.Sigma, ncells = ncells)
-    #rmvnorm(t(X) %*% beta, Sigma.full)
-    var.save.temp[k %% 100 + 1, , ] <- fort.raster
+    if(k %% 1000 == 0){
+      for(s in 1:t){
+        var.save[, s] <- var.save[, s] + apply(var.save.temp[, , s], 2, var) / ((n.mcmc - n.burn) / 1000)
+        var.save.temp <- array(0, dim = c(100, ncells, t))
+      }
+    }
   }
 
   ##

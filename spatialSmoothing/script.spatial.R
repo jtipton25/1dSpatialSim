@@ -19,24 +19,30 @@ source('mcmc.spatial.R')
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 10 # number of spatial fields
+reps <- 20 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
 s2.e <- 0.01
-samp.size <- 40
+samp.size <- 5:40
 
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
 
 layout(matrix(1:2, ncol = 2))
-plot.Z.field(field$Z.list, locs, main = "Actual data")
-plot.Y.field(field$Y.list, field$H.list, locs)
+plot.Y.field(field$Y.list[1:(reps / 2)], field$H.list[1:(reps / 2)], locs)
+plot.Z.field(field$Z.list[(reps / 2 + 1):reps], locs, main = "Full Data")
+
+Y.list <- field$Y.list[1:(reps / 2)]
+H.list <- field$H.list[1:(reps / 2)]
+Z.list <- field$Z.list[(reps / 2 + 1):reps]
+X <- matrix(unlist(Z.list), ncol = reps / 2, byrow = FALSE)
+matplot(X, type = 'l')
 
 ##
 ## Initialize priors and tuning paramteters
 ##
 
-mu.0 <- c(0, 2)#rep(0, dim(X)[2])
+mu.0 <- rep(0, dim(X)[2])
 sigma.squared.0 <- 0.025
 #Sigma.0 <-
 alpha.beta <- 2
@@ -79,7 +85,7 @@ finish
 ##
 ## Plot output
 ##
-x11()
+# x11()
 make.output.plot(out)
 ## identifiability between beta_0 and sigma.squared.epsilon???
 matplot(out$beta.save[1, , (n.mcmc / 10 + 1):n.mcmc], type = 'l', ylim = c(min(out$beta.save[, , (n.mcmc / 10 + 1):n.mcmc]), max(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc])))

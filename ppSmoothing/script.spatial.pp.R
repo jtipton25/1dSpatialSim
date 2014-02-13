@@ -19,7 +19,7 @@ source('mcmc.spatial.pp.R')
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 200 # number of spatial fields
+reps <- 20 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
@@ -27,20 +27,24 @@ s2.e <- 0.01
 samp.size <- 5:40
 
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
-plot.Y.field(field$Y.list, field$H.list, locs)
-plot.Z.field(field$Z.list, locs)
 
-Y.list <- field$Y.list[1:100]
-H.list <- field$H.list[1:100]
-Z.list <- field$Z.list[101:200]
+layout(matrix(1:2, ncol = 2))
+plot.Y.field(field$Y.list[1:(reps / 2)], field$H.list[1:(reps / 2)], locs)
+plot.Z.field(field$Z.list[(reps / 2 + 1):reps], locs, main = "Full Data")
+
+Y.list <- field$Y.list[1:(reps / 2)]
+H.list <- field$H.list[1:(reps / 2)]
+Z.list <- field$Z.list[(reps / 2 + 1):reps]
+X <- matrix(unlist(Z.list), ncol = reps / 2, byrow = FALSE)
+matplot(X, type = 'l')
 
 ##
 ## Initialize priors and tuning paramteters
 ##
 
-mu.0 <- c(0, 2)#rep(0, dim(X)[2])
+mu.0 <- rep(0, dim(X)[2])
 sigma.squared.0 <- 0.025
-#Sigma.0 <- sigma.squared.0 * diag(dim(X)[2])
+Sigma.0 <- sigma.squared.0 * diag(dim(X)[2])
 alpha.beta <- 2
 beta.beta <- 0.2
 curve(dinvgamma(x, alpha.beta, beta.beta))
@@ -60,9 +64,6 @@ beta.phi <- 20
 curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 abline(v = phi, col = 'red')
 ##
-sigma.squared.eta.tune <- 0.0075
-sigma.squared.epsilon.tune <- 0.005
-phi.tune <- 0.75
 
 ##
 ## Knots for predictive process
@@ -70,11 +71,11 @@ phi.tune <- 0.75
 
 s.star <- seq(0.1, 0.9, 0.1)
 
-sigma.squared.eta.tune <- 0.0275
-sigma.squared.epsilon.tune <- 0.020
-phi.tune <- 0.50
+sigma.squared.eta.tune <- 0.000275
+sigma.squared.epsilon.tune <- 0.0020
+phi.tune <- 0.0050
 
-n.mcmc <- 2000
+n.mcmc <- 5000
 
 ##
 ## Fit spatial MCMC kriging model

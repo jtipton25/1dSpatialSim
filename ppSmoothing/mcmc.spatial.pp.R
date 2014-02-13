@@ -167,7 +167,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0,
 #   Sigma <- lapply(1:t, make.Sigma, R.list = R.list, Sigma.epsilon = Sigma.epsilon)
 #   Sigma.inv <- lapply(1:t, make.Sigma.inv, Sigma = Sigma)
    
-  devs <- rnorm(t)
+  devs <- rnorm(tau)
 	Sigma.chol <- chol(Sigma.0)
 	mu.beta <- backsolve(Sigma.chol, backsolve(Sigma.0, mu.0, transpose = TRUE) + devs)
 
