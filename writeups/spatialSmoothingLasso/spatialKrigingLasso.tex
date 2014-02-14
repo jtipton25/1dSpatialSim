@@ -31,7 +31,7 @@
 %
 \begin{align*}
 %
-\bm{\beta}_t & \sim N(\bm{\mu}_\beta, \bm{\Sigma}_\beta) & \bm{\Sigma}_\beta &  = \sigma^2_\beta \bm{I}_{n_t}\\
+\bm{\beta}_t & \sim N(\bm{\mu}_\beta, \bm{\Sigma}_\beta) & \bm{\Sigma}_\beta &  = \sigma^2_\epsilon \bm{D}_\gamma & \bm{D}_\gamma & = diag(\gamma^2_1, \ldots, \gamma^2_p)\\
 %
 \bm{\eta}_t & \sim N(0, \bm{\Sigma}_\eta) & \bm{\Sigma}_\eta &  = \sigma^2_\eta \bm{R}(\phi) & \bm{R}(\phi) & = \exp{( - \bm{D}_t / \phi)}\\
 %
