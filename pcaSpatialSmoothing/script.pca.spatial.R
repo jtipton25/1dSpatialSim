@@ -8,9 +8,9 @@ setwd('~/1dSpatialSim/')
 source('dinvgamma.R')
 source('make.output.plot.R')
 library(mvtnorm)
-source('make.spatial.field.R')
-setwd('~/1dSpatialSim/spatialSmoothing/')
-source('mcmc.spatial.R')
+source('make.spatial.field.pca.R')
+setwd('~/1dSpatialSim/pcaSpatialSmoothing/')
+source('mcmc.pca.spatial.R')
 
 ##
 ## Simulate Data
@@ -30,44 +30,37 @@ field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponen
 
 layout(matrix(1:2, ncol = 2))
 plot.Y.field(field$Y.list[1:(reps / 2)], field$H.list[1:(reps / 2)], locs)
-plot.Z.field(field$Z.list[(reps / 2 + 1):reps], locs, main = "Full Data")
+plot.Z.field(field$Z.list[(reps / 2 + 1):reps], locs, main = 'Full Data')
 
-Y.list <- field$Y.list[1:(reps / 2)]
-H.list <- field$H.list[1:(reps / 2)]
+Y.list <- field$Y.list[1:(reps / 2)] 
+H.list <- field$H.list[1:(reps / 2)] 
 Z.list <- field$Z.list[(reps / 2 + 1):reps]
 X <- matrix(unlist(Z.list), ncol = reps / 2, byrow = FALSE)
 matplot(X, type = 'l')
+num.pca <- 3 
 
 ##
 ## Initialize priors and tuning paramteters
 ##
 
-mu.0 <- rep(0, dim(X)[2])
+mu.0 <- rep(0, num.pca)#rep(0, dim(X)[2])
 sigma.squared.0 <- 0.025
-#Sigma.0 <-
+Sigma.0 <- sigma.squared.0 * diag(num.pca)
 alpha.beta <- 2
 beta.beta <- 0.2
-curve(dinvgamma(x, alpha.beta, beta.beta))
 ##
 alpha.eta <- 12
 beta.eta <- 12
-curve(dinvgamma(x, alpha.eta, beta.eta), from = 0, to = 6)
-abline(v = s2.s, col = 'red')
 ##
 alpha.epsilon <- 3
 beta.epsilon <- 2
-curve(dinvgamma(x, alpha.epsilon, beta.epsilon), from = 0, to = 6)
-abline(v = s2.e, col = 'red')
 ##
 alpha.phi <- 10
 beta.phi <- 20
-curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
-abline(v = phi, col = 'red')
 ##
-sigma.squared.beta.tune <- 0.025
-sigma.squared.eta.tune <- 0.25
-sigma.squared.epsilon.tune <- 0.075
-phi.tune <- 0.25
+sigma.squared.eta.tune <- 0.5
+sigma.squared.epsilon.tune <- 0.275
+phi.tune <- 0.5
 
 n.mcmc <- 5000
 
@@ -76,7 +69,10 @@ n.mcmc <- 5000
 ##
 
 start <- Sys.time()
-out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
+# Rprof(file = 'spatial.Rprof.out')
+out <- mcmc.1d(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
+# Rprof(NULL)
+# summaryRprof('spatial.Rprof.out')
 finish <- Sys.time() - start
 finish 
 
@@ -87,12 +83,12 @@ finish
 ##
 # x11()
 make.output.plot(out)
-## identifiability between beta_0 and sigma.squared.epsilon???
+
 matplot(out$beta.save[1, , (n.mcmc / 10 + 1):n.mcmc], type = 'l', ylim = c(min(out$beta.save[, , (n.mcmc / 10 + 1):n.mcmc]), max(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc])))
 matplot(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc], type = 'l', add = TRUE)
 
 apply(out$mu.beta.save[, (n.mcmc / 10 + 1):n.mcmc], 1, mean)
 matplot(out$fort.raster, type = 'l', main = 'Posterior Predictive')
 
-MSPE <- (out$fort.raster - matrix(unlist(field$Z.list), nrow = m, byrow = FALSE))^2
+MSPE <- (out$fort.raster - X)^2
 matplot(MSPE, type = 'l', main = 'MSPE')

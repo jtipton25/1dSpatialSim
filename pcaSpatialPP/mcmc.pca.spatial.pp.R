@@ -1,5 +1,5 @@
 ##
-## MCMC spatial kriging algorithm
+## MCMC principal component spatial predictive process algorithm
 ##
 ## John Tipton
 ##
@@ -154,8 +154,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   Sigma.inv <- lapply(1:t, make.Sigma.inv, Sigma.epsilon.inv = Sigma.epsilon, C.star = C.star, c = c, H.list = H.list)
   
   devs <- rnorm(tau)
-	Sigma.chol <- chol(Sigma.0)
-	mu.beta <- backsolve(Sigma.chol, backsolve(Sigma.0, mu.0, transpose = TRUE) + devs)
+  Sigma.chol <- chol(Sigma.0)
+  mu.beta <- backsolve(Sigma.chol, backsolve(Sigma.0, mu.0, transpose = TRUE) + devs)
 
   n.burn <- floor(n.mcmc / 5) + 1
   fort.raster.batch <- matrix(0, ncells, t)   

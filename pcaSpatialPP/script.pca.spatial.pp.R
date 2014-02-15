@@ -8,9 +8,9 @@ setwd('~/1dSpatialSim/')
 source('dinvgamma.R')
 library(mvtnorm)
 source('make.output.plot.R')
-source('make.spatial.field.R')
-setwd('~/1dSpatialSim/ppSmoothing//')
-source('mcmc.spatial.pp.R')
+source('make.spatial.field.pca.R')
+setwd('~/1dSpatialSim/pcaSpatialPP')
+source('mcmc.pca.spatial.pp.R')
 
 ##
 ## Simulate Data
@@ -42,27 +42,21 @@ matplot(X, type = 'l')
 ## Initialize priors and tuning paramteters
 ##
 
-mu.0 <- rep(0, dim(X)[2])
+mu.0 <- rep(0, num.pca)#c(0, 2)#rep(0, dim(X)[2])
 sigma.squared.0 <- 0.025
-Sigma.0 <- sigma.squared.0 * diag(dim(X)[2])
+Sigma.0 <- sigma.squared.0 * diag(num.pca)
+#Sigma.0 <- sigma.squared.0 * diag(dim(X)[2])
 alpha.beta <- 2
 beta.beta <- 0.2
-curve(dinvgamma(x, alpha.beta, beta.beta))
 ##
 alpha.eta <- 12
 beta.eta <- 12
-curve(dinvgamma(x, alpha.eta, beta.eta), from = 0, to = 6)
-abline(v = s2.s, col = 'red')
 ##
 alpha.epsilon <- 3
 beta.epsilon <- 2
-curve(dinvgamma(x, alpha.epsilon, beta.epsilon), from = 0, to = 6)
-abline(v = s2.e, col = 'red')
 ##
 alpha.phi <- 10
 beta.phi <- 20
-curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
-abline(v = phi, col = 'red')
 ##
 
 ##
@@ -71,9 +65,9 @@ abline(v = phi, col = 'red')
 
 s.star <- seq(0.1, 0.9, 0.1)
 
-sigma.squared.eta.tune <- 0.000275
-sigma.squared.epsilon.tune <- 0.0020
-phi.tune <- 0.0050
+sigma.squared.eta.tune <- 0.275
+sigma.squared.epsilon.tune <- 0.0080
+phi.tune <- 5.00
 
 n.mcmc <- 5000
 
@@ -81,11 +75,9 @@ n.mcmc <- 5000
 ## Fit spatial MCMC kriging model
 ##
 
-## Something is happening to sigma.squared.epsilon.save that is driving it to 0...
-
 start <- Sys.time()
 # Rprof(file = 'spatial.pp.Rprof.out')
-out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune, s.star)
+out <- mcmc.1d(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune, s.star)
 # Rprof(NULL)
 # summaryRprof('spatial.pp.Rprof.out')
 finish <- Sys.time() - start
@@ -96,6 +88,14 @@ finish
 ##
 ## Plot output
 ##
-
+# x11();
 make.output.plot(out)
 apply(out$mu.beta.save, 1, mean)
+
+mean(out$phi.save[(n.mcmc / 5 + 1):n.mcmc])
+phi
+mean(out$sigma.squared.epsilon.save[(n.mcmc / 5 + 1):n.mcmc])
+s2.e
+mean(out$sigma.squared.eta.save[(n.mcmc / 5 + 1):n.mcmc])
+s2.s
+matplot((out$fort.raster - matrix(unlist(field$Z.list[1:(reps / 2)]), nrow = m))^2, type = 'l') ## prediction error
