@@ -24,7 +24,7 @@ beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
 s2.e <- 0.01
-samp.size <- 40
+samp.size <- 5:40
 
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
 
