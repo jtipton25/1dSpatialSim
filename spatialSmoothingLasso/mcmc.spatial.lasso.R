@@ -22,7 +22,7 @@
 ## mu_0 and Sigma_0 are hyperparameters
 ##
 
-mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon, alpha.phi, beta.phi, alpha.lambda, beta.lambda, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune){
+mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon, alpha.phi, beta.phi, alpha.lambda, beta.lambda, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune, gamma.squared.tune){
   #mu.0, Sigma.0, 
   
   ##
@@ -67,6 +67,10 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon
   
   make.mh.epsilon <- function(s, beta, Sigma, Sigma.inv, Sigma.beta, Sigma.beta.inv){
     ( - 1 / 2) * determinant(Sigma[[s]],  logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s]) + ( - 1 / 2) * determinant(Sigma.beta,  logarithm = TRUE)$modulus[1] - 1 / 2 * beta[, s] %*% Sigma.beta.inv %*% beta[, s]
+  }
+  
+  make.mh.gamma <- function(s, beta, sigma.squared.epsilon, gamma.squared, lambda.squared){
+    ( - T / 2) * log(sigma.squared.epsilon * gamma.squared[s]) - sum(sapply(1:t, make.sum.beta, beta = beta)) / (2 * sigma.squared.epsilon + gamma.squared[s]) - lambda.squared * gamma.squared[s] / 2
   }
   
   make.fort.batch <- function(s, beta, H.list, Y.list, Sigma.full, ncells){
@@ -142,17 +146,19 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon
   ##
   
   beta.save <- array(dim = c(tau, t, n.mcmc))
-  sigma.squared.beta.save <- vector(length = n.mcmc)
+#   sigma.squared.beta.save <- vector(length = n.mcmc)
   sigma.squared.epsilon.save <- vector(length = n.mcmc)
   sigma.squared.eta.save <- vector(length = n.mcmc)
   phi.save <- vector(length = n.mcmc) 
-  mu.beta.save <- matrix(NA, nrow = tau, ncol = n.mcmc)
+  gamma.squared.save <- matrix(NA, nrow = tau, ncol = n.mcmc)
+  lambda.squared.save <- vector(length = n.mcmc)
   fort.raster <- matrix(0, nrow = ncells, ncol = t)
   var.save <- matrix(0, nrow = ncells, ncol = t)
   var.save.temp <- array(dim = c(100, ncells, t))
   phi.accept <- 0  
   eta.accept <- 0
   epsilon.accept <- 0
+  gamma.accept <- 0
   
   ##
   ## Begin MCMC loop
@@ -278,18 +284,32 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon
     ##
     ## Sample gamma.squared
     ##
+##
+## This needs some work...
+##
+#     gamma.squared <- 1 / rgamma(1 + t / 2, lambda.squared / 2 + sapply(1:t, make.sum.beta, beta = beta))
+    gamma.squared.star <- rnorm(tau, gamma.squared, rep(sigma.squared.gamma.tune, tau))
+    if(min(gamma.squared.star) > 0){
+      mh.gamma.1 <- sum(sapply(1:tau, make.mh.gamma, beta = beta, sigma.squared.epsilon = sigma.squared.epsilon, gamma.squared = gamma.squared.star, lambda.squared = lambda.squared))
+      mh.gamma.2 <- sum(sapply(1:tau, make.mh.gamma, beta = beta, sigma.squared.epsilon = sigma.squared.epsilon, gamma.squared = gamma.squared, lambda.squared = lambda.squared))
+      mh.gamma <- exp(mh.gamma.1 - mh.gamma.2)
+    
+      if(mh.gamma > runif(1)){
+        gamma.squared <- gamma.squared.star
+        D.gamma <- diag(gamma.squared)
+        D.gamma.inv <- diag(1 / gamma.squared)
+        Sigma.beta <- sigma.squared.epsilon * D.gamma
+        Sigma.beta.inv <- 1 / sigma.squared.epsilon * D.gamma.inv
+        gamma.accept <- gamma.accept + 1 / n.mcmc
+      }
+    }
 
-    gamma.squared <- 1 / rgamma(1 + t / 2, lambda.squared / 2 + sapply(1:t, make.sum.beta, beta = beta))
-    D.gamma <- diag(gamma.squared)
-    D.gamma.inv <- diag(1 / gamma.squared)
-    Sigma.beta <- sigma.squared.epsilon * D.gamma
-    Sigma.beta.inv <- 1 / sigma.squared.epsilon * D.gamma.inv
 
     ##
     ## sample lambda.squared
     ##
   
-    lambda.squared <- rgamma(alpha.lambda + tau, beta.lambda + sum(gamma.squared) / 2)
+    lambda.squared <- rgamma(1, alpha.lambda + tau, beta.lambda + sum(gamma.squared) / 2)
     
     ##
     ## Simulate random field
@@ -318,10 +338,11 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon
     ## 
     
     beta.save[, , k] <- beta
-    sigma.squared.beta.save[k] <- sigma.squared.beta
+#     sigma.squared.beta.save[k] <- sigma.squared.beta
     sigma.squared.eta.save[k] <- sigma.squared.eta
     sigma.squared.epsilon.save[k] <- sigma.squared.epsilon
-    mu.beta.save[, k] <- mu.beta  
+    lambda.squared.save[k] <- lambda.squared
+    gamma.squared.save[, k] <- gamma.squared
     phi.save[k] <- phi	
   }
   
@@ -329,5 +350,5 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon
   ## Write output
   ##
   
-  list(beta.save = beta.save, sigma.squared.beta.save = sigma.squared.beta.save, sigma.squared.epsilon.save = sigma.squared.epsilon.save, sigma.squared.eta.save = sigma.squared.eta.save, mu.beta.save = mu.beta.save, n.mcmc = n.mcmc, fort.raster = fort.raster, phi.accept = phi.accept, eta.accept = eta.accept, epsilon.accept = epsilon.accept, phi.save = phi.save, var.save = var.save)#, MSPE.save = MSPE.save)
+  list(beta.save = beta.save, sigma.squared.epsilon.save = sigma.squared.epsilon.save, sigma.squared.eta.save = sigma.squared.eta.save, lambda.squared.save = lambda.squared.save, n.mcmc = n.mcmc, fort.raster = fort.raster, phi.accept = phi.accept, eta.accept = eta.accept, epsilon.accept = epsilon.accept, phi.save = phi.save, gamma.accept = gamma.accept, var.save = var.save)#, MSPE.save = MSPE.save)
 }

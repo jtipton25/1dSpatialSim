@@ -6,11 +6,41 @@ set.seed(1)
 ##
 setwd('~/1dSpatialSim/')
 source('dinvgamma.R')
-source('make.output.plot.R')
+# source('make.output.plot.R')
 library(mvtnorm)
 source('make.spatial.field.R')
-setwd('~/1dSpatialSim/spatialSmoothing/')
-source('mcmc.spatial.R')
+setwd('~/1dSpatialSim/spatialSmoothingLasso/')
+source('mcmc.spatial.lasso.R')
+
+##
+## Plot of 1d spatial mcmc output
+##
+
+make.output.plot <- function(out){
+  n.burn <- floor(n.mcmc / 10)
+  #x11()
+  layout(matrix(1:9, nrow = 3))
+  #
+  plot(out$sigma.squared.epsilon.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$epsilon.accept, 2)))
+  abline(h = s2.e, col = 'red')
+  #
+  plot(out$sigma.squared.eta.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$eta.accept, 2)))
+  abline(h = s2.s, col = 'red')
+  #
+  plot(out$phi.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$phi.accept, 2)))
+  abline(h = phi, col = 'red')
+  #
+  matplot(out$fort.raster, type = 'l')
+  #
+  plot.Z.field(field$Z.list, locs = locs, main = "True Surface")
+  #
+  #
+  plot.Y.field(field$Y.list, field$H.list, locs = locs)
+  #
+  MSPE <- (out$fort.raster - matrix(unlist(field$Z.list), nrow = m, byrow = FALSE))^2
+  matplot(MSPE, type = 'l', main = 'MSPE')
+}
+
 
 ##
 ## Simulate Data
@@ -31,7 +61,8 @@ field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponen
 layout(matrix(1:2, ncol = 2))
 plot.Z.field(field$Z.list, locs, main = "Actual data")
 plot.Y.field(field$Y.list, field$H.list, locs)
-
+Y.list <- field$Y.list
+H.list <- field$H.list
 ##
 ## Initialize priors and tuning paramteters
 ##
@@ -59,15 +90,15 @@ curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 abline(v = phi, col = 'red')
 
 
-alpha.lambda <- 10
-beta.lambda <- 10
+alpha.lambda <- 1
+beta.lambda <- 1
 
 ##
 sigma.squared.beta.tune <- 0.025
 sigma.squared.eta.tune <- 0.25
 sigma.squared.epsilon.tune <- 0.075
 phi.tune <- 0.25
-
+sigma.squared.gamma.tune <- 0.1
 n.mcmc <- 5000
 
 ##
@@ -75,7 +106,7 @@ n.mcmc <- 5000
 ##
 
 start <- Sys.time()
-out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
+out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon, alpha.phi, beta.phi, alpha.lambda, beta.lambda, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune, sigma.squared.gamma.tune)
 finish <- Sys.time() - start
 finish 
 
