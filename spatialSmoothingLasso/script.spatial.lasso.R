@@ -98,7 +98,11 @@ sigma.squared.beta.tune <- 0.025
 sigma.squared.eta.tune <- 0.25
 sigma.squared.epsilon.tune <- 0.075
 phi.tune <- 0.25
+<<<<<<< HEAD
 sigma.squared.gamma.tune <- 0.3
+=======
+sigma.squared.gamma.tune <- 0.1
+>>>>>>> b163ded288d050c2f685358044130e31463780d5
 n.mcmc <- 5000
 
 ##
