@@ -36,5 +36,8 @@ make.output.plot <- function(out){
   hist(out$mu.beta.save[2, ][(n.burn + 1):n.mcmc])
   abline(v = beta[2], col = 'red')
   abline(v = quantile(out$mu.beta.save[2, ], probs = c(0.025, 0.975)), col = 'blue')
+  #
+  MSPE <- (out$fort.raster - matrix(unlist(field$Z.list), nrow = m, byrow = FALSE))^2
+  matplot(MSPE, type = 'l', main = 'MSPE')
 }
 

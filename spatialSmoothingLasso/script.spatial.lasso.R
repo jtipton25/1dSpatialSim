@@ -57,6 +57,11 @@ alpha.phi <- 10
 beta.phi <- 20
 curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 abline(v = phi, col = 'red')
+
+
+alpha.lambda <- 10
+beta.lambda <- 10
+
 ##
 sigma.squared.beta.tune <- 0.025
 sigma.squared.eta.tune <- 0.25
@@ -79,7 +84,7 @@ finish
 ##
 ## Plot output
 ##
-
+x11()
 make.output.plot(out)
 ## identifiability between beta_0 and sigma.squared.epsilon???
 matplot(out$beta.save[1, , (n.mcmc / 10 + 1):n.mcmc], type = 'l', ylim = c(min(out$beta.save[, , (n.mcmc / 10 + 1):n.mcmc]), max(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc])))

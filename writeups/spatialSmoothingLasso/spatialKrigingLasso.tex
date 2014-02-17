@@ -31,7 +31,8 @@
 %
 \begin{align*}
 %
-\bm{\beta}_t & \sim N(\bm{\mu}_\beta, \bm{\Sigma}_\beta) & \bm{\Sigma}_\beta &  = \sigma^2_\epsilon \bm{D}_\gamma & \bm{D}_\gamma & = diag(\gamma^2_1, \ldots, \gamma^2_p)\\
+% \bm{\beta}_t & \sim N(\bm{\mu}_\beta, \bm{\Sigma}_\beta) & \bm{\Sigma}_\beta &  = \sigma^2_\epsilon \bm{D}_\gamma & \bm{D}_\gamma & = diag(\gamma^2_1, \ldots, \gamma^2_\tau)\\
+\bm{\beta}_t & \sim N(\bm{0}, \bm{\Sigma}_\beta) & \bm{\Sigma}_\beta &  = \sigma^2_\epsilon \bm{D}_\gamma & \bm{D}_\gamma & = diag(\gamma^2_1, \ldots, \gamma^2_\tau)\\
 %
 \bm{\eta}_t & \sim N(0, \bm{\Sigma}_\eta) & \bm{\Sigma}_\eta &  = \sigma^2_\eta \bm{R}(\phi) & \bm{R}(\phi) & = \exp{( - \bm{D}_t / \phi)}\\
 %
@@ -43,7 +44,7 @@
 %
 \begin{align*}
 %
-\bm{\mu}_\beta & \sim N(\bm{\mu}_0, \bm{\Sigma}_0)\\
+% \bm{\mu}_\beta & \sim N(\bm{\mu}_0, \bm{\Sigma}_0)\\
 %
 \sigma^2_\beta & \sim IG(\alpha_\beta, \beta_\beta)\\
 %
@@ -82,32 +83,32 @@ which is Normal with mean $ \bm{A}^{ - 1} \bm{b}$ and variance $\bm{A}^{ - 1}$ w
   \bm{b} & = (\bm{X}^T \bm{H}_t^T \bm{\Sigma}^{ - 1} \bm{y}_t + \bm{\Sigma}_\beta^{ - 1} \bm{\mu}_\beta)\\
 \end{align*}
 %
-\subsection{Full Conditional for $\bm{\mu}_\beta$}
+% \subsection{Full Conditional for $\bm{\mu}_\beta$}
+% %
+% \begin{align*}
+% [\bm{\mu}_\beta | \cdot] & \propto \prod_{t = 1}^T [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta] [\bm{\mu}_\beta]\\
+% %
+% & \propto e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)} e^{ - \frac{1} {2} (\bm{\mu}_\beta - \bm{\mu}_0)^T \Sigma_0^{ - 1} (\bm{\mu}_\beta - \bm{\mu}_0)}\\
+% %
+% & \propto e^{ - \frac{1} {2} (
+% \bm{\mu}_\beta^T (T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1}) \bm{\mu}_\beta - 2 \bm{\mu}_\beta^T (\sum_{t = 1}^T \bm{\Sigma}_\beta^{ - 1} \bm{\beta}_t + \bm{\Sigma}_0^{ - 1} \bm{\mu}_0) ) }
+% \end{align*}
+% %
+% which is multivariate normal with mean
+% $(T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1})^{ - 1} (\sum_{t = 1}^T \bm{\Sigma}_\beta^{ - 1} \bm{\beta}_t + \bm{\Sigma}_0^{ - 1} \bm{\mu}_0)$ and variance $(T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1})^{ - 1}$
 %
-\begin{align*}
-[\bm{\mu}_\beta | \cdot] & \propto \prod_{t = 1}^T [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta] [\bm{\mu}_\beta]\\
-%
-& \propto e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)} e^{ - \frac{1} {2} (\bm{\mu}_\beta - \bm{\mu}_0)^T \Sigma_0^{ - 1} (\bm{\mu}_\beta - \bm{\mu}_0)}\\
-%
-& \propto e^{ - \frac{1} {2} (
-\bm{\mu}_\beta^T (T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1}) \bm{\mu}_\beta - 2 \bm{\mu}_\beta^T (\sum_{t = 1}^T \bm{\Sigma}_\beta^{ - 1} \bm{\beta}_t + \bm{\Sigma}_0^{ - 1} \bm{\mu}_0) ) }
-\end{align*}
-%
-which is multivariate normal with mean
-$(T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1})^{ - 1} (\sum_{t = 1}^T \bm{\Sigma}_\beta^{ - 1} \bm{\beta}_t + \bm{\Sigma}_0^{ - 1} \bm{\mu}_0)$ and variance $(T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1})^{ - 1}$
-%
-\subsection{Full Conditional for $\sigma^2_\beta$}
-%
-\begin{align*}
-[\sigma^2_\beta | \cdot] & \propto \prod_{t = 1}^T [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta] [\sigma^2_\beta]\\
-%
-& \propto (\prod_{t = 1}^T |\bm{\Sigma}_\beta|^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)} (\sigma^2_\beta)^{ - (\alpha_\beta + 1)} e^{ - \frac{\beta_\beta} {\sigma^2_\beta}}\\
-%
-& \propto (\sigma^2_\beta)^{ - (\alpha_\beta + \frac{\sum_{t = 1}^T n_t} {2} + 1)} e^{ - \frac{1} {\sigma^2_\beta} (\frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)}
-\end{align*}
-%
-which is IG$(\alpha_\beta + \frac{\sum_{t = 1}^T n_t} {2}, \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)$ since the determinant $|\bm{\Sigma}_\beta| = (\sigma^2_\beta)^{n_t}$ and $\bm{\Sigma}_\beta^{ - 1} = \frac{1} {\sigma^2_\beta} \bm{I}_t$
-%
+% \subsection{Full Conditional for $\sigma^2_\beta$}
+% %
+% \begin{align*}
+% [\sigma^2_\beta | \cdot] & \propto \prod_{t = 1}^T [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta] [\sigma^2_\beta]\\
+% %
+% & \propto (\prod_{t = 1}^T |\bm{\Sigma}_\beta|^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)} (\sigma^2_\beta)^{ - (\alpha_\beta + 1)} e^{ - \frac{\beta_\beta} {\sigma^2_\beta}}\\
+% %
+% & \propto (\sigma^2_\beta)^{ - (\alpha_\beta + \frac{\sum_{t = 1}^T n_t} {2} + 1)} e^{ - \frac{1} {\sigma^2_\beta} (\frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)}
+% \end{align*}
+% %
+% which is IG$(\alpha_\beta + \frac{\sum_{t = 1}^T n_t} {2}, \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)$ since the determinant $|\bm{\Sigma}_\beta| = (\sigma^2_\beta)^{n_t}$ and $\bm{\Sigma}_\beta^{ - 1} = \frac{1} {\sigma^2_\beta} \bm{I}_t$
+% %
 \subsection{Full Conditional for $\sigma^2_\eta$}
 %
 \begin{align*}
@@ -123,11 +124,11 @@ which can be sampled using a Metropolis-Hastings step
 \subsection{Full Conditional for $\sigma^2_\epsilon$}
 %
 \begin{align*}
-[\sigma^2_\epsilon | \cdot] & \propto \prod_{t = 1}^T [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\sigma^2_\epsilon]\\
+[\sigma^2_\epsilon | \cdot] & \propto \prod_{t = 1}^T [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\bm{\beta}_t | \sigma^2_\eta, \bm{\gamma}] [\sigma^2_\epsilon]\\
 %
-& \propto (\prod_{t = 1}^T |\bm{\Sigma} |^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}\\
+& \propto (\prod_{t = 1}^T |\bm{\Sigma} |^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} |\bm{\Sigma}_\beta |^{ - \frac{1} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T \bm{\beta}_t^T \bm{\Sigma}_{\beta}^{ - 1} \bm{\beta}_t} (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}\\
 %
-& \propto |\bm{\Sigma} |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}\\
+& \propto |\bm{\Sigma} |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} |\bm{\Sigma}_\beta |^{ - \frac{1} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T \bm{\beta}_t^T \bm{\Sigma}_{\beta}^{ - 1} \bm{\beta}_t} (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}\\
 \end{align*}
 % 
 which can be sampled using a Metropolis-Hastings step
@@ -143,6 +144,16 @@ which can be sampled using a Metropolis-Hastings step
 \end{align*}
 % 
 which can be sampled using a Metropolis-Hastings step
+%
+\subsection*{Full Conditional for $\lambda^2$}
+%
+\begin{align*}
+[\lambda^2 | \cdot] & \propto \prod_{t = 1}^T \prod_{j = 1}^\tau (\lambda^2) e^{ - \frac{\lambda^2 / 2} {1 / \gamma^2_j}} (\frac{\lambda^2} {2})^{\alpha_\lambda - 1} e^{ - \beta_\lambda (\lambda^2 /2)}\\
+%
+& \propto (\frac{\lambda^2} {2})^{\alpha_\lambda + \tau - 1} e^{ - \lambda^2(\beta_\lambda + \sum_{j = 1}^\tau \gamma^2_j / 2)}
+\end{align*}
+%
+which is Gamma($\alpha_\lambda + \tau, \beta_\lambda + \sum_{j = 1}^\tau \gamma^2_j / 2$)
 %
 \section{Posterior Predictive Distribution}
 %

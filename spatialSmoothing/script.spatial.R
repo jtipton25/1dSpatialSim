@@ -87,12 +87,4 @@ finish
 ##
 # x11()
 make.output.plot(out)
-## identifiability between beta_0 and sigma.squared.epsilon???
-matplot(out$beta.save[1, , (n.mcmc / 10 + 1):n.mcmc], type = 'l', ylim = c(min(out$beta.save[, , (n.mcmc / 10 + 1):n.mcmc]), max(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc])))
-matplot(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc], type = 'l', add = TRUE)
 
-apply(out$mu.beta.save[, (n.mcmc / 10 + 1):n.mcmc], 1, mean)
-matplot(out$fort.raster, type = 'l', main = 'Posterior Predictive')
-
-MSPE <- (out$fort.raster - matrix(unlist(field$Z.list), nrow = m, byrow = FALSE))^2
-matplot(MSPE, type = 'l', main = 'MSPE')
