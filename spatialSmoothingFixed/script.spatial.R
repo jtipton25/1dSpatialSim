@@ -143,5 +143,10 @@ hist(out$beta.save[2, , ])
 abline(v = beta[2], col = 'red')
 
 dim(out$beta.save)
-apply(out$beta.save, 1, mean)
-
+beta.model <- apply(out$beta.save, 1, mean)
+phi.model <- mean(out$phi.save)
+sigma.squared.epsilon.model <- mean(out$sigma.squared.epsilon.save)
+sigma.squared.eta.model <- mean(out$sigma.squared.eta.save)
+D <- as.matrix(dist(locs))
+model.fit <- X %*% beta.model + rmvnorm(1, rep(0, m), sigma.squared.eta.model * exp( - D / phi.model)) + rnorm(m, 0, sigma.squared.epsilon.model)
+out$beta.save
