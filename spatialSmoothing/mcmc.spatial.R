@@ -72,10 +72,15 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
 	  ( - 1 / 2) * determinant(Sigma[[s]], logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
 	}
 
+#   make.fort.batch <- function(s, beta, H.list, Y.list, Sigma.full, ncells){
+#     temp <- vector(length = ncells)
+#     temp[ - H.list[[s]]] <- X[ - H.list[[s]], ] %*% beta[, s] + Sigma.full[ - H.list[[s]], H.list[[s]]] %*% solve(Sigma.full[H.list[[s]], H.list[[s]]]) %*% (Y.list[[s]] - X[H.list[[s]], ] %*% beta[, s])
+#     temp[H.list[[s]]] <- Y.list[[s]]
+#     return(temp)
+#   }
+
   make.fort.batch <- function(s, beta, H.list, Y.list, Sigma.full, ncells){
-    temp <- vector(length = ncells)
-    temp[ - H.list[[s]]] <- X[ - H.list[[s]], ] %*% beta[, s] + Sigma.full[ - H.list[[s]], H.list[[s]]] %*% solve(Sigma.full[H.list[[s]], H.list[[s]]]) %*% (Y.list[[s]] - X[H.list[[s]], ] %*% beta[, s])
-    temp[H.list[[s]]] <- Y.list[[s]]
+    temp <- t(rmvnorm(1, X %*% beta[, s], Sigma.full))
     return(temp)
   }
 
@@ -270,7 +275,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     
   if(k > n.burn){
     if(k %% 10 == 0){
-      Sigma.full <- (sigma.squared.eta * exp( - D / phi)) + sigma.squared.epsilon * I.full
+#       Sigma.full <- (sigma.squared.eta * exp( - D / phi)) + sigma.squared.epsilon * I.full
+      Sigma.full <- (sigma.squared.eta * exp( - D / phi))
       fort.raster <- fort.raster + 1 / (n.mcmc - n.burn) * sapply(1:t, make.fort.batch, beta = beta, H.list = H.list, Y.list = Y.list, Sigma.full = Sigma.full, ncells = ncells)
         if(k %% 1000 == 0){
         var.save.temp[100, , ] <- fort.raster
