@@ -54,7 +54,7 @@
 \phi & \sim IG(\alpha_\phi, \beta_\phi)
 \end{align*}
 %
-where $\bm{I}_\{n_t} is the identity matrix of size $n_t \times \n_t where $\tau$ is the number of parameters in $\bm{\beta}_t$ and $n_t$ is the number of samples of $y_t$ at time $t$ and $\bm{D}_t$ is the distance matrix between locations observed at time $t$. Define $\bm{\Sigma} = \bm{\Sigma}_\eta + \bm{\Sigma}_\epsilon$
+where $\bm{I}_{n_t}$ is the identity matrix of size $n_t \times n_t$ where $\tau$ is the number of parameters in $\bm{\beta}_t$ and $n_t$ is the number of samples of $y_t$ at time $t$ and $\bm{D}_t$ is the distance matrix between locations observed at time $t$. Define $\bm{\Sigma} = \bm{\Sigma}_\eta + \bm{\Sigma}_\epsilon$
 %
 \section{Posterior}
 %
@@ -103,10 +103,10 @@ $(T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1})^{ - 1} (\sum_{t = 1}^T \bm{
 %
 & \propto (\prod_{t = 1}^T |\bm{\Sigma}_\beta|^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)} (\sigma^2_\beta)^{ - (\alpha_\beta + 1)} e^{ - \frac{\beta_\beta} {\sigma^2_\beta}}\\
 %
-& \propto (\sigma^2_\beta)^{ - (\alpha_\beta + \frac{\sum_{t = 1}^T n_t} {2} + 1)} e^{ - \frac{1} {\sigma^2_\beta} (\frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)}
+& \propto (\sigma^2_\beta)^{ - (\alpha_\beta + \frac{T \tau} {2} + 1)} e^{ - \frac{1} {\sigma^2_\beta} (\frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)}
 \end{align*}
 %
-which is IG$(\alpha_\beta + \frac{\sum_{t = 1}^T n_t} {2}, \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)$ since the determinant $|\bm{\Sigma}_\beta| = (\sigma^2_\beta)^{n_t}$ and $\bm{\Sigma}_\beta^{ - 1} = \frac{1} {\sigma^2_\beta} \bm{I}_t$
+which is IG$(\alpha_\beta + \frac{t \tau} {2}, \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)$ since the determinant $|\bm{\Sigma}_\beta| = (\sigma^2_\beta)^\tau$ and $\bm{\Sigma}_\beta^{ - 1} = \frac{1} {\sigma^2_\beta} \bm{I}_\tau$
 %
 \subsection{Full Conditional for $\sigma^2_\eta$}
 %

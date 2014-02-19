@@ -194,9 +194,10 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon
   	##
   	
 #     sigma.squared.beta <- 1 / rgamma(1, alpha.beta + nt.sum / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta, mu.beta = mu.beta)))
-    sigma.squared.beta <- 1 / rgamma(1, alpha.beta + nt.sum / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta)))
+#     sigma.squared.beta <- 1 / rgamma(1, alpha.beta + nt.sum / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta)))
+    sigma.squared.beta <- 1 / rgamma(1, alpha.beta + t * tau / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta)))
   	Sigma.beta <- sigma.squared.beta * I.beta
-  	Sigma.beta.inv <- solve(Sigma.beta)
+  	Sigma.beta.inv <- 1 / sigma.squared.beta * I.beta #solve(Sigma.beta)
   	
   	##
     ## Sample sigma.squared.eta

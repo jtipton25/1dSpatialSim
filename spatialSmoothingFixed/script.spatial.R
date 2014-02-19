@@ -19,7 +19,7 @@ source('mcmc.spatial.R')
 ##
 
 make.output.plot <- function(out){
-  n.burn <- floor(n.mcmc / 10)
+  n.burn <- floor(n.mcmc / 5)
   #x11()
   layout(matrix(1:16, nrow = 4))
   #
@@ -78,8 +78,10 @@ samp.size <- 5:40
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
 
 layout(matrix(1:2, ncol = 2))
-plot.Y.field(field$Y.list[1:(reps / 2)], field$H.list[1:(reps / 2)], locs)
-plot.Z.field(field$Z.list[(reps / 2 + 1):reps], locs, main = "Full Data")
+# plot.Y.field(field$Y.list[1:(reps / 2)], field$H.list[1:(reps / 2)], locs)
+# plot.Z.field(field$Z.list[(reps / 2 + 1):reps], locs, main = "Full Data")
+plot.Y.field(field$Y.list, field$H.list, locs)
+plot.Z.field(field$Z.list, locs, main = "Full Data")
 
 # Y.list <- field$Y.list[1:(reps / 2)]
 # H.list <- field$H.list[1:(reps / 2)]
@@ -119,7 +121,7 @@ sigma.squared.eta.tune <- 0.25
 sigma.squared.epsilon.tune <- 0.075
 phi.tune <- 0.25
 
-n.mcmc <- 500
+n.mcmc <- 10000
 
 ##
 ## Fit spatial MCMC kriging model
