@@ -22,7 +22,7 @@
 ## mu_0 and Sigma_0 are hyperparameters
 ##
 
-mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune){
+mcmc.1d <- function(Y.list, H.list, X, locs, mu.beta, n.mcmc, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune){
 
 ## params = c(mu.0, Sigma.0, alpha.beta, beta.beta, alpha.eta, beta.eta, alpha.epsilon, beta.epsilon, alpha.phi, beta.phi, n.mcmc = 5000)
   
@@ -36,8 +36,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon
 #     t(beta[, s] - mu.beta) %*% (beta[, s] - mu.beta)
 #   }
   
-  make.sum.sigma.beta <- function(s, beta){
-    t(beta[, s]) %*% beta[, s]
+  make.sum.sigma.beta <- function(s, beta, mu.beta){
+    t(beta[, s] - mu.beta) %*% (beta[, s] - mu.beta)
   }
     
   make.D.list <- function(s, H.list, locs){
@@ -171,13 +171,14 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon
   	##
   	
   	for(s in 1:t){
-#       devs <- rnorm(tau)
-#       beta.A.chol <- chol(tHX.list[[s]] %*% Sigma.inv[[s]] %*% HX.list[[s]] + Sigma.beta.inv)
-#       beta.b <- tHX.list[[s]] %*% Sigma.inv[[s]] %*% Y.list[[s]]
-#       beta[, s] <- backsolve(beta.A.chol, backsolve(beta.A.chol, beta.b, transpose = TRUE) + devs)
-      Sig <- solve(tHX.list[[s]] %*% Sigma.inv[[s]] %*% HX.list[[s]] + Sigma.beta.inv)
-      mu <- Sig %*% tHX.list[[s]] %*% Sigma.inv[[s]] %*% Y.list[[s]]
-      beta[, s] <- rmvnorm(1, mu, Sig)
+      devs <- rnorm(tau)
+      beta.A.chol <- chol(tHX.list[[s]] %*% Sigma.inv[[s]] %*% HX.list[[s]] + Sigma.beta.inv)
+      ## added in mu.beta, double check this
+      beta.b <- tHX.list[[s]] %*% Sigma.inv[[s]] %*% Y.list[[s]] + Sigma.beta.inv %*% mu.beta
+      beta[, s] <- backsolve(beta.A.chol, backsolve(beta.A.chol, beta.b, transpose = TRUE) + devs)
+#       Sig <- solve(tHX.list[[s]] %*% Sigma.inv[[s]] %*% HX.list[[s]] + Sigma.beta.inv)
+#       mu <- Sig %*% tHX.list[[s]] %*% Sigma.inv[[s]] %*% Y.list[[s]]
+#       beta[, s] <- rmvnorm(1, mu, Sig)
    	}
   	
 #   	##
@@ -195,7 +196,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon
   	
 #     sigma.squared.beta <- 1 / rgamma(1, alpha.beta + nt.sum / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta, mu.beta = mu.beta)))
 #     sigma.squared.beta <- 1 / rgamma(1, alpha.beta + nt.sum / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta)))
-    sigma.squared.beta <- 1 / rgamma(1, alpha.beta + t * tau / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta)))
+    sigma.squared.beta <- 1 / rgamma(1, alpha.beta + t * tau / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta), mu.beta = mu.beta))
   	Sigma.beta <- sigma.squared.beta * I.beta
   	Sigma.beta.inv <- 1 / sigma.squared.beta * I.beta #solve(Sigma.beta)
   	
