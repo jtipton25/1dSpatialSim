@@ -148,5 +148,6 @@ phi.model <- mean(out$phi.save)
 sigma.squared.epsilon.model <- mean(out$sigma.squared.epsilon.save)
 sigma.squared.eta.model <- mean(out$sigma.squared.eta.save)
 D <- as.matrix(dist(locs))
-model.fit <- X %*% beta.model + rmvnorm(1, rep(0, m), sigma.squared.eta.model * exp( - D / phi.model)) + rnorm(m, 0, sigma.squared.epsilon.model)
-out$beta.save
+model.fit <- t(X %*% as.matrix(beta.model)) + rmvnorm(1, rep(0, m), sigma.squared.eta.model * exp( - D / phi.model))+ rnorm(m, 0, sigma.squared.epsilon.model)
+plot(model.fit[1,] ~ locs, type = 'l')
+points(locs, X %*% beta, type = 'l', col = 'red')
