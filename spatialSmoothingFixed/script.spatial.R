@@ -41,7 +41,7 @@ make.output.plot <- function(out){
   matplot(out$fort.raster, type = 'l', ylim = c(min(out$fort.raster) - 2*max(sqrt(out$var.save)), max(out$fort.raster) + 2*max(sqrt(out$var.save))))
   matplot(out$fort.raster - 2*sqrt(out$var.save), type = 'l', add = TRUE, col = 'red', lty = 'dashed')
   matplot(out$fort.raster + 2*sqrt(out$var.save), type = 'l', add = TRUE, col = 'red', lty = 'dashed')
-  
+  points(X %*% beta, type = 'l', col = 'red')  
   #
   plot.Z.field(field$Z.list, locs = locs, main = "True Surface")
   #
@@ -121,7 +121,7 @@ sigma.squared.eta.tune <- 0.25
 sigma.squared.epsilon.tune <- 0.075
 phi.tune <- 0.25
 
-n.mcmc <- 10000
+n.mcmc <- 5000
 
 ##
 ## Fit spatial MCMC kriging model

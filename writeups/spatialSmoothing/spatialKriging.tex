@@ -33,7 +33,7 @@
 %
 \bm{\beta}_t & \sim N(\bm{\mu}_\beta, \bm{\Sigma}_\beta) & \bm{\Sigma}_\beta &  = \sigma^2_\beta \bm{I}_{n_t}\\
 %
-\bm{\eta}_t & \sim N(0, \bm{\Sigma}_\eta) & \bm{\Sigma}_\eta &  = \sigma^2_\eta \bm{R}(\phi) & \bm{R}(\phi) & = \exp{( - \bm{D}_t / \phi)}\\
+\bm{\eta}_t & \sim N(0, \bm{\Sigma}_\eta) & \bm{\Sigma}_\eta &  = \sigma^2_\eta \bm{R}(\phi) & \bm{R}(\phi) & = \exp{ \left( - \bm{D}_t / \phi \right)}\\
 %
 \bm{\epsilon}_t & \sim N(0, \bm{\Sigma}_\epsilon) & \bm{\Sigma}_\epsilon &  = \sigma^2_\epsilon \bm{I}_{n_t}\\
 %
@@ -70,9 +70,9 @@ For $t = 1, \ldots, T$,
 \begin{align*}
 [\bm{\beta}_t | \cdot] & \propto [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \sigma^2_\epsilon, \phi] [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta]\\
 %
-& \propto e^{ - \frac{1} {2} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} e^{ - \frac{1} {2} (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)}\\
+& \propto \exp{\left( - \frac{1} {2} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right)} \exp{\left( - \frac{1} {2} (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta) \right)}\\
 %
-& \propto e^{ - \frac{1} {2} \{\bm{\beta}_t^T (\bm{X}^T \bm{H}_t^T \bm{\Sigma}^{ - 1} \bm{H}_t \bm{X} + \bm{\Sigma}_\beta^{ - 1}) \bm{\beta}_t - 2 \bm{\beta}_t^T (\bm{X}^T \bm{H}_t^T \bm{\Sigma}^{ - 1} \bm{y}_t + \bm{\Sigma}_\beta^{ - 1} \bm{\mu}_\beta) \} }
+& \propto \exp{\left( - \frac{1} {2} \{\bm{\beta}_t^T (\bm{X}^T \bm{H}_t^T \bm{\Sigma}^{ - 1} \bm{H}_t \bm{X} + \bm{\Sigma}_\beta^{ - 1}) \bm{\beta}_t - 2 \bm{\beta}_t^T (\bm{X}^T \bm{H}_t^T \bm{\Sigma}^{ - 1} \bm{y}_t + \bm{\Sigma}_\beta^{ - 1} \bm{\mu}_\beta) \} \right) }
 \end{align*}
 %
 which is Normal with mean $ \bm{A}^{ - 1} \bm{b}$ and variance $\bm{A}^{ - 1}$ where
@@ -87,10 +87,9 @@ which is Normal with mean $ \bm{A}^{ - 1} \bm{b}$ and variance $\bm{A}^{ - 1}$ w
 \begin{align*}
 [\bm{\mu}_\beta | \cdot] & \propto \prod_{t = 1}^T [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta] [\bm{\mu}_\beta]\\
 %
-& \propto e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)} e^{ - \frac{1} {2} (\bm{\mu}_\beta - \bm{\mu}_0)^T \Sigma_0^{ - 1} (\bm{\mu}_\beta - \bm{\mu}_0)}\\
+& \propto \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta) \right) } \exp{ \left( - \frac{1} {2} (\bm{\mu}_\beta - \bm{\mu}_0)^T \Sigma_0^{ - 1} (\bm{\mu}_\beta - \bm{\mu}_0) \right)}\\
 %
-& \propto e^{ - \frac{1} {2} (
-\bm{\mu}_\beta^T (T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1}) \bm{\mu}_\beta - 2 \bm{\mu}_\beta^T (\sum_{t = 1}^T \bm{\Sigma}_\beta^{ - 1} \bm{\beta}_t + \bm{\Sigma}_0^{ - 1} \bm{\mu}_0) ) }
+& \propto \exp{ \left( - \frac{1} {2} (\bm{\mu}_\beta^T (T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1}) \bm{\mu}_\beta - 2 \bm{\mu}_\beta^T (\sum_{t = 1}^T \bm{\Sigma}_\beta^{ - 1} \bm{\beta}_t + \bm{\Sigma}_0^{ - 1} \bm{\mu}_0) ) \right) }
 \end{align*}
 %
 which is multivariate normal with mean
@@ -101,9 +100,9 @@ $(T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1})^{ - 1} (\sum_{t = 1}^T \bm{
 \begin{align*}
 [\sigma^2_\beta | \cdot] & \propto \prod_{t = 1}^T [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta] [\sigma^2_\beta]\\
 %
-& \propto (\prod_{t = 1}^T |\bm{\Sigma}_\beta|^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)} (\sigma^2_\beta)^{ - (\alpha_\beta + 1)} e^{ - \frac{\beta_\beta} {\sigma^2_\beta}}\\
+& \propto (\prod_{t = 1}^T |\bm{\Sigma}_\beta|^{ - \frac{1} {2}}) \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta) \right) } (\sigma^2_\beta)^{ - (\alpha_\beta + 1)} \exp{ \left( - \frac{\beta_\beta} {\sigma^2_\beta} \right) }\\
 %
-& \propto (\sigma^2_\beta)^{ - (\alpha_\beta + \frac{T \tau} {2} + 1)} e^{ - \frac{1} {\sigma^2_\beta} (\frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)}
+& \propto (\sigma^2_\beta)^{ - (\alpha_\beta + \frac{T \tau} {2} + 1)} \exp{ \left( - \frac{1} {\sigma^2_\beta} (\frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta) \right) }
 \end{align*}
 %
 which is IG$(\alpha_\beta + \frac{t \tau} {2}, \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)$ since the determinant $|\bm{\Sigma}_\beta| = (\sigma^2_\beta)^\tau$ and $\bm{\Sigma}_\beta^{ - 1} = \frac{1} {\sigma^2_\beta} \bm{I}_\tau$
@@ -113,9 +112,9 @@ which is IG$(\alpha_\beta + \frac{t \tau} {2}, \frac{1} {2} \sum_{t = 1}^T (\bm{
 \begin{align*}
 [\sigma^2_\eta | \cdot] & \propto \prod_{t = 1}^T [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\sigma^2_\eta]\\
 %
-& \propto (\prod_{t = 1}^T |\bm{\Sigma} |^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} (\sigma^2_\eta)^{ - \alpha_\eta + 1} e^{ - \frac{\beta_\eta} {\sigma^2_\eta}}\\
+& \propto (\prod_{t = 1}^T |\bm{\Sigma} |^{ - \frac{1} {2}}) \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right) } (\sigma^2_\eta)^{ - \alpha_\eta + 1} \exp{ \left( - \frac{\beta_\eta} {\sigma^2_\eta} \right) }\\
 %
-& \propto |\bm{\Sigma} |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} (\sigma^2_\eta)^{ - \alpha_\eta + 1} e^{ - \frac{\beta_\eta} {\sigma^2_\eta}}\\
+& \propto |\bm{\Sigma} |^{ - \frac{T} {2}} \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right) } (\sigma^2_\eta)^{ - \alpha_\eta + 1} \exp{ \left( - \frac{\beta_\eta} {\sigma^2_\eta} \right) }\\
 \end{align*}
 % 
 which can be sampled using a Metropolis-Hastings step
@@ -125,9 +124,9 @@ which can be sampled using a Metropolis-Hastings step
 \begin{align*}
 [\sigma^2_\epsilon | \cdot] & \propto \prod_{t = 1}^T [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\sigma^2_\epsilon]\\
 %
-& \propto (\prod_{t = 1}^T |\bm{\Sigma} |^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}\\
+& \propto (\prod_{t = 1}^T |\bm{\Sigma} |^{ - \frac{1} {2}}) \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right) } (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} \exp{ \left( - \frac{\beta_\epsilon} {\sigma^2_\epsilon} \right) }\\
 %
-& \propto |\bm{\Sigma} |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}\\
+& \propto |\bm{\Sigma} |^{ - \frac{T} {2}} \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right) } (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} \exp{ \left( - \frac{\beta_\epsilon} {\sigma^2_\epsilon} \right) }\\
 \end{align*}
 % 
 which can be sampled using a Metropolis-Hastings step
@@ -137,9 +136,9 @@ which can be sampled using a Metropolis-Hastings step
 \begin{align*}
   [\phi | \cdot] & \propto \prod_{t = 1}^T [y_t | \beta_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\phi]\\
 %
-& \propto \prod_{t = 1}^T | \bm{\Sigma} |^{ - \frac{1} {2}} e^{ - \frac{1} {2} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} \phi^{ - \alpha_\phi + 1} e^{ - \frac{\beta_\phi} {\phi}}\\
+& \propto \prod_{t = 1}^T | \bm{\Sigma} |^{ - \frac{1} {2}} \exp{ \left( - \frac{1} {2} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right) } \phi^{ - \alpha_\phi + 1} \exp{ \left( - \frac{\beta_\phi} {\phi} \right) }\\
 %
-& \propto | \bm{\Sigma} |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} \phi^{ - \alpha_\phi + 1} e^{ - \frac{\beta_\phi} {\phi}}\\
+& \propto | \bm{\Sigma} |^{ - \frac{T} {2}} \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right) } \phi^{ - \alpha_\phi + 1} \exp{ \left( - \frac{\beta_\phi} {\phi} \right) }\\
 \end{align*}
 % 
 which can be sampled using a Metropolis-Hastings step

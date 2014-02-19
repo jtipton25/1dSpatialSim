@@ -132,7 +132,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon
 # 	Sigma.chol <- chol(Sigma.0)
 # 	mu.beta <- backsolve(Sigma.chol, backsolve(Sigma.0, mu.0, transpose = TRUE) + devs)
 
-  n.burn <- floor(n.mcmc / 5) + 1
+  n.burn <- floor(n.mcmc / 5)
   fort.raster.batch <- matrix(0, ncells, t)   
 
   tHX.list <- vector('list', length = t) # speeds up computation by not calculating each MCMC step
@@ -286,7 +286,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon
     if(k %% 10 == 0){
 #       Sigma.full <- (sigma.squared.eta * exp( - D / phi)) + sigma.squared.epsilon * I.full
       Sigma.full <- (sigma.squared.eta * exp( - D / phi))
-      fort.raster <- fort.raster + 1 / (n.mcmc - n.burn) * sapply(1:t, make.fort.batch, beta = beta, H.list = H.list, Y.list = Y.list, Sigma.full = Sigma.full, ncells = ncells, sigma.squared.epsilon = sigma.squared.epsilon)
+      fort.raster <- fort.raster + 10 / ((n.mcmc - n.burn)) * sapply(1:t, make.fort.batch, beta = beta, H.list = H.list, Y.list = Y.list, Sigma.full = Sigma.full, ncells = ncells, sigma.squared.epsilon = sigma.squared.epsilon)
         if(k %% 1000 == 0){
         var.save.temp[100, , ] <- fort.raster
       } else {
