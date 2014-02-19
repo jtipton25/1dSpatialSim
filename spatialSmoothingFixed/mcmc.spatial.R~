@@ -83,12 +83,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, mu.beta, n.mcmc, alpha.epsilon, bet
 #     return(temp)
 #   }
 
-#   make.fort.batch <- function(s, beta, H.list, Y.list, Sigma.eta.full, ncells, sigma.squared.epsilon){
-  make.fort.batch <- function(s, beta, H.list, Y.list, Sigma.full, ncells){
-#     temp <- t(rmvnorm(1, X %*% beta[, s], Sigma.eta.full)) + rnorm(ncells, 0, sigma.squared.epsilon)
-    D <- chol(Sigma.full)
-    temp <- t(matrix(rnorm(ncells), ncol = ncells) %*% D + rep(X %*% beta[, s], rep(1, ncells)))
-#     temp <- t(rmvnorm(1, X %*% beta[, s], Sigma.full))
+  make.fort.batch <- function(s, beta, H.list, Y.list, Sigma.eta.full, ncells, sigma.squared.epsilon){
+    temp <- X %*% beta[, s] + t(rmvnorm(1, rep(0, ncells), Sigma.eta.full)) + rnorm(ncells, 0, sigma.squared.epsilon)
     return(temp)
   }
 
@@ -177,8 +173,12 @@ mcmc.1d <- function(Y.list, H.list, X, locs, mu.beta, n.mcmc, alpha.epsilon, bet
     for(s in 1:t){
       devs <- rnorm(tau)
       beta.A.chol <- chol(tHX.list[[s]] %*% Sigma.inv[[s]] %*% HX.list[[s]] + Sigma.beta.inv)
+      ## added in mu.beta, double check this
       beta.b <- tHX.list[[s]] %*% Sigma.inv[[s]] %*% Y.list[[s]] + Sigma.beta.inv %*% mu.beta
       beta[, s] <- backsolve(beta.A.chol, backsolve(beta.A.chol, beta.b, transpose = TRUE) + devs)
+#       Sig <- solve(tHX.list[[s]] %*% Sigma.inv[[s]] %*% HX.list[[s]] + Sigma.beta.inv)
+#       mu <- Sig %*% tHX.list[[s]] %*% Sigma.inv[[s]] %*% Y.list[[s]]
+#       beta[, s] <- rmvnorm(1, mu, Sig)
    	}
   	
 #   	##
@@ -194,9 +194,11 @@ mcmc.1d <- function(Y.list, H.list, X, locs, mu.beta, n.mcmc, alpha.epsilon, bet
   	## Sample sigma.squared.beta
   	##
   	
-    sigma.squared.beta <- 1 / rgamma(1, alpha.beta + t * tau / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta, mu.beta = mu.beta)))
+#     sigma.squared.beta <- 1 / rgamma(1, alpha.beta + nt.sum / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta, mu.beta = mu.beta)))
+#     sigma.squared.beta <- 1 / rgamma(1, alpha.beta + nt.sum / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta)))
+    sigma.squared.beta <- 1 / rgamma(1, alpha.beta + t * tau / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta), mu.beta = mu.beta))
     Sigma.beta <- sigma.squared.beta * I.beta
-    Sigma.beta.inv <- 1 / sigma.squared.beta * I.beta 
+    Sigma.beta.inv <- 1 / sigma.squared.beta * I.beta #solve(Sigma.beta)
   	
     ##
     ## Sample sigma.squared.eta
@@ -283,9 +285,10 @@ mcmc.1d <- function(Y.list, H.list, X, locs, mu.beta, n.mcmc, alpha.epsilon, bet
     
   if(k > n.burn){
     if(k %% 10 == 0){
-      Sigma.full <- (sigma.squared.eta * exp( - D / phi)) + sigma.squared.epsilon * I.full
-      fort.raster <- fort.raster + 10 / (n.mcmc - n.burn) * sapply(1:t, make.fort.batch, beta = beta, H.list = H.list, Y.list = Y.list, Sigma.full = Sigma.full, ncells = ncells)
-    if(k %% 1000 == 0){
+#       Sigma.full <- (sigma.squared.eta * exp( - D / phi)) + sigma.squared.epsilon * I.full
+      Sigma.full <- (sigma.squared.eta * exp( - D / phi))
+      fort.raster <- fort.raster + 10 / ((n.mcmc - n.burn)) * sapply(1:t, make.fort.batch, beta = beta, H.list = H.list, Y.list = Y.list, Sigma.full = Sigma.full, ncells = ncells, sigma.squared.epsilon = sigma.squared.epsilon)
+        if(k %% 1000 == 0){
         var.save.temp[100, , ] <- fort.raster
       } else {
         var.save.temp[(k %% 1000) / 10, , ] <- fort.raster

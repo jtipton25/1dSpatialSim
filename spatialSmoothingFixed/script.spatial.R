@@ -38,9 +38,9 @@ make.output.plot <- function(out){
   plot(out$phi.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$phi.accept, 2)))
   abline(h = phi, col = 'red')
   #
-  matplot(out$fort.raster, type = 'l', ylim = c(min(out$fort.raster) - 2*max(sqrt(out$var.save)), max(out$fort.raster) + 2*max(sqrt(out$var.save))))
-  matplot(out$fort.raster - 2*sqrt(out$var.save), type = 'l', add = TRUE, col = 'red', lty = 'dashed')
-  matplot(out$fort.raster + 2*sqrt(out$var.save), type = 'l', add = TRUE, col = 'red', lty = 'dashed')
+  matplot(out$fort.raster, type = 'l')#, ylim = c(min(out$fort.raster) - 2*max(sqrt(out$var.save)), max(out$fort.raster) + 2*max(sqrt(out$var.save))))
+#   matplot(out$fort.raster - 2*sqrt(out$var.save), type = 'l', add = TRUE, col = 'red', lty = 'dashed')
+#   matplot(out$fort.raster + 2*sqrt(out$var.save), type = 'l', add = TRUE, col = 'red', lty = 'dashed')
   points(X %*% beta, type = 'l', col = 'red')  
   #
   plot.Z.field(field$Z.list, locs = locs, main = "True Surface")
@@ -48,13 +48,13 @@ make.output.plot <- function(out){
   #
   plot.Y.field(field$Y.list, field$H.list, locs = locs)
   #
-  hist(out$mu.beta.save[1, ][(n.burn + 1):n.mcmc])
+  hist(out$beta.save[1, , ][(n.burn + 1):n.mcmc])
   abline(v = beta[1], col = 'red')
-  abline(v = quantile(out$mu.beta.save[1, ], probs = c(0.025, 0.975)), col = 'blue')
+  abline(v = quantile(out$beta.save[1, , ], probs = c(0.025, 0.975)), col = 'blue')
   #
-  hist(out$mu.beta.save[2, ][(n.burn + 1):n.mcmc])
+  hist(out$beta.save[2, , ][(n.burn + 1):n.mcmc])
   abline(v = beta[2], col = 'red')
-  abline(v = quantile(out$mu.beta.save[2, ], probs = c(0.025, 0.975)), col = 'blue')
+  abline(v = quantile(out$beta.save[2, , ], probs = c(0.025, 0.975)), col = 'blue')
   #
   MSPE <- (out$fort.raster - matrix(unlist(field$Z.list), nrow = m, byrow = FALSE))^2
   matplot(MSPE, type = 'l', main = 'MSPE')
@@ -65,10 +65,10 @@ make.output.plot <- function(out){
 ## Simulate Data
 ##
 
-m <- 1000 # number of spatial locations
+m <- 500 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 1#20 # number of spatial fields
+reps <- 20 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
@@ -123,12 +123,14 @@ phi.tune <- 0.25
 
 n.mcmc <- 5000
 
+mu.beta <- c(0, 2)
+
 ##
 ## Fit spatial MCMC kriging model
 ##
 
 start <- Sys.time()
-out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
+out <- mcmc.1d(field$Y.list, field$H.list, X, locs, mu.beta, n.mcmc, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
 finish <- Sys.time() - start
 finish 
 
