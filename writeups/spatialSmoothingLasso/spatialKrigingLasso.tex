@@ -34,7 +34,7 @@
 % \bm{\beta}_t & \sim N(\bm{\mu}_\beta, \bm{\Sigma}_\beta) & \bm{\Sigma}_\beta &  = \sigma^2_\epsilon \bm{D}_\gamma & \bm{D}_\gamma & = diag(\gamma^2_1, \ldots, \gamma^2_\tau)\\
 \bm{\beta}_t & \sim N(\bm{0}, \bm{\Sigma}_\beta) & \bm{\Sigma}_\beta &  = \sigma^2_\epsilon \bm{D}_\gamma & \bm{D}_\gamma & = diag(\gamma^2_1, \ldots, \gamma^2_\tau)\\
 %
-\bm{\eta}_t & \sim N(0, \bm{\Sigma}_{\eta_t}) & \bm{\Sigma}_{\eta_t} &  = \sigma^2_\eta \bm{R}_t(\phi) & \bm{R}_t(\phi) & = \exp{( - \bm{D}_t / \phi)}\\
+\bm{\eta}_t & \sim N(0, \bm{\Sigma}_{\eta_t}) & \bm{\Sigma}_{\eta_t} &  = \sigma^2_\eta \bm{R}_t(\phi) & \bm{R}_t(\phi) & = \exp{ \left( - \bm{D}_t / \phi \right)}\\
 %
 \bm{\epsilon}_t & \sim N(0, \bm{\Sigma}_{\epsilon_t}) & \bm{\Sigma}_{\epsilon_t} &  = \sigma^2_\epsilon \bm{I}_{n_t}\\
 %
@@ -75,9 +75,9 @@ For $t = 1, \ldots, T$,
 \begin{align*}
 [\bm{\beta}_t | \cdot] & \propto [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \sigma^2_\epsilon, \phi] [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta]\\
 %
-& \propto e^{ - \frac{1} {2} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}_t^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} e^{ - \frac{1} {2} \bm{\beta}_t^T \bm{\Sigma}_\beta^{ - 1} \bm{\beta}_t}\\
+& \propto \exp{ \left( - \frac{1} {2} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}_t^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right) } \exp{ \left( - \frac{1} {2} \bm{\beta}_t^T \bm{\Sigma}_\beta^{ - 1} \bm{\beta}_t \right) }\\
 %
-& \propto e^{ - \frac{1} {2} \{\bm{\beta}_t^T (\bm{X}^T \bm{H}_t^T \bm{\Sigma}_t^{ - 1} \bm{H}_t \bm{X} + \bm{\Sigma}_\beta^{ - 1}) \bm{\beta}_t - 2 \bm{\beta}_t^T (\bm{X}^T \bm{H}_t^T \bm{\Sigma}_t^{ - 1} \bm{y}_t) \} }
+& \propto \exp{ \left( - \frac{1} {2} \{\bm{\beta}_t^T (\bm{X}^T \bm{H}_t^T \bm{\Sigma}_t^{ - 1} \bm{H}_t \bm{X} + \bm{\Sigma}_\beta^{ - 1}) \bm{\beta}_t - 2 \bm{\beta}_t^T (\bm{X}^T \bm{H}_t^T \bm{\Sigma}_t^{ - 1} \bm{y}_t) \} \right) }
 \end{align*}
 %
 which is Normal with mean $ \bm{A}^{ - 1} \bm{b}$ and variance $\bm{A}^{ - 1}$ where
@@ -92,10 +92,10 @@ which is Normal with mean $ \bm{A}^{ - 1} \bm{b}$ and variance $\bm{A}^{ - 1}$ w
 % \begin{align*}
 % [\bm{\mu}_\beta | \cdot] & \propto \prod_{t = 1}^T [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta] [\bm{\mu}_\beta]\\
 % %
-% & \propto e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)} e^{ - \frac{1} {2} (\bm{\mu}_\beta - \bm{\mu}_0)^T \Sigma_0^{ - 1} (\bm{\mu}_\beta - \bm{\mu}_0)}\\
+% & \propto \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta) \right)} \exp{ \left( - \frac{1} {2} (\bm{\mu}_\beta - \bm{\mu}_0)^T \Sigma_0^{ - 1} (\bm{\mu}_\beta - \bm{\mu}_0) \right) }\\
 % %
-% & \propto e^{ - \frac{1} {2} (
-% \bm{\mu}_\beta^T (T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1}) \bm{\mu}_\beta - 2 \bm{\mu}_\beta^T (\sum_{t = 1}^T \bm{\Sigma}_\beta^{ - 1} \bm{\beta}_t + \bm{\Sigma}_0^{ - 1} \bm{\mu}_0) ) }
+% & \propto \exp{ \left( - \frac{1} {2} (
+% \bm{\mu}_\beta^T (T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1}) \bm{\mu}_\beta - 2 \bm{\mu}_\beta^T (\sum_{t = 1}^T \bm{\Sigma}_\beta^{ - 1} \bm{\beta}_t + \bm{\Sigma}_0^{ - 1} \bm{\mu}_0) ) \right) }
 % \end{align*}
 % %
 % which is multivariate normal with mean
@@ -106,9 +106,9 @@ which is Normal with mean $ \bm{A}^{ - 1} \bm{b}$ and variance $\bm{A}^{ - 1}$ w
 % \begin{align*}
 % [\sigma^2_\beta | \cdot] & \propto \prod_{t = 1}^T [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta] [\sigma^2_\beta]\\
 % %
-% & \propto (\prod_{t = 1}^T |\bm{\Sigma}_\beta|^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)} (\sigma^2_\beta)^{ - (\alpha_\beta + 1)} e^{ - \frac{\beta_\beta} {\sigma^2_\beta}}\\
+% & \propto (\prod_{t = 1}^T |\bm{\Sigma}_\beta|^{ - \frac{1} {2}}) \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta) \right) } (\sigma^2_\beta)^{ - (\alpha_\beta + 1)} \exp{ \left( - \frac{\beta_\beta} {\sigma^2_\beta} \right) }\\
 % %
-% & \propto (\sigma^2_\beta)^{ - (\alpha_\beta + \frac{\sum_{t = 1}^T n_t} {2} + 1)} e^{ - \frac{1} {\sigma^2_\beta} (\frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)}
+% & \propto (\sigma^2_\beta)^{ - (\alpha_\beta + \frac{\sum_{t = 1}^T n_t} {2} + 1)} \exp{ \left( - \frac{1} {\sigma^2_\beta} (\frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta) \right) }
 % \end{align*}
 % %
 % which is IG$(\alpha_\beta + \frac{\sum_{t = 1}^T n_t} {2}, \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)$ since the determinant $|\bm{\Sigma}_\beta| = (\sigma^2_\beta)^{n_t}$ and $\bm{\Sigma}_\beta^{ - 1} = \frac{1} {\sigma^2_\beta} \bm{I}_t$
@@ -117,13 +117,13 @@ which is Normal with mean $ \bm{A}^{ - 1} \bm{b}$ and variance $\bm{A}^{ - 1}$ w
 % \subsection{Full Conditional for $\gamma^2_i$}
 % For $i = 1, \ldots, \tau$
 % \begin{align*}
-% [\gamma^2_i | \cdot] & \propto \prod_{t = 1}^T [\beta_t | \sigma^2_\epsilon, \gamma^2_i] [\gamma^2_i | \lambda^2]\\
+% [\gamma^2_i | \cdot] & \propto \prod_{t = 1}^T [\bm{\beta}_t | \sigma^2_\epsilon, \gamma^2_i] [\gamma^2_i | \lambda^2]\\
 %  %
-%  & \propto \prod_{t = 1}^T |\sigma^2_\epsilon \gamma^2_i|^{ - \frac{1} {2}} e^{ - \frac{1} {2} \beta_t^T (\sigma^2_\epsilon \gamma^2_i)^{ - 1} \beta_t} (\frac{1} {\gamma^2_i})^{ - 2} e^{-\frac{\lambda^2 / 2} {\frac{1} {\gamma^2_i}}}\\
+%  & \propto \prod_{t = 1}^T |\sigma^2_\epsilon \gamma^2_i|^{ - \frac{1} {2}} \exp{ \left( - \frac{1} {2} \bm{\beta}_t^T (\sigma^2_\epsilon \gamma^2_i)^{ - 1} \bm{\beta}_t \right) } (\frac{1} {\gamma^2_i})^{ - 2} \exp{ \left(-\frac{\lambda^2 / 2} {\frac{1} {\gamma^2_i}} \right) }\\
 % %
-% & \propto (\gamma^2_i)^{ - \frac{T} {2}} e^{ - \frac{1} {\gamma^2_i}(\frac{\sum_{t = 1}^T \beta_t^T \beta_t} {2 \sigma^2_\epsilon})} (\gamma^2_i)^{2} e^{ - \frac{\lambda^2 / 2} {\frac{1} {\gamma^2_i}}}\\
+% & \propto (\gamma^2_i)^{ - \frac{T} {2}} \exp{ \left( - \frac{1} {\gamma^2_i}(\frac{\sum_{t = 1}^T \bm{\beta}_t^T \bm{\beta}_t} {2 \sigma^2_\epsilon}) \right) } (\gamma^2_i)^{2} \exp{ \left( - \frac{\lambda^2 / 2} {\frac{1} {\gamma^2_i}} \right) }\\
 % %
-% & \propto (\frac{1} {\gamma^2_i})^{2 - \frac{T} {2}} e^{ - \frac{1} {\gamma^2_i}(\frac{\sum_{t = 1}^T \beta_t^T \beta_t} {2 \sigma^2_\epsilon})} (\frac{1} {\gamma^2_i})^{ - 2} e^{ - \frac{\lambda^2 / 2} {\frac{1} {\gamma^2_i}}}
+% & \propto (\frac{1} {\gamma^2_i})^{2 - \frac{T} {2}} \exp{ \left( - \frac{1} {\gamma^2_i}(\frac{\sum_{t = 1}^T \bm{\beta}_t^T \bm{\beta}_t} {2 \sigma^2_\epsilon}) \right) } (\frac{1} {\gamma^2_i})^{ - 2} \exp{ \left( - \frac{\lambda^2 / 2} {\frac{1} {\gamma^2_i}} \right) }
 % \end{align*}
 % 
 % NEED TO WORK ON THIS ONE SOME MORE!!
@@ -132,11 +132,11 @@ which is Normal with mean $ \bm{A}^{ - 1} \bm{b}$ and variance $\bm{A}^{ - 1}$ w
 \subsection{Full Conditional for $\gamma^2_i$}
 For $i = 1, \ldots, \tau$
 \begin{align*}
-[\gamma^2_i | \cdot] & \propto \prod_{t = 1}^T [\beta_t | \sigma^2_\epsilon, \gamma^2_i] [\gamma^2_i | \lambda^2]\\
+[\gamma^2_i | \cdot] & \propto \prod_{t = 1}^T [\bm{\beta}_t | \sigma^2_\epsilon, \gamma^2_i] [\gamma^2_i | \lambda^2]\\
  %
- & \propto \prod_{t = 1}^T |\sigma^2_\epsilon \gamma^2_i|^{ - \frac{1} {2}} e^{ - \frac{1} {2} \beta_t^T (\sigma^2_\epsilon \gamma^2_i)^{ - 1} \beta_t} e^{-\frac{\lambda^2} {2} \gamma^2_i}\\
+ & \propto \prod_{t = 1}^T |\sigma^2_\epsilon \gamma^2_i|^{ - \frac{1} {2}} \exp{ \left( - \frac{1} {2} \bm{\beta}_t^T (\frac{\sigma^2_\epsilon} {\gamma^2_i})^{ - 1} \bm{\beta}_t \right) } \exp{ \left(-\frac{\lambda^2} {2} \gamma^2_i \right) }\\
 %
-& \propto (\gamma^2_i)^{ - \frac{T} {2}} e^{ - \frac{1} {\gamma^2_i}(\frac{\sum_{t = 1}^T \beta_t^T \beta_t} {2 \sigma^2_\epsilon})} e^{ - \frac{\lambda^2} {2} \gamma^2_i}\\
+& \propto (\gamma^2_i)^{ - \frac{T} {2}} \exp{ \left( - \gamma^2_i(\frac{\sum_{t = 1}^T \bm{\beta}_t^T \bm{\beta}_t} {2 \sigma^2_\epsilon} + \frac{\lambda^2} {2}) \right) }\\
 %
 \end{align*}
 
@@ -146,9 +146,9 @@ For $i = 1, \ldots, \tau$
 \begin{align*}
 [\sigma^2_\eta | \cdot] & \propto \prod_{t = 1}^T [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\sigma^2_\eta]\\
 %
-& \propto (\prod_{t = 1}^T |\bm{\Sigma}_t |^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}_t^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} (\sigma^2_\eta)^{ - \alpha_\eta - 1} e^{ - \frac{\beta_\eta} {\sigma^2_\eta}}\\
+& \propto (\prod_{t = 1}^T |\bm{\Sigma}_t |^{ - \frac{1} {2}}) \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}_t^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right) } (\sigma^2_\eta)^{ - \alpha_\eta - 1} \exp{ \left( - \frac{\beta_\eta} {\sigma^2_\eta} \right) }\\
 %
-& \propto |\bm{\Sigma}_t |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}_t^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} (\sigma^2_\eta)^{ - \alpha_\eta - 1} e^{ - \frac{\beta_\eta} {\sigma^2_\eta}}\\
+& \propto |\bm{\Sigma}_t |^{ - \frac{T} {2}} \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}_t^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right) } (\sigma^2_\eta)^{ - \alpha_\eta - 1} \exp{ \left( - \frac{\beta_\eta} {\sigma^2_\eta} \right) }\\
 \end{align*}
 % 
 which can be sampled using a Metropolis-Hastings step
@@ -158,9 +158,11 @@ which can be sampled using a Metropolis-Hastings step
 \begin{align*}
 [\sigma^2_\epsilon | \cdot] & \propto \prod_{t = 1}^T [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\bm{\beta}_t | \sigma^2_\eta, \bm{\gamma}] [\sigma^2_\epsilon]\\
 %
-& \propto (\prod_{t = 1}^T |\bm{\Sigma}_t |^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}_t^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} |\bm{\Sigma}_\beta |^{ - \frac{1} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T \bm{\beta}_t^T \bm{\Sigma}_{\beta}^{ - 1} \bm{\beta}_t} (\sigma^2_\epsilon)^{ - \alpha_\epsilon - 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}\\
+& \propto (\prod_{t = 1}^T |\bm{\Sigma}_t |^{ - \frac{1} {2}}) \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}_t^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right) } |\bm{\Sigma}_\beta |^{ - \frac{1} {2}} \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T \bm{\beta}_t^T \bm{\Sigma}_{\beta}^{ - 1} \bm{\beta}_t \right) }\\
+& \phantom{{}=1} \times (\sigma^2_\epsilon)^{ - \alpha_\epsilon - 1} \exp{ \left( - \frac{\beta_\epsilon} {\sigma^2_\epsilon} \right) }\\
 %
-& \propto |\bm{\Sigma}_t |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}_t^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} |\bm{\Sigma}_\beta |^{ - \frac{1} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T \bm{\beta}_t^T \bm{\Sigma}_{\beta}^{ - 1} \bm{\beta}_t} (\sigma^2_\epsilon)^{ - \alpha_\epsilon - 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}\\
+& \propto |\bm{\Sigma}_t |^{ - \frac{T} {2}} \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}_t^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right) } |\bm{\Sigma}_\beta |^{ - \frac{1} {2}} \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T \bm{\beta}_t^T \bm{\Sigma}_{\beta}^{ - 1} \bm{\beta}_t \right) }\\
+& \phantom{{}=1} \times (\sigma^2_\epsilon)^{ - \alpha_\epsilon - 1} \exp{ \left( - \frac{\beta_\epsilon} {\sigma^2_\epsilon} \right) }\\
 \end{align*}
 % 
 which can be sampled using a Metropolis-Hastings step
@@ -170,9 +172,9 @@ which can be sampled using a Metropolis-Hastings step
 \begin{align*}
   [\phi | \cdot] & \propto \prod_{t = 1}^T [y_t | \beta_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\phi]\\
 %
-& \propto \prod_{t = 1}^T | \bm{\Sigma}_t |^{ - \frac{1} {2}} e^{ - \frac{1} {2} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}_t^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} \phi^{ - \alpha_\phi - 1} e^{ - \frac{\beta_\phi} {\phi}}\\
+& \propto \prod_{t = 1}^T | \bm{\Sigma}_t |^{ - \frac{1} {2}} \exp{ \left( - \frac{1} {2} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}_t^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right) } \phi^{ - \alpha_\phi - 1} \exp{ \left( - \frac{\beta_\phi} {\phi} \right) }\\
 %
-& \propto | \bm{\Sigma}_t |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}_t^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)} \phi^{ - \alpha_\phi - 1} e^{ - \frac{\beta_\phi} {\phi}}\\
+& \propto | \bm{\Sigma}_t |^{ - \frac{T} {2}} \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}_t^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right) } \phi^{ - \alpha_\phi - 1} \exp{ \left( - \frac{\beta_\phi} {\phi} \right) }\\
 \end{align*}
 % 
 which can be sampled using a Metropolis-Hastings step
@@ -180,9 +182,9 @@ which can be sampled using a Metropolis-Hastings step
 \subsection*{Full Conditional for $\lambda^2$}
 %
 \begin{align*}
-[\lambda^2 | \cdot] & \propto \prod_{t = 1}^T \prod_{j = 1}^\tau (\lambda^2) e^{ - \frac{\lambda^2 / 2} {1 / \gamma^2_j}} (\frac{\lambda^2} {2})^{\alpha_\lambda - 1} e^{ - \beta_\lambda (\lambda^2 /2)}\\
+[\lambda^2 | \cdot] & \propto \prod_{t = 1}^T \prod_{j = 1}^\tau (\lambda^2) \exp{ \left( - \frac{\lambda^2 / 2} {1 / \gamma^2_j} \right) } (\frac{\lambda^2} {2})^{\alpha_\lambda - 1} \exp{ \left( - \beta_\lambda (\lambda^2 /2) \right) }\\
 %
-& \propto (\frac{\lambda^2} {2})^{\alpha_\lambda + \tau - 1} e^{ - \lambda^2(\beta_\lambda + \sum_{j = 1}^\tau \gamma^2_j / 2)}
+& \propto (\frac{\lambda^2} {2})^{\alpha_\lambda + \tau - 1} \exp{ \left( - \lambda^2(\beta_\lambda + \sum_{j = 1}^\tau \gamma^2_j / 2) \right) }
 \end{align*}
 %
 which is Gamma($\alpha_\lambda + \tau, \beta_\lambda + \sum_{j = 1}^\tau \gamma^2_j / 2$)
