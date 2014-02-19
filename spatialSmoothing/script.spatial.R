@@ -6,7 +6,8 @@ set.seed(1)
 ##
 setwd('~/1dSpatialSim/')
 source('dinvgamma.R')
-source('make.output.plot.R')
+# source('make.output.plot.R')
+source('make.output.plot.ci.R')
 library(mvtnorm)
 source('make.spatial.field.R')
 setwd('~/1dSpatialSim/spatialSmoothing/')
@@ -19,7 +20,7 @@ source('mcmc.spatial.R')
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 20 # number of spatial fields
+reps <- 1#20 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
@@ -35,8 +36,6 @@ plot.Z.field(field$Z.list[(reps / 2 + 1):reps], locs, main = "Full Data")
 Y.list <- field$Y.list[1:(reps / 2)]
 H.list <- field$H.list[1:(reps / 2)]
 Z.list <- field$Z.list[(reps / 2 + 1):reps]
-X <- matrix(unlist(Z.list), ncol = reps / 2, byrow = FALSE)
-matplot(X, type = 'l')
 
 ##
 ## Initialize priors and tuning paramteters
@@ -54,13 +53,13 @@ beta.eta <- 12
 curve(dinvgamma(x, alpha.eta, beta.eta), from = 0, to = 6)
 abline(v = s2.s, col = 'red')
 ##
-alpha.epsilon <- 3
-beta.epsilon <- 2
+alpha.epsilon <- 1
+beta.epsilon <- 0.1
 curve(dinvgamma(x, alpha.epsilon, beta.epsilon), from = 0, to = 6)
 abline(v = s2.e, col = 'red')
 ##
-alpha.phi <- 10
-beta.phi <- 20
+alpha.phi <- 4
+beta.phi <- 1
 curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 abline(v = phi, col = 'red')
 ##
@@ -85,6 +84,6 @@ finish
 ##
 ## Plot output
 ##
-# x11()
+ x11()
 make.output.plot(out)
 
