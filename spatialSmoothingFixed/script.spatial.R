@@ -95,7 +95,7 @@ Z.list <- field$Z.list
 ##
 
 mu.0 <- rep(0, dim(X)[2])
-sigma.squared.0 <- 0.025
+sigma.squared.0 <- 25
 #Sigma.0 <-
 alpha.beta <- 2
 beta.beta <- 0.2
@@ -155,3 +155,4 @@ D <- as.matrix(dist(locs))
 model.fit <- t(X %*% as.matrix(beta.model)) + rmvnorm(1, rep(0, m), sigma.squared.eta.model * exp( - D / phi.model))+ rnorm(m, 0, sigma.squared.epsilon.model)
 plot(model.fit[1,] ~ locs, type = 'l')
 points(locs, X %*% beta, type = 'l', col = 'red')
+

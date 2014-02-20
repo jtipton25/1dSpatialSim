@@ -85,9 +85,9 @@ Z.list <- field$Z.list[(reps / 2 + 1):reps]
 ## Initialize priors and tuning paramteters
 ##
 
-mu.0 <- beta
-sigma.squared.0 <- 0.025
-#Sigma.0 <-
+mu.0 <- rep(0, dim(X)[2])
+sigma.squared.0 <- 25 #make sure this is large
+Sigma.0 <- sigma.squared.0 * diag(dim(X)[2])
 alpha.beta <- 2
 beta.beta <- 0.2
 curve(dinvgamma(x, alpha.beta, beta.beta))
@@ -119,7 +119,7 @@ n.mcmc <- 5000
 ##
 
 start <- Sys.time()
-out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
+out.sp <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
 finish <- Sys.time() - start
 finish 
 
@@ -129,5 +129,6 @@ finish
 ## Plot output
 ##
  x11()
-make.output.plot(out)
-
+make.output.plot(out.sp)
+MSPE.sp <- (out.sp$fort.raster - X)^2
+matplot(MSPE.pca, type = 'l', main = 'MSPE')

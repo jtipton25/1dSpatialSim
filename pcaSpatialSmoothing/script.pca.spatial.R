@@ -8,7 +8,8 @@ setwd('~/1dSpatialSim/')
 source('dinvgamma.R')
 source('make.output.plot.R')
 library(mvtnorm)
-source('make.spatial.field.pca.R')
+# source('make.spatial.field.pca.R')
+source('make.spatial.field.R')
 setwd('~/1dSpatialSim/pcaSpatialSmoothing/')
 source('mcmc.pca.spatial.R')
 
@@ -44,7 +45,7 @@ num.pca <- 3
 ##
 
 mu.0 <- rep(0, num.pca)#rep(0, dim(X)[2])
-sigma.squared.0 <- 0.025
+sigma.squared.0 <- 25
 Sigma.0 <- sigma.squared.0 * diag(num.pca)
 alpha.beta <- 2
 beta.beta <- 0.2
@@ -70,25 +71,21 @@ n.mcmc <- 5000
 
 start <- Sys.time()
 # Rprof(file = 'spatial.Rprof.out')
-out <- mcmc.1d(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
+out.pca <- mcmc.1d(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
 # Rprof(NULL)
 # summaryRprof('spatial.Rprof.out')
 finish <- Sys.time() - start
 finish 
 
 #5000 iterations takes 12.15 minutes for m = 1000 and reps = 10
-
+ 
 ##
 ## Plot output
 ##
-# x11()
-make.output.plot(out)
+x11()
+make.output.plot(out.pca)
 
-matplot(out$beta.save[1, , (n.mcmc / 10 + 1):n.mcmc], type = 'l', ylim = c(min(out$beta.save[, , (n.mcmc / 10 + 1):n.mcmc]), max(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc])))
-matplot(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc], type = 'l', add = TRUE)
+apply(out.pca$mu.beta.save[, (n.mcmc / 10 + 1):n.mcmc], 1, mean)
 
-apply(out$mu.beta.save[, (n.mcmc / 10 + 1):n.mcmc], 1, mean)
-matplot(out$fort.raster, type = 'l', main = 'Posterior Predictive')
-
-MSPE <- (out$fort.raster - X)^2
-matplot(MSPE, type = 'l', main = 'MSPE')
+MSPE.pca <- (out.pca$fort.raster - Y.list)^2
+matplot(MSPE.pca, type = 'l', main = 'MSPE')

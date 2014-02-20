@@ -1,6 +1,6 @@
 library(spBayes)
-out <- spLM(field$Y.list[[1]] ~ locs[field$H.list[[1]]], n.sample = 5000, cov.model = 'exp')
-
+out <- spLM(field$Y.list[[1]] ~ locs[field$H.list[[1]]], coords = cbind(rep(0, m), locs)[field$H.list[[1]],], n.sample = 5000, cov.model = 'exponential')
+m <- spRecover(out, start=burn.in, verbose=FALSE)
 
 ## Not run: 
 rmvn <- function(n, mu=0, V = matrix(1)){
@@ -15,22 +15,22 @@ set.seed(1)
 
 n <- 100
 coords <- cbind(runif(n,0,1), runif(n,0,1))
-X <- as.matrix(cbind(1, rnorm(n)))
+X. <- as.matrix(cbind(1, rnorm(n)))
 
 B <- as.matrix(c(1,5))
 p <- length(B)
 
 sigma.sq <- 2
 tau.sq <- 0.1
-phi <- 3/0.5
+phi. <- 3/0.5
 
-D <- as.matrix(dist(coords))
-R <- exp(-phi*D)
-w <- rmvn(1, rep(0,n), sigma.sq*R)
-y <- rnorm(n, X%*%B + w, sqrt(tau.sq))
+D. <- as.matrix(dist(coords))
+R. <- exp(-phi.*D.)
+w <- rmvn(1, rep(0,n), sigma.sq*R.)
+y <- rnorm(n, X.%*%B + w, sqrt(tau.sq))
 
-idx <- order(X[, 2])
-plot(y[idx] ~ X[, 2][idx], type = 'l')
+idx <- order(X.[, 2])
+plot(y[idx] ~ X.[, 2][idx], type = 'l')
 
 
 n.samples <- 2000
@@ -51,11 +51,12 @@ cov.model <- "exponential"
 n.report <- 500
 verbose <- TRUE
 
-m.1 <- spLM(y~X-1, coords=coords, starting=starting,
+
+m.1 <- spLM(y~X.-1, coords=coords, starting=starting,
             tuning=tuning, priors=priors.1, cov.model=cov.model,
             n.samples=n.samples, verbose=verbose, n.report=n.report)
 
-m.2 <- spLM(y~X-1, coords=coords, starting=starting,
+m.2 <- spLM(y~X.-1, coords=coords, starting=starting,
             tuning=tuning, priors=priors.2, cov.model=cov.model,
             n.samples=n.samples, verbose=verbose, n.report=n.report)
 

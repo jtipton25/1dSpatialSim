@@ -35,15 +35,15 @@ plot.Z.field(field$Z.list[(reps / 2 + 1):reps], locs, main = "Full Data")
 Y.list <- field$Y.list[1:(reps / 2)]
 H.list <- field$H.list[1:(reps / 2)]
 Z.list <- field$Z.list[(reps / 2 + 1):reps]
-X <- matrix(unlist(Z.list), ncol = reps / 2, byrow = FALSE)
-matplot(X, type = 'l')
+# X <- matrix(unlist(Z.list), ncol = reps / 2, byrow = FALSE)
+# matplot(X, type = 'l')
 
 ##
 ## Initialize priors and tuning paramteters
 ##
 
 mu.0 <- rep(0, dim(X)[2])
-sigma.squared.0 <- 0.025
+sigma.squared.0 <- 25
 Sigma.0 <- sigma.squared.0 * diag(dim(X)[2])
 alpha.beta <- 2
 beta.beta <- 0.2
@@ -71,11 +71,11 @@ abline(v = phi, col = 'red')
 
 s.star <- seq(0.1, 0.9, 0.1)
 
-sigma.squared.eta.tune <- 0.000275
-sigma.squared.epsilon.tune <- 0.0020
-phi.tune <- 0.0050
+sigma.squared.eta.tune <- 0.075
+sigma.squared.epsilon.tune <- 0.0050
+phi.tune <- 12.50
 
-n.mcmc <- 5000
+n.mcmc <- 10000
 
 ##
 ## Fit spatial MCMC kriging model
@@ -96,6 +96,7 @@ finish
 ##
 ## Plot output
 ##
-
+x11()
 make.output.plot(out)
 apply(out$mu.beta.save, 1, mean)
+str(out$mu.beta.save)

@@ -37,6 +37,10 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0,
   ## Predictive Process
   ##
   
+  make.sum.sigma.beta <- function(s, beta, mu.beta){
+    t(beta[, s] - mu.beta) %*% (beta[, s] - mu.beta)
+  }
+  
   make.mh <- function(s, beta, Sigma.epsilon, Sigma.epsilon.inv, Sigma.inv, C.star, C.star.inv, c){
     cH.list <- c[, H.list[[s]]]
 #      ( - 1 / 2) * (determinant(C.star.inv + cH.list %*% Sigma.epsilon.inv[[s]] %*% t(cH.list), logarithm = TRUE)$modulus[1] + determinant(C.star, logarithm = TRUE)$modulus[1] + determinant(Sigma.epsilon[[s]], logarithm = TRUE)$modulus[1]) - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% (Sigma.inv[[s]]) %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
@@ -52,10 +56,6 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0,
       }
     }
     
-   make.sum.sigma.beta <- function(s, beta, mu.beta){
-     t(beta[, s] - mu.beta) %*% (beta[, s] - mu.beta)
-   }
-  
   make.Sigma.epsilon <- function(s, sigma.squared.epsilon, I.nt){
     sigma.squared.epsilon * I.nt[[s]]
   }
@@ -77,7 +77,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0,
   }
   
 #   make.Sigma <- function(s, Sigma.epsilon, C.star, c, H.list){
-    make.Sigma <- function(s, Sigma.epsilon, C.star.inv, c, H.list){
+  make.Sigma <- function(s, Sigma.epsilon, C.star.inv, c, H.list){
     cH.list <- c[, H.list[[s]]]
 #     (t(cH.list) %*% C.star %*% cH.list) + Sigma.epsilon[[s]]
     (t(cH.list) %*% C.star.inv %*% cH.list) + Sigma.epsilon[[s]]
@@ -211,16 +211,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0,
   	
   	for(s in 1:t){
       devs <- rnorm(tau)
-      beta.A.chol <- if(is.null(dim(H.list[[s]])) == TRUE){
-        chol(tHX.list[[s]] %*% Sigma.inv[[s]] %*% HX.list[[s]] + Sigma.beta.inv)
-      } else {
-        chol(tHX.list[[s]] %*% Sigma.inv[[s]] %*% HX.list[[s]] + Sigma.beta.inv)
-      }
-      beta.b <- if(is.null(dim(H.list[[s]])) == TRUE){
-        tHX.list[[s]] %*% Sigma.inv[[s]] %*% Y.list[[s]] + Sigma.beta.inv %*% mu.beta
-      } else {
-        tHX.list[[s]] %*% Sigma.inv[[s]] %*% Y.list[[s]] + Sigma.beta.inv %*% mu.beta
-      }
+      beta.A.chol <- chol(tHX.list[[s]] %*% Sigma.inv[[s]] %*% HX.list[[s]] + Sigma.beta.inv)
+      beta.b <- tHX.list[[s]] %*% Sigma.inv[[s]] %*% Y.list[[s]] + Sigma.beta.inv %*% mu.beta
       beta[, s] <- backsolve(beta.A.chol, backsolve(beta.A.chol, beta.b, transpose = TRUE) + devs)
   	}
   	
@@ -237,9 +229,9 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0,
   	## Sample sigma.squared.beta
   	##
   	
-    sigma.squared.beta <- 1 / rgamma(1, alpha.beta + nt.sum / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta, mu.beta = mu.beta)))
+    sigma.squared.beta <- 1 / rgamma(1, alpha.beta + t * tau / 2, beta.beta + 1 / 2 * sum(sapply(1:t, make.sum.sigma.beta, beta = beta, mu.beta = mu.beta)))
   	Sigma.beta <- sigma.squared.beta * I.beta
-  	Sigma.beta.inv <- solve(Sigma.beta)
+  	Sigma.beta.inv <- 1 / sigma.squared.beta * I.beta
   	
   	##
     ## Sample sigma.squared.eta
@@ -341,24 +333,28 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0,
      	}
      	rm(phi.star)
     
-  ##
-  ## Simulate random field
-  ##
-    
-    
-     if(k > n.burn){
-       if(k %% 100 == 0){
-         for(s in 1:t){
-           var.save[, s] <- var.save[, s] + apply(var.save.temp[, , s], 2, var) / ((n.mcmc - n.burn) / 100)
-           fort.raster.batch <- matrix(0, ncells, t)
-         }
-         var.save.temp <- array(0, dim = c(100, ncells, t))
-       }
-       fort.raster <- fort.raster + 1 / (n.mcmc - n.burn) * sapply(1:t, make.fort.batch, beta = beta, c = c, C.star = C.star, C.star.inv = C.star.inv, sigma.squared.epsilon = sigma.squared.epsilon)#, w.tilde = w.tilde)
-       var.save.temp[k %% 100 + 1, , ] <- fort.raster
-     }
-##
     ##
+    ## Simulate random field
+    ##
+    
+    if(k > n.burn){
+      if(k %% 10 == 0){
+        fort.raster <- fort.raster + 10 / (n.mcmc - n.burn) * sapply(1:t, make.fort.batch, beta = beta, c = c, C.star = C.star, C.star.inv = C.star.inv, sigma.squared.epsilon = sigma.squared.epsilon)#, w.tilde = w.tilde)
+        if(k %% 1000 == 0){
+          var.save.temp[100, , ] <- fort.raster
+        } else {
+          var.save.temp[(k %% 1000) / 10, , ] <- fort.raster
+        }
+      }
+      if(k %% 1000 == 0){
+        for(s in 1:t){
+          var.save[, s] <- var.save[, s] + apply(var.save.temp[, , s], 2, var) / ((n.mcmc - n.burn) / 1000)
+          var.save.temp <- array(0, dim = c(100, ncells, t))
+        }
+      }
+    }
+
+##
 #      temp <- c()
 #      for(j in 1:t){
 #        if(is.null(H.list[[j]]) == FALSE){
