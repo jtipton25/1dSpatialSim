@@ -9,7 +9,7 @@ source('dinvgamma.R')
 library(mvtnorm)
 source('make.output.plot.R')
 source('make.spatial.field.R')
-setwd('~/1dSpatialSim/ppSmoothing//')
+setwd('~/1dSpatialSim/spatialSmoothingPP/')
 source('mcmc.spatial.pp.R')
 
 ##
