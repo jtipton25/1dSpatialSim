@@ -24,14 +24,10 @@
 
 mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune){
 
-## params = c(mu.0, Sigma.0, alpha.beta, beta.beta, alpha.eta, beta.eta, alpha.epsilon, beta.epsilon, alpha.phi, beta.phi, n.mcmc = 5000)
-  
   ##
   ## Libraries and Subroutines
   ##
 
-  #source('dinvgamma.R')
-	
   make.sum.sigma.beta <- function(s, beta, mu.beta){
     t(beta[, s] - mu.beta) %*% (beta[, s] - mu.beta)
   }
@@ -55,11 +51,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   make.Sigma.epsilon <- function(s, sigma.squared.epsilon, I.nt){
     sigma.squared.epsilon * I.nt[[s]]
   }
-  
-  #make.Sigma.epsilon.inv <- function(s, sigma.squared.epsilon, I.nt){
-  #  1 / sigma.squared.epsilon * I.nt[[s]]
-  #}
-    
+      
   make.Sigma <- function(s, Sigma.eta, Sigma.epsilon){
     Sigma.eta[[s]] + Sigma.epsilon[[s]]
   }
@@ -296,23 +288,23 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
       }
     }
 
-  ##
-  ## Save variables
-  ## 
+    ##
+    ## Save variables
+    ## 
   
-  beta.save[, , k] <- beta
-  sigma.squared.beta.save[k] <- sigma.squared.beta
-  sigma.squared.eta.save[k] <- sigma.squared.eta
-  sigma.squared.epsilon.save[k] <- sigma.squared.epsilon
-  mu.beta.save[, k] <- mu.beta  
-  phi.save[k] <- phi	
+    beta.save[, , k] <- beta
+    sigma.squared.beta.save[k] <- sigma.squared.beta
+    sigma.squared.eta.save[k] <- sigma.squared.eta
+    sigma.squared.epsilon.save[k] <- sigma.squared.epsilon
+    mu.beta.save[, k] <- mu.beta  
+    phi.save[k] <- phi	
   }
   
-##
-## Write output
-##
+  ##
+  ## Write output
+  ##
   
-list(beta.save = beta.save, sigma.squared.beta.save = sigma.squared.beta.save, 
+  list(beta.save = beta.save, sigma.squared.beta.save = sigma.squared.beta.save, 
      sigma.squared.epsilon.save = sigma.squared.epsilon.save, sigma.squared.eta.save = sigma.squared.eta.save, 
      mu.beta.save = mu.beta.save, n.mcmc = n.mcmc, fort.raster = fort.raster, phi.accept = phi.accept, eta.accept = eta.accept, 
      epsilon.accept = epsilon.accept, phi.save = phi.save, var.save = var.save)#, MSPE.save = MSPE.save)
