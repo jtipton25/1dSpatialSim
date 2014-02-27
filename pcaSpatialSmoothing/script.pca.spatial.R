@@ -87,5 +87,8 @@ make.output.plot(out.pca)
 
 apply(out.pca$mu.beta.save[, (n.mcmc / 10 + 1):n.mcmc], 1, mean)
 
-MSPE.pca <- (out.pca$fort.raster - Y.list)^2
+make.MSPE <- function(s, out, Y.list){
+  (out$fort.raster[, s] - Z.list[[s]])^2
+}
+MSPE.pca <- sapply(1:(reps / 2), make.MSPE, out = out.pca, Y.list = Y.list)
 matplot(MSPE.pca, type = 'l', main = 'MSPE')
