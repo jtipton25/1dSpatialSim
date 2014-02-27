@@ -6,11 +6,13 @@ set.seed(1)
 ##
 setwd('~/1dSpatialSim/')
 source('dinvgamma.R')
+source('rMVN.R')
 library(mvtnorm)
 source('make.output.plot.R')
 source('make.spatial.field.R')
-setwd('~/1dSpatialSim/spatialSmoothingPP/')
-source('mcmc.spatial.pp.R')
+setwd('~/1dSpatialSim/spatialSmoothingPPModified//')
+# source('mcmc.spatial.pp.R')
+source('mcmc.spatial.pp.edits.R')
 
 ##
 ## Simulate Data
@@ -71,11 +73,11 @@ abline(v = phi, col = 'red')
 
 s.star <- seq(0.1, 0.9, 0.1)
 
-sigma.squared.eta.tune <- 0.075
-sigma.squared.epsilon.tune <- 0.0050
-phi.tune <- 12.50
+sigma.squared.eta.tune <- 0.700
+sigma.squared.epsilon.tune <- 0.300
+phi.tune <- 0.05
 
-n.mcmc <- 10000
+n.mcmc <- 1000
 
 ##
 ## Fit spatial MCMC kriging model

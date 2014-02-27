@@ -97,11 +97,11 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   make.fort.batch <- function(s, beta, c, C.star, C.star.inv, sigma.squared.epsilon){#, w.tilde){
     w.star <- rmvnorm(1, vec.0, C.star)
     w.tilde <- t(c) %*% C.star.inv %*% t(w.star)
-    if(dim(beta)[1] == 1){
-      X * beta[s] + w.tilde + rnorm(ncells, 0, sigma.squared.epsilon)
-    } else {
-      X %*% beta[, s] + w.tilde + rnorm(ncells, 0, sigma.squared.epsilon)
-    }
+  	if(dim(beta)[1] == 1){
+  		X * beta[s] + w.tilde + rnorm(ncells, 0, sigma.squared.epsilon)
+  	} else {
+  		X %*% beta[, s] + w.tilde + rnorm(ncells, 0, sigma.squared.epsilon)
+  	}
   }
 
   ##
