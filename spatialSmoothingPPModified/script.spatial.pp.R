@@ -1,5 +1,5 @@
 rm(list = ls())
-set.seed(1)
+# set.seed(1)
 
 ##
 ## Libraries and Subroutines
@@ -21,12 +21,12 @@ source('mcmc.spatial.pp.edits.R')
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 20 # number of spatial fields
+reps <- 4#20 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
 s2.e <- 0.01
-samp.size <- 5:40
+samp.size <- 200:250#5:40
 
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
 
@@ -74,10 +74,10 @@ abline(v = phi, col = 'red')
 s.star <- seq(0.1, 0.9, 0.1)
 
 sigma.squared.eta.tune <- 0.700
-sigma.squared.epsilon.tune <- 0.300
-phi.tune <- 0.05
+sigma.squared.epsilon.tune <- 0.150
+phi.tune <- 0.65
 
-n.mcmc <- 1000
+n.mcmc <- 10000
 
 ##
 ## Fit spatial MCMC kriging model

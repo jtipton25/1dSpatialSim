@@ -8,9 +8,9 @@ setwd('~/1dSpatialSim/')
 source('dinvgamma.R')
 library(mvtnorm)
 source('make.output.plot.R')
-source('make.spatial.field.pca.R')
-setwd('~/1dSpatialSim/pcaSpatialPP')
-source('mcmc.pca.spatial.pp.R')
+source('make.spatial.field.R')
+setwd('~/1dSpatialSim/pcaSpatialPPModified/')
+source('mcmc.pca.spatial.pp.modified.R')
 
 ##
 ## Simulate Data
@@ -66,9 +66,9 @@ beta.phi <- 20
 
 s.star <- seq(0.1, 0.9, 0.1)
 
-sigma.squared.eta.tune <- 0.275
-sigma.squared.epsilon.tune <- 0.0080
-phi.tune <- 5.00
+sigma.squared.eta.tune <- 0.575
+sigma.squared.epsilon.tune <- 0.280
+phi.tune <- 1.00
 
 n.mcmc <- 5000
 
@@ -89,7 +89,7 @@ finish
 ##
 ## Plot output
 ##
-# x11();
+ x11();
 make.output.plot(out)
 apply(out$mu.beta.save, 1, mean)
 

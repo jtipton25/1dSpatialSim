@@ -75,7 +75,7 @@ sigma.squared.eta.tune <- 0.075
 sigma.squared.epsilon.tune <- 0.0050
 phi.tune <- 12.50
 
-n.mcmc <- 10000
+n.mcmc <- 2000
 
 ##
 ## Fit spatial MCMC kriging model
