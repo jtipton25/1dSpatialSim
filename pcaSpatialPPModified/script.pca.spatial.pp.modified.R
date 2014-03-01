@@ -1,5 +1,5 @@
 rm(list = ls())
-set.seed(1)
+set.seed(121)
 
 ##
 ## Libraries and Subroutines
@@ -7,7 +7,7 @@ set.seed(1)
 setwd('~/1dSpatialSim/')
 source('dinvgamma.R')
 library(mvtnorm)
-source('make.output.plot.R')
+source('make.output.plot.pca.R')
 source('make.spatial.field.R')
 setwd('~/1dSpatialSim/pcaSpatialPPModified/')
 source('mcmc.pca.spatial.pp.modified.R')
@@ -19,7 +19,7 @@ source('mcmc.pca.spatial.pp.modified.R')
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 20 # number of spatial fields
+reps <- 72 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
@@ -34,7 +34,8 @@ plot.Z.field(field$Z.list[(reps / 2 + 1):reps], locs, main = "Full Data")
 
 Y.list <- field$Y.list[1:(reps / 2)]
 H.list <- field$H.list[1:(reps / 2)]
-Z.list <- field$Z.list[(reps / 2 + 1):reps]
+Y.pred.list <- field$Z.list[1:(reps / 2)]## for MSPE calculation
+Z.list <- field$Z.list[(reps / 2 + 1):reps] ## for fitting
 X <- matrix(unlist(Z.list), ncol = reps / 2, byrow = FALSE)
 matplot(X, type = 'l')
 num.pca <- 3
@@ -66,11 +67,11 @@ beta.phi <- 20
 
 s.star <- seq(0.1, 0.9, 0.1)
 
-sigma.squared.eta.tune <- 0.575
-sigma.squared.epsilon.tune <- 0.280
+sigma.squared.eta.tune <- 0.475
+sigma.squared.epsilon.tune <- 0.20
 phi.tune <- 1.00
 
-n.mcmc <- 5000
+n.mcmc <- 50000#10000
 
 ##
 ## Fit spatial MCMC kriging model
@@ -78,7 +79,7 @@ n.mcmc <- 5000
 
 start <- Sys.time()
 # Rprof(file = 'spatial.pp.Rprof.out')
-out <- mcmc.1d(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune, s.star)
+out.pca <- mcmc.1d(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune, s.star)
 # Rprof(NULL)
 # summaryRprof('spatial.pp.Rprof.out')
 finish <- Sys.time() - start
@@ -89,8 +90,8 @@ finish
 ##
 ## Plot output
 ##
- x11();
-make.output.plot(out)
+x11()
+make.output.plot(out.pca)
 apply(out$mu.beta.save, 1, mean)
 
 mean(out$phi.save[(n.mcmc / 5 + 1):n.mcmc])

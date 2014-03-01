@@ -10,9 +10,9 @@ source('rMVN.R')
 library(mvtnorm)
 source('make.output.plot.R')
 source('make.spatial.field.R')
-setwd('~/1dSpatialSim/spatialSmoothingPPModified//')
+setwd('~/1dSpatialSim/spatialSmoothingPPModified/')
 # source('mcmc.spatial.pp.R')
-source('mcmc.spatial.pp.edits.R')
+source('mcmc.spatial.pp.R')
 
 ##
 ## Simulate Data

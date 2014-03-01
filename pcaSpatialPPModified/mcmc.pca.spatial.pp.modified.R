@@ -107,8 +107,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     Sig.mat + (rep((sigma.squared.eta + sigma.squared.epsilon), ncells) - diag(Sig.mat)) * I.full
   }
   
-  make.fort.batch <- function(s, beta, Sigma.full){
-    Sigma.chol <- chol(Sigma.full)
+  make.fort.batch <- function(s, beta, Sigma.chol){
     devs <- rnorm(ncells)
     if(dim(beta)[1] == 1){
       X * beta[s] + Sigma.chol %*% devs
@@ -172,7 +171,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   Sigma.epsilon.tilde.plus.epsilon <- lapply(1:t, make.Sigma.epsilon.tilde.plus.epsilon, sigma.squared.epsilon = sigma.squared.epsilon, sigma.squared.eta = sigma.squared.eta, cH.list = cH.list, tcH.list = tcH.list, C.star.inv = C.star.inv, I.nt = I.nt)
   Sigma.epsilon.tilde.plus.epsilon.inv <- lapply(1:t, make.Sigma.epsilon.tilde.plus.epsilon.inv, Sigma.epsilon.tilde.plus.epsilon = Sigma.epsilon.tilde.plus.epsilon)
   
-  Sigma.0 <- sigma.squared.0 * diag(tau)
+#   Sigma.0 <- sigma.squared.0 * diag(tau)
   Sigma.0.inv <- solve(Sigma.0)
   
   Sigma <- lapply(1:t, make.Sigma, Sigma.epsilon.tilde.plus.epsilon = Sigma.epsilon.tilde.plus.epsilon, cH.list = cH.list, tcH.list = tcH.list, C.star.inv = C.star.inv) 
@@ -367,7 +366,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     if(k > n.burn){
       if(k %% 10 == 0){
         Sigma.full <- make.Sigma.full(c, C.star.inv, sigma.squared.eta, sigma.squared.epsilon)
-        fort.raster <- fort.raster + 10 / (n.mcmc - n.burn) * sapply(1:t, make.fort.batch, beta = beta, Sigma.full = Sigma.full)
+        Sigma.chol <- chol(Sigma.full)
+        fort.raster <- fort.raster + 10 / (n.mcmc - n.burn) * sapply(1:t, make.fort.batch, beta = beta, Sigma.chol = Sigma.chol)
         if(k %% 1000 == 0){
           var.save.temp[100, , ] <- fort.raster
         } else {
