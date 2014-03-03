@@ -100,4 +100,4 @@ mean(out$sigma.squared.epsilon.save[(n.mcmc / 5 + 1):n.mcmc])
 s2.e
 mean(out$sigma.squared.eta.save[(n.mcmc / 5 + 1):n.mcmc])
 s2.s
-matplot((out$fort.raster - matrix(unlist(field$Z.list[1:(reps / 2)]), nrow = m))^2, type = 'l') ## prediction error
+matplot((out$fort.raster - matrix(unlist(field$Z.list[1:(reps / 2)]), nrow = m))^2, type = 'l') ## 
