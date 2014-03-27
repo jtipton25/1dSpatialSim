@@ -167,21 +167,18 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   	##
   	
   	for(s in 1:t){
-      devs <- rnorm(tau)
       beta.A.chol <- chol(tHX.list[[s]] %*% Sigma.inv[[s]] %*% HX.list[[s]] + Sigma.beta.inv)
       beta.b <- tHX.list[[s]] %*% Sigma.inv[[s]] %*% Y.list[[s]] + Sigma.beta.inv %*% mu.beta
-      beta[, s] <- backsolve(beta.A.chol, backsolve(beta.A.chol, beta.b, transpose = TRUE) + devs)
+      beta[, s] <- rMVN(beta.A.chol, beta.b)
   	}
   	
   	##
   	## Sample mu.beta
   	##
   	
-  	devs <- rnorm(tau)
   	mu.beta.A.chol <- chol(t * Sigma.beta.inv + Sigma.0.inv)
   	mu.beta.b <- apply(Sigma.beta.inv %*% beta, 1, sum) + Sigma.0.inv %*% mu.0
-  	mu.beta <- backsolve(mu.beta.A.chol, backsolve(mu.beta.A.chol, mu.beta.b, transpose = TRUE) + devs)
-  
+  	mu.beta <- rMVN(mu.beta.A.chol, mu.beta.b)  
   	##
   	## Sample sigma.squared.beta
   	##

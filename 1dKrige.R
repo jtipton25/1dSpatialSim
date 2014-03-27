@@ -4,6 +4,7 @@ set.seed(201)
 ##
 ## Libraries and Subroutines
 ##
+library('geoR')
 
 ## make true spatial field
 make.field <- function(reps, mu, Sig.s, m){
@@ -130,7 +131,7 @@ Z.geo.var <- list(length = reps)
 Z.geo.fit <- list(length = reps)
 
 for(t in 1:reps){
-  Z.geo[[t]] <- as.geodata(cbind(Z[, t], locs, rep(0, m)), coords.col = 2:3, data.col = 1)
+  Z.geo[[t]] <- as.geodata(cbind(Z.list[[t]], locs, rep(0, m)), coords.col = 2:3, data.col = 1)
   Z.geo.var[[t]] <- variog(Z.geo[[t]], ini.cov.pairs = c(1, 2), trend = '1st', 
                            max.dist = 0.75, messages = FALSE)
   Z.geo.fit[[t]] <- variofit(Z.geo.var[[t]], messages = FALSE, cov.model = 'exponential', 

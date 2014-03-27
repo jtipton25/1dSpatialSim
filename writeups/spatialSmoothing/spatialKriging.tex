@@ -33,7 +33,7 @@
 %
 \bm{\beta}_t & \sim N(\bm{\mu}_\beta, \bm{\Sigma}_\beta) & \bm{\Sigma}_\beta &  = \sigma^2_\beta \bm{I}_{n_t}\\
 %
-\bm{\eta}_t & \sim N(0, \bm{\Sigma}_\eta) & \bm{\Sigma}_\eta &  = \sigma^2_\eta \bm{R}(\phi) & \bm{R}(\phi) & = \exp{ \left( - \bm{D}_t / \phi \right)}\\
+\bm{\eta}_t & \sim N(0, \bm{\Sigma}_{\eta_t}) & \bm{\Sigma}_{\eta_t} &  = \sigma^2_\eta \bm{R}(\phi) & \bm{R}(\phi) & = \exp{ \left( - \bm{D}_t / \phi \right)}\\
 %
 \bm{\epsilon}_t & \sim N(0, \bm{\Sigma}_\epsilon) & \bm{\Sigma}_\epsilon &  = \sigma^2_\epsilon \bm{I}_{n_t}\\
 %
@@ -70,7 +70,7 @@ For $t = 1, \ldots, T$,
 \begin{align*}
 [\bm{\beta}_t | \cdot] & \propto [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \sigma^2_\epsilon, \phi] [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta]\\
 %
-& \propto \exp{\left( - \frac{1} {2} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right)} \exp{\left( - \frac{1} {2} (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta) \right)}\\
+& \propto \exp{ \left\{ - \frac{1} {2} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right\} } \exp{ \left\{ - \frac{1} {2} (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta) \right\}}\\
 %
 & \propto \exp{\left( - \frac{1} {2} \{\bm{\beta}_t^T (\bm{X}^T \bm{H}_t^T \bm{\Sigma}^{ - 1} \bm{H}_t \bm{X} + \bm{\Sigma}_\beta^{ - 1}) \bm{\beta}_t - 2 \bm{\beta}_t^T (\bm{X}^T \bm{H}_t^T \bm{\Sigma}^{ - 1} \bm{y}_t + \bm{\Sigma}_\beta^{ - 1} \bm{\mu}_\beta) \} \right) }
 \end{align*}

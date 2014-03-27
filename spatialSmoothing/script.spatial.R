@@ -4,15 +4,12 @@ set.seed(1)
 ##
 ## Libraries and Subroutines
 ##
-setwd('~/1dSpatialSim/')
-source('dinvgamma.R')
-# source('make.output.plot.R')
-source('make.output.plot.ci.R')
+source('~/1dSpatialSim/dinvgamma.R')
+source('~/1dSpatialSim/make.output.plot.ci.R')
 library(mvtnorm)
-source('make.spatial.field.R')
-setwd('~/1dSpatialSim/spatialSmoothing/')
-source('mcmc.spatial.R')
-
+source('~/1dSpatialSim/make.spatial.field.R')
+source('~/1dSpatialSim/spatialSmoothing/mcmc.spatial.R')
+source('~/1dSpatialSim/rMVN.R')
 
 make.output.plot <- function(out){
   n.burn <- floor(n.mcmc / 5)
@@ -119,7 +116,7 @@ n.mcmc <- 5000
 ##
 
 start <- Sys.time()
-out.sp <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
+out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
 finish <- Sys.time() - start
 finish 
 
@@ -129,6 +126,5 @@ finish
 ## Plot output
 ##
  x11()
-make.output.plot(out.sp)
+make.output.plot(out)
 MSPE.sp <- (out.sp$fort.raster - X)^2
-matplot(MSPE.pca, type = 'l', main = 'MSPE')
