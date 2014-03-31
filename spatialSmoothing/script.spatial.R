@@ -4,14 +4,16 @@ set.seed(1)
 ##
 ## Libraries and Subroutines
 ##
-source('~/1dSpatialSim/dinvgamma.R')
-source('~/1dSpatialSim/make.output.plot.ci.R')
-library(mvtnorm)
-source('~/1dSpatialSim/make.spatial.field.R')
-source('~/1dSpatialSim/spatialSmoothing/mcmc.spatial.R')
-source('~/1dSpatialSim/rMVN.R')
 
-make.output.plot <- function(out){
+library(mvtnorm)
+source('~/1dSpatialSim/functions/dinvgamma.R')
+source('~/1dSpatialSim/plots/make.output.plot.ci.R')
+source('~/1dSpatialSim/functions/make.spatial.field.R')
+source('~/1dSpatialSim/spatialSmoothing/mcmc.spatial.R')
+source('~/1dSpatialSim/functions/rMVN.R')
+source('~/1dSpatialSim/plots//make.output.plot.ci.R')
+
+# make.output.plot <- function(out){
   n.burn <- floor(n.mcmc / 5)
   #x11()
   layout(matrix(1:16, nrow = 4))
@@ -34,7 +36,7 @@ make.output.plot <- function(out){
   matplot(out$fort.raster, type = 'l')#, ylim = c(min(out$fort.raster) - 2*max(sqrt(out$var.save)), max(out$fort.raster) + 2*max(sqrt(out$var.save))))
     matplot(out$fort.raster - 2*sqrt(out$var.save), type = 'l', add = TRUE, col = 'red', lty = 'dashed')
     matplot(out$fort.raster + 2*sqrt(out$var.save), type = 'l', add = TRUE, col = 'red', lty = 'dashed')
-  points(X %*% beta, type = 'l', col = 'red')  
+  points(X %*% beta, type = 'l', col = 'blue')  
   #
   plot.Z.field(field$Z.list, locs = locs, main = "True Surface")
   #
@@ -61,7 +63,7 @@ make.output.plot <- function(out){
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 1#20 # number of spatial fields
+reps <- 2#20 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
@@ -125,6 +127,6 @@ finish
 ##
 ## Plot output
 ##
- x11()
+#  x11()
 make.output.plot(out)
 MSPE.sp <- (out.sp$fort.raster - X)^2
