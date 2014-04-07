@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  27 MAR 2014 14:01
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  1 APR 2014 11:42
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -230,19 +230,18 @@ ic/amsfonts/cm/cmmi5.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public
 /amsfonts/cm/cmmi7.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/a
 msfonts/cm/cmmi8.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/ams
 fonts/cm/cmmib10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/ams
-fonts/cmextra/cmmib7.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public
-/amsfonts/cm/cmr10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/a
-msfonts/cm/cmr12.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/ams
-fonts/cm/cmr17.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfo
-nts/cm/cmr5.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts
-/cm/cmr7.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm
-/cmr8.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-sy10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cms
-y7.pfb>
-Output written on spatialKriging.pdf (3 pages, 173144 bytes).
+fonts/cm/cmr10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmr12.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfont
+s/cm/cmr17.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/
+cm/cmr5.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmr7.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr
+8.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10
+.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.p
+fb>
+Output written on spatialKriging.pdf (3 pages, 166725 bytes).
 PDF statistics:
- 86 PDF objects out of 1000 (max. 8388607)
- 62 compressed objects within 1 object stream
+ 82 PDF objects out of 1000 (max. 8388607)
+ 59 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

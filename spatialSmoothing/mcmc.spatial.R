@@ -64,23 +64,18 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
 	  ( - 1 / 2) * determinant(Sigma[[s]], logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
 	}
 
-#   make.fort.batch <- function(s, beta, H.list, Y.list, Sigma.full, ncells){
-#     temp <- vector(length = ncells)
-#     temp[ - H.list[[s]]] <- X[ - H.list[[s]], ] %*% beta[, s] + Sigma.full[ - H.list[[s]], H.list[[s]]] %*% solve(Sigma.full[H.list[[s]], H.list[[s]]]) %*% (Y.list[[s]] - X[H.list[[s]], ] %*% beta[, s])
-#     temp[H.list[[s]]] <- Y.list[[s]]
-#     return(temp)
-#   }
-
-  make.fort.batch <- function(s, beta, H.list, Y.list, Sigma.full, ncells){
-#     temp <- t(rmvnorm(1, X %*% beta[, s], Sigma.eta.full)) + rnorm(ncells, 0, sigma.squared.epsilon)
-    D <- chol(Sigma.full)
-    temp <- t(matrix(rnorm(ncells), ncol = ncells) %*% D + rep(X %*% beta[, s], rep(1, ncells)))
-#     temp <- t(rmvnorm(1, X %*% beta[, s], Sigma.full))
+  make.fort.batch <- function(s, beta, H.list, Y.list, c.Y, Sigma, ncells){
+    temp <- vector(length = ncells)
+    temp[ - H.list[[s]]] <- X[ - H.list[[s]], ] %*% beta[, s] + c.Y[ - H.list[[s]], H.list[[s]]] %*% solve(Sigma[[s]]) %*% (Y.list[[s]] - X[H.list[[s]], ] %*% beta[, s])
+    temp[H.list[[s]]] <- Y.list[[s]]
     return(temp)
   }
 
-# make.fort.batch <- function(s, beta, H.list, Y.list, Sigma.full, ncells){
-#     temp <- t(rmvnorm(1, X %*% beta[, s], Sigma.full))
+#   make.fort.batch <- function(s, beta, H.list, Y.list, Sigma.full, ncells){
+# #     temp <- t(rmvnorm(1, X %*% beta[, s], Sigma.eta.full)) + rnorm(ncells, 0, sigma.squared.epsilon)
+#     D <- chol(Sigma.full)
+#     temp <- t(matrix(rnorm(ncells), ncol = ncells) %*% D + rep(X %*% beta[, s], rep(1, ncells)))
+# #     temp <- t(rmvnorm(1, X %*% beta[, s], Sigma.full))
 #     return(temp)
 #   }
 
@@ -179,6 +174,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   	mu.beta.A.chol <- chol(t * Sigma.beta.inv + Sigma.0.inv)
   	mu.beta.b <- apply(Sigma.beta.inv %*% beta, 1, sum) + Sigma.0.inv %*% mu.0
   	mu.beta <- rMVN(mu.beta.A.chol, mu.beta.b)  
+    
   	##
   	## Sample sigma.squared.beta
   	##
@@ -269,8 +265,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     
     if(k > n.burn){
       if(k %% 10 == 0){
-        Sigma.full <- (sigma.squared.eta * exp( - D / phi)) + sigma.squared.epsilon * I.full
-        fort.raster <- fort.raster + 10 / (n.mcmc - n.burn) * sapply(1:t, make.fort.batch, beta = beta, H.list = H.list, Y.list = Y.list, Sigma.full = Sigma.full, ncells = ncells)
+        c.Y <- sigma.squared.eta * exp( - D / phi)
+        fort.raster <- fort.raster + 10 / (n.mcmc - n.burn) * sapply(1:t, make.fort.batch, beta = beta, H.list = H.list, Y.list = Y.list, c.Y = c.Y, Sigma = Sigma, ncells = ncells)
         if(k %% 1000 == 0){
           var.save.temp[100, , ] <- fort.raster
         } else {
