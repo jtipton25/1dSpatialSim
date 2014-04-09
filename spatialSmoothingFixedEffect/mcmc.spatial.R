@@ -72,25 +72,9 @@ mcmc.1d <- function(Y.list, H.list, X, locs, mu.beta, n.mcmc, alpha.epsilon, bet
     ( - 1 / 2) * determinant(Sigma[[s]], logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
 	}
 
-#   make.fort.batch <- function(s, beta, H.list, Y.list, c.Y, Sigma, ncells){
-#     tmp.mn <- X[ - H.list[[s]], ] %*% beta[, s] + c.Y[ - H.list[[s]], H.list[[s]]] %*% Sigma.inv[[s]] %*% (Y.list[[s]] - X[H.list[[s]], ] %*% beta[, s])
-#     tmp.var <- diag(c.Y[ - H.list[[s]], - H.list[[s]]] - c.Y[ - H.list[[s]], H.list[[s]]] %*% Sigma.inv[[s]] %*% c.Y[H.list[[s]], - H.list[[s]]]) * I.full.t[[s]]
-#     ret <- vector(length = ncells)
-#     ret[ - H.list[[s]]] <- rmvnorm(1, tmp.mn, tmp.var)
-#     ret[H.list[[s]]] <- Y.list[[s]]
-#     return(ret)
-#   }
-##
-## Need to work on this...
-##
   make.fort.batch <- function(s, beta, c.Y, Sigma.inv){
-    tmp.mn <- X[ - H.list[[s]], ] %*% beta[, s] + t(c.Y[H.list[[s]], - H.list[[s]]]) %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
-#       X[ - H.list[[s]], ] %*% beta[, s] + c.Y[ - H.list[[s]], H.list[[s]]] %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])-
-    tmp.var <- c.Y[ - H.list[[s]], - H.list[[s]]] - t(c.Y[H.list[[s]], - H.list[[s]]]) %*% Sigma.inv[[s]] %*% c.Y[H.list[[s]], - H.list[[s]]]
-#       c.Y[ - H.list[[s]], - H.list[[s]]] - c.Y[ - H.list[[s]], H.list[[s]]] %*% Sigma.inv[[s]] %*% c.Y[H.list[[s]], - H.list[[s]]]-
     ret <- vector(length = ncells)
-    ret[ - H.list[[s]]] <- chol(tmp.var) %*% rnorm(ncells - nt[s]) + tmp.mn
-#     ret[ - H.list[[s]]] <- rmvnorm(1, tmp.mn, tmp.var)
+    ret[ - H.list[[s]]] <- X[ - H.list[[s]], ] %*% beta[, s] + c.Y[ - H.list[[s]], H.list[[s]]] %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
     ret[H.list[[s]]] <- Y.list[[s]]
     return(ret)
   }
@@ -163,8 +147,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, mu.beta, n.mcmc, alpha.epsilon, bet
   ##
 
     for(k in 1:n.mcmc){
-#     if(k %% 100 == 0) cat(" ", k) 
-      cat(" ", k) 
+    if(k %% 100 == 0) cat(" ", k) 
       
     ##
     ## Sample Beta

@@ -64,21 +64,13 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
 	  ( - 1 / 2) * determinant(Sigma[[s]], logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
 	}
 
-  make.fort.batch <- function(s, beta, H.list, Y.list, c.Y, Sigma, ncells){
+  make.fort.batch <- function(s, beta, c.Y, Sigma){
     temp <- vector(length = ncells)
     temp[ - H.list[[s]]] <- X[ - H.list[[s]], ] %*% beta[, s] + c.Y[ - H.list[[s]], H.list[[s]]] %*% solve(Sigma[[s]]) %*% (Y.list[[s]] - X[H.list[[s]], ] %*% beta[, s])
     temp[H.list[[s]]] <- Y.list[[s]]
     return(temp)
   }
-
-#   make.fort.batch <- function(s, beta, H.list, Y.list, Sigma.full, ncells){
-# #     temp <- t(rmvnorm(1, X %*% beta[, s], Sigma.eta.full)) + rnorm(ncells, 0, sigma.squared.epsilon)
-#     D <- chol(Sigma.full)
-#     temp <- t(matrix(rnorm(ncells), ncol = ncells) %*% D + rep(X %*% beta[, s], rep(1, ncells)))
-# #     temp <- t(rmvnorm(1, X %*% beta[, s], Sigma.full))
-#     return(temp)
-#   }
-
+  
   ##
   ## Initialize parameters
   ## 
@@ -111,17 +103,12 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   I.nt <- lapply(1:t, make.identity.list, nt = nt)
   I.full <- diag(ncells)
   Sigma.epsilon <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
-  #Sigma.epsilon.inv <- lapply(1:t, make.Sigma.epsilon.inv, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
 
-#   Sigma.0 <- sigma.squared.0 * I.beta
   Sigma.0.inv <- solve(Sigma.0)
 
   Sigma <- lapply(1:t, make.Sigma, Sigma.eta = Sigma.eta, Sigma.epsilon = Sigma.epsilon)
   Sigma.inv <- lapply(1:t, make.Sigma.inv, Sigma = Sigma)
-  
-  devs <- rnorm(t)
-	Sigma.chol <- chol(Sigma.0)
-	mu.beta <- backsolve(Sigma.chol, backsolve(Sigma.chol, mu.0, transpose = TRUE) + devs)
+	mu.beta <- backsolve(chol(Sigma.0), backsolve(chol(Sigma.0), mu.0, transpose = TRUE) + rnorm(t))
 
   n.burn <- floor(n.mcmc / 5) + 1
   fort.raster.batch <- matrix(0, ncells, t)   
@@ -266,11 +253,12 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     if(k > n.burn){
       if(k %% 10 == 0){
         c.Y <- sigma.squared.eta * exp( - D / phi)
-        fort.raster <- fort.raster + 10 / (n.mcmc - n.burn) * sapply(1:t, make.fort.batch, beta = beta, H.list = H.list, Y.list = Y.list, c.Y = c.Y, Sigma = Sigma, ncells = ncells)
+        fort.raster.tmp <- sapply(1:t, make.fort.batch, beta = beta, c.Y = c.Y, Sigma = Sigma)
+        fort.raster <- fort.raster + 10 / (n.mcmc - n.burn) * fort.raster.tmp
         if(k %% 1000 == 0){
-          var.save.temp[100, , ] <- fort.raster
+          var.save.temp[100, , ] <- fort.raster.tmp
         } else {
-          var.save.temp[(k %% 1000) / 10, , ] <- fort.raster
+          var.save.temp[(k %% 1000) / 10, , ] <- fort.raster.tmp
         }
       }
       if(k %% 1000 == 0){

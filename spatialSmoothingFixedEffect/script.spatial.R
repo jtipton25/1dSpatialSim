@@ -1,7 +1,3 @@
-##
-## This model is severely overestimating the nugget variance. This is leading to poor predictions...
-##
-
 rm(list = ls())
 set.seed(10)
 
@@ -19,15 +15,15 @@ source('~/1dSpatialSim/spatialSmoothingFixedEffect/mcmc.spatial.R')
 ## Simulate Data
 ##
 
-m <- 500 # number of spatial locations
+m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
 reps <- 2 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
-s2.e <- 0.01
-samp.size <- 5:40
+s2.e <- 0.1
+samp.size <- 40:100
 
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
 
@@ -69,7 +65,7 @@ sigma.squared.eta.tune <- 0.25
 sigma.squared.epsilon.tune <- 0.075
 phi.tune <- 0.25
 
-n.mcmc <- 60
+n.mcmc <- 5000
 
 mu.beta <- c(0, 2)
 

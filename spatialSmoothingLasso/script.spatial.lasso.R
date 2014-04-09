@@ -67,7 +67,6 @@ plot.Z.field(field$Z.list, locs, main = "Actual data")
 plot.Y.field(field$Y.list, field$H.list, locs)
 Y.list <- field$Y.list
 H.list <- field$H.list
-
 ##
 ## Initialize priors and tuning paramteters
 ##
@@ -85,13 +84,13 @@ beta.eta <- 12
 curve(dinvgamma(x, alpha.eta, beta.eta), from = 0, to = 6)
 abline(v = s2.s, col = 'red')
 ##
-alpha.epsilon <- 2
-beta.epsilon <- 0.25
+alpha.epsilon <- 3
+beta.epsilon <- 2
 curve(dinvgamma(x, alpha.epsilon, beta.epsilon), from = 0, to = 6)
 abline(v = s2.e, col = 'red')
 ##
-alpha.phi <- 4
-beta.phi <- 2
+alpha.phi <- 10
+beta.phi <- 20
 curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 abline(v = phi, col = 'red')
 
@@ -104,12 +103,12 @@ curve(dgamma(x, alpha.lambda, beta.lambda))
 
 ##
 sigma.squared.beta.tune <- 0.05
-sigma.squared.eta.tune <- 0.25
-sigma.squared.epsilon.tune <- 0.010
-phi.tune <- 0.25
+sigma.squared.eta.tune <- 0.5
+sigma.squared.epsilon.tune <- 0.0150
+phi.tune <- 0.75
 sigma.squared.gamma.tune <- 0.3
 sigma.squared.gamma.tune <- 0.0015
-n.mcmc <- 10000
+n.mcmc <- 5000
 
 ##
 ## Fit spatial MCMC kriging model
@@ -125,10 +124,9 @@ finish
 ##
 ## Plot output
 ##
+x11()
 make.output.plot(out)
 out$gamma.accept
-matplot(t(out$gamma.squared.save), type = 'l')
-matplot(out$lambda.squared.save, type = 'l')
 ## identifiability between beta_0 and sigma.squared.epsilon???
 # matplot(out$beta.save[1, , (n.mcmc / 10 + 1):n.mcmc], type = 'l', ylim = c(min(out$beta.save[, , (n.mcmc / 10 + 1):n.mcmc]), max(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc])))
 # matplot(out$beta.save[2, , (n.mcmc / 10 + 1):n.mcmc], type = 'l', add = TRUE)
