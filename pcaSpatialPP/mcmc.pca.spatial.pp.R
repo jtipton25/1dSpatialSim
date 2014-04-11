@@ -124,10 +124,17 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   beta <- matrix(0, nrow = tau, ncol = t)
   
   ## Initialize parameter model
-  lambda <- X.pca$sdev^2
-  Lambda <- diag(lambda[1:num.pca])
-  Lambda.determinant <- det(Lambda)
-  Lambda.inv <- solve(Lambda)
+#   lambda <- X.pca$sdev^2
+#   Lambda <- diag(lambda[1:num.pca])
+#   Lambda.determinant <- det(Lambda)
+#   Lambda.inv <- solve(Lambda)
+
+    icar.eigen <- eigen(D.mat - W.mat)
+    lambda <- icar.eigen$values
+    Lambda <- lambda[1:tau] * diag(tau)
+    Lambda.inv <- 1 / lambda[1:tau] * diag(tau)
+    H <- icar.eigen$vectors[, 1:tau]
+
   sigma.squared.beta <- 1 / rgamma(1, alpha.beta, beta.beta)
   Sigma.beta <- sigma.squared.beta * Lambda
   Sigma.beta.inv <- 1 / sigma.squared.beta * Lambda.inv

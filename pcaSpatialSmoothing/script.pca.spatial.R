@@ -5,13 +5,12 @@ set.seed(1)
 ## Libraries and Subroutines
 ##
 setwd('~/1dSpatialSim/')
-source('dinvgamma.R')
-source('make.output.plot.R')
+source('~/1dSpatialSim/functions/dinvgamma.R')
+source('~/1dSpatialSim/functions/make.output.plot.R')
 library(mvtnorm)
 # source('make.spatial.field.pca.R')
-source('make.spatial.field.R')
-setwd('~/1dSpatialSim/pcaSpatialSmoothing/')
-source('mcmc.pca.spatial.R')
+source('~/1dSpatialSim/functions/make.spatial.field.R')
+source('~/1dSpatialSim/pcaSpatialSmoothing/mcmc.pca.spatial.R')
 
 ##
 ## Simulate Data

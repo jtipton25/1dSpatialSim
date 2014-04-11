@@ -4,27 +4,21 @@ set.seed(1)
 ##
 ## Libraries and Subroutines
 ##
-setwd('~/1dSpatialSim/')
-source('dinvgamma.R')
-# source('make.output.plot.R')
-source('make.output.plot.ci.R')
+source('~/1dSpatialSim/functions/dinvgamma.R')
+source('~/1dSpatialSim/functions/make.output.plot.ci.R')
 library(mvtnorm)
-source('make.spatial.field.R')
-setwd('~/1dSpatialSim/spatialSmoothing/')
-source('mcmc.spatial.R')
+source('~/1dSpatialSim/functions/make.spatial.field.R')
+source('~/1dSpatialSim/spatialSmoothing/mcmc.spatial.R')
 
 
 make.output.plot <- function(out){
   n.burn <- floor(n.mcmc / 5)
   #x11()
   layout(matrix(1:16, nrow = 4))
-  #
-  #   matplot(t(out$mu.beta.save)[(n.burn + 1):n.mcmc, ], type = 'l')
-  #   abline(h = beta[1], col = 'black')
-  #   abline(h = beta[2], col = 'red')
-  #
+  matplot(t(out$mu.beta.save)[(n.burn + 1):n.mcmc, ], type = 'l')
+  abline(h = beta[1], col = 'black')
+  abline(h = beta[2], col = 'red')  
   plot(out$sigma.squared.beta.save[(n.burn + 1):n.mcmc], type = 'l')
-  #
   plot(out$sigma.squared.epsilon.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$epsilon.accept, 2)))
   abline(h = s2.e, col = 'red')
   #
@@ -40,7 +34,6 @@ make.output.plot <- function(out){
   points(X %*% beta, type = 'l', col = 'red')  
   #
   plot.Z.field(field$Z.list, locs = locs, main = "True Surface")
-  #
   #
   plot.Y.field(field$Y.list, field$H.list, locs = locs)
   #
@@ -64,7 +57,7 @@ make.output.plot <- function(out){
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 1#20 # number of spatial fields
+reps <- 20 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
@@ -130,5 +123,3 @@ finish
 ##
  x11()
 make.output.plot(out.sp)
-MSPE.sp <- (out.sp$fort.raster - X)^2
-matplot(MSPE.pca, type = 'l', main = 'MSPE')
