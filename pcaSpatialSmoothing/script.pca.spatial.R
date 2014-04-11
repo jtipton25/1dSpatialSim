@@ -4,13 +4,7 @@ set.seed(10)
 ##
 ## Libraries and Subroutines
 ##
-<<<<<<< HEAD
-setwd('~/1dSpatialSim/')
-source('~/1dSpatialSim/functions/dinvgamma.R')
-source('~/1dSpatialSim/functions/make.output.plot.R')
-=======
 
->>>>>>> 39e34f1dce0981c54eec954fea807c4ec8ad7950
 library(mvtnorm)
 source('~/1dSpatialSim/functions/dinvgamma.R')
 source('~/1dSpatialSim/plots/make.output.plot.ci.R')
@@ -70,7 +64,7 @@ sigma.squared.eta.tune <- 0.5
 sigma.squared.epsilon.tune <- 0.0575
 phi.tune <- 0.25
 
-n.mcmc <- 5000
+n.mcmc <- 20000
 
 ##
 ## Fit spatial MCMC kriging model
@@ -90,14 +84,8 @@ finish
 ## Plot output
 ##
 
+# jpeg(file = '~/1dSpatialSim/plots/pcaRegressionSpatial_4_11_2014.jpeg', width = 6, height = 6, quality = 100, res  = 600, units = 'in')
 make.output.plot(out.pca)
+# dev.off()
 
-apply(out.pca$mu.beta.save[, (n.mcmc / 10 + 1):n.mcmc], 1, mean)
 
-make.MSPE <- function(s, out){
-  (out$fort.raster[, s] - Z.list.hist[[s]])^2
-}
-MSPE.pca <- sapply(1:(reps / 2), make.MSPE, out = out.pca)
-matplot(MSPE.pca, type = 'l', main = 'MSPE')
-
-mean(MSPE.pca)

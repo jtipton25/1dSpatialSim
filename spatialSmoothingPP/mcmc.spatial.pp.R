@@ -83,22 +83,22 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     (1 / sigma.squared.beta)^tau
   }
   
-  #   make.fort.batch <- function(s, beta, c, C.star, C.star.inv, sigma.squared.epsilon){#, w.tilde){
-  #     w.star <- rmvnorm(1, vec.0, C.star)
-  #     w.tilde <- t(c) %*% C.star.inv %*% t(w.star)
-  #     if(dim(beta)[1] == 1){
-  #       X * beta[s] + w.tilde + rnorm(ncells, 0, sigma.squared.epsilon)
-  #     } else {
-  #       X %*% beta[, s] + w.tilde + rnorm(ncells, 0, sigma.squared.epsilon)
-  #     }
-  #   }
-  # 
-  make.fort.batch <- function(s, beta, c, C.star, C.star.inv, sigma.squared.epsilon){
-    temp <- vector(length = ncells)
-    temp[ - H.list[[s]]] <- X[ - H.list[[s]], ] %*% beta[, s] + (t(c) %*% C.star.inv %*% c)[ - H.list[[s]], H.list[[s]]] %*% Sigma.inv[[s]] %*% (Y.list[[s]] - X[H.list[[s]], ] %*% beta[, s])
-    temp[H.list[[s]]] <- Y.list[[s]]
-    return(temp)
-  }
+    make.fort.batch <- function(s, beta, c, C.star, C.star.inv, sigma.squared.epsilon){#, w.tilde){
+      w.star <- rmvnorm(1, vec.0, C.star)
+      w.tilde <- t(c) %*% C.star.inv %*% t(w.star)
+      if(dim(beta)[1] == 1){
+        X * beta[s] + w.tilde + rnorm(ncells, 0, sigma.squared.epsilon)
+      } else {
+        X %*% beta[, s] + w.tilde + rnorm(ncells, 0, sigma.squared.epsilon)
+      }
+    }
+  
+#   make.fort.batch <- function(s, beta, c, C.star, C.star.inv, sigma.squared.epsilon){
+#     temp <- vector(length = ncells)
+#     temp[ - H.list[[s]]] <- X[ - H.list[[s]], ] %*% beta[, s] + (t(c) %*% C.star.inv %*% c)[ - H.list[[s]], H.list[[s]]] %*% Sigma.inv[[s]] %*% (Y.list[[s]] - X[H.list[[s]], ] %*% beta[, s])
+#     temp[H.list[[s]]] <- Y.list[[s]]
+#     return(temp)
+#   }
   
   ##
   ## Initialize parameters

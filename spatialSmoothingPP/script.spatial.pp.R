@@ -1,5 +1,5 @@
 rm(list = ls())
-set.seed(1)
+set.seed(10)
 
 ##
 ## Libraries and Subroutines
@@ -45,7 +45,7 @@ Z.list.pca <- field$Z.list[(reps / 2 + 1):reps]
 mu.0 <- rep(0, dim(X)[2])
 sigma.squared.0 <- 25
 Sigma.0 <- sigma.squared.0 * diag(dim(X)[2])
-alpha.beta <- 20
+alpha.beta <- 2
 beta.beta <- 0.2
 curve(dinvgamma(x, alpha.beta, beta.beta))
 ##
@@ -75,7 +75,7 @@ sigma.squared.eta.tune <- 0.275
 sigma.squared.epsilon.tune <- 0.0250
 phi.tune <- 75.50
 
-n.mcmc <- 5000
+n.mcmc <- 20000
 
 ##
 ## Fit spatial MCMC kriging model
@@ -98,6 +98,8 @@ finish
 ##
 # x11()
 make.output.plot(out)
+
+
 apply(out$mu.beta.save, 1, mean)
 str(out$mu.beta.save)
 
