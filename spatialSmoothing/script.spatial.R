@@ -1,10 +1,9 @@
 rm(list = ls())
-set.seed(10)
+set.seed(1)
 
 ##
 ## Libraries and Subroutines
 ##
-<<<<<<< HEAD
 source('~/1dSpatialSim/functions/dinvgamma.R')
 source('~/1dSpatialSim/functions/make.output.plot.ci.R')
 library(mvtnorm)
@@ -49,16 +48,7 @@ make.output.plot <- function(out){
   MSPE <- (out$fort.raster - matrix(unlist(field$Z.list), nrow = m, byrow = FALSE))^2
   matplot(MSPE, type = 'l', main = 'MSPE')
 }
-=======
->>>>>>> 39e34f1dce0981c54eec954fea807c4ec8ad7950
 
-library(mvtnorm)
-source('~/1dSpatialSim/functions/dinvgamma.R')
-source('~/1dSpatialSim/plots/make.output.plot.ci.R')
-source('~/1dSpatialSim/functions/make.spatial.field.R')
-source('~/1dSpatialSim/spatialSmoothing/mcmc.spatial.R')
-source('~/1dSpatialSim/functions/rMVN.R')
-source('~/1dSpatialSim/plots/make.output.plot.ci.R')
 
 ##
 ## Simulate Data
@@ -67,16 +57,12 @@ source('~/1dSpatialSim/plots/make.output.plot.ci.R')
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-<<<<<<< HEAD
 reps <- 20 # number of spatial fields
-=======
-reps <- 2#20 # number of spatial fields
->>>>>>> 39e34f1dce0981c54eec954fea807c4ec8ad7950
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
-s2.e <- 0.1
-samp.size <- 40:100
+s2.e <- 0.01
+samp.size <- 5:40
 
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
 
@@ -126,7 +112,7 @@ n.mcmc <- 5000
 ##
 
 start <- Sys.time()
-out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
+out.sp <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
 finish <- Sys.time() - start
 finish 
 
@@ -135,11 +121,5 @@ finish
 ##
 ## Plot output
 ##
-<<<<<<< HEAD
  x11()
 make.output.plot(out.sp)
-=======
-#  x11()
-make.output.plot(out)
-MSPE.sp <- (out$fort.raster - X)^2
->>>>>>> 39e34f1dce0981c54eec954fea807c4ec8ad7950
