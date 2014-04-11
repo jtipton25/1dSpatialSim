@@ -23,18 +23,18 @@ source('~/1dSpatialSim/pcaRegression/mcmc.pca.R')
 make.output.plot <- function(out){
   n.burn <- floor(n.mcmc / 10)
   #x11()
-  layout(matrix(1:16, nrow = 4))
+  layout(matrix(1:9, nrow = 3))
   #
-  matplot(t(out$mu.beta.save)[(n.burn + 1):n.mcmc, ], type = 'l')
+  matplot(t(out$mu.beta.save)[(n.burn + 1):n.mcmc, ], type = 'l', main = 'Trace plot for Beta')
   abline(h = beta[1], col = 'black')
   abline(h = beta[2], col = 'red')
   #
-  plot(out$sigma.squared.beta.save[(n.burn + 1):n.mcmc], type = 'l')
+  plot(out$sigma.squared.beta.save[(n.burn + 1):n.mcmc], type = 'l', main = 'Trace plot for sigma^2_beta')
   #
-  plot(out$sigma.squared.epsilon.save[(n.burn + 1):n.mcmc], type = 'l')
+  plot(out$sigma.squared.epsilon.save[(n.burn + 1):n.mcmc], type = 'l', main = 'Trace plot for sigma^2_epsilon')
   abline(h = s2.e, col = 'red')
   #
-  matplot(out$fort.raster, type = 'l')
+  matplot(out$fort.raster, type = 'l', main = 'Fitted Values')
   #
   plot.Z.field(Z.list.hist, locs = locs, main = "True Surface")
   #
@@ -42,20 +42,9 @@ make.output.plot <- function(out){
   #
   plot.Y.field(Y.list, H.list, locs = locs)
   #
-  hist(out$mu.beta.save[1, ][(n.burn + 1):n.mcmc])
-  abline(v = beta[1], col = 'red')
-  abline(v = quantile(out$mu.beta.save[1, ], probs = c(0.025, 0.975)), col = 'blue')
-  #
-  hist(out$mu.beta.save[2, ][(n.burn + 1):n.mcmc])
-  abline(v = beta[2], col = 'red')
-  abline(v = quantile(out$mu.beta.save[2, ], probs = c(0.025, 0.975)), col = 'blue')
-  #
   MSPE <- (out$fort.raster - matrix(unlist(Z.list.hist), nrow = m, byrow = FALSE))^2
-  matplot(MSPE, type = 'l', main = 'MSPE')
+  matplot(MSPE, type = 'l', main = paste('MSPE = ', round(mean(MSPE), 4)))
 }
-
-
-
 
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
@@ -104,7 +93,7 @@ sigma.squared.eta.tune <- 0.5
 sigma.squared.epsilon.tune <- 0.275
 phi.tune <- 0.5
 
-n.mcmc <- 5000
+n.mcmc <- 20000
 
 ##
 ## Fit spatial MCMC kriging model
@@ -123,14 +112,16 @@ finish
 ##
 ## Plot output
 ##
-
+# jpeg(file = '~/1dSpatialSim/plots/pcaRegression.4.10.2014.jpeg', width = 6, height = 6, quality = 100, res  = 600, units = 'in')
+# x11()
 make.output.plot(out.pca)
-
-apply(out.pca$mu.beta.save[, (n.mcmc / 10 + 1):n.mcmc], 1, mean)
-
-make.MSPE <- function(s, out){
-  (out$fort.raster[, s] - Z.list.hist[[s]])^2
-}
-MSPE.pca <- sapply(1:(reps /  2), make.MSPE, out = out.pca)
-# matplot(MSPE.pca, type = 'l', main = 'MSPE')
-mean(MSPE.pca)
+# dev.off()
+# 
+# apply(out.pca$mu.beta.save[, (n.mcmc / 10 + 1):n.mcmc], 1, mean)
+# 
+# make.MSPE <- function(s, out){
+#   (out$fort.raster[, s] - Z.list.hist[[s]])^2
+# }
+# MSPE.pca <- sapply(1:(reps /  2), make.MSPE, out = out.pca)
+# # matplot(MSPE.pca, type = 'l', main = 'MSPE')
+# mean(MSPE.pca)
