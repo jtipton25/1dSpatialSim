@@ -19,12 +19,20 @@
 \begin{document}
 \maketitle
 
-\section{Full Dimensional Model Statement}
+\section{Full Dimensional Model Statement - Cressie and Wikle Statistics for Spatio-Temporal Data p. 139}
 %
 \subsection{Data Model}
 \begin{align*}
 %
-\bm{y}_t & = \bm{H}_t \bm{X} \bm{\beta}_t + \bm{\eta}_t + \bm{\epsilon}_t\\
+\bm{y}_t & = \bm{z}_t + \bm{\epsilon}_t\\
+%
+\end{align*}
+%
+\subsection{Process Model}
+%
+\begin{align*}
+%
+\bm{z}_t & = \bm{H}_t \bm{X} \bm{\beta}_t + \bm{\eta}_t\\
 %
 \end{align*}
 %
@@ -141,12 +149,9 @@ which can be sampled using a Metropolis-Hastings step
 \section{Posterior Predictive Distribution}
 %
 The posterior predictive distribution for $\bm{y}_t$ is sampled a each MCMC iteration $k$ by
-% \begin{align*}
-%   \bm{y}^{ \left( k \right) }_t \left( \bm{s}_0 \right) &  = \bm{X} \left( \bm{s}_0 \right) ^T \bm{\beta}^{ \left( k \right ) }_t + \bm{c}_Y \left( \bm{s}_0 \right )^T 
-%   \bm{\Sigma
-%   \bm{\Sigma}^{(k)}
-% \end{align*}
-
+\begin{align*}
+  \left( \bm{z}^{ \left( k \right) }_t \left( \bm{s}_0 \right) \middle| \bm{y} \right) &  = \bm{X} \left( \bm{s}_0 \right) ^T \bm{\beta}^{ \left( k \right ) }_t + \bm{c}_Y \left( \bm{s}_0 \right )^T \bm{\Sigma}^{ - 1}
+\end{align*}
 % 
 %     temp <- vector(length = ncells)
 %     temp[ - H.list[[s]]] <- X[ - H.list[[s]], ] %*% beta[, s] + Sigma.full[ - H.list[[s]], H.list[[s]]] %*% solve(Sigma.full[H.list[[s]], H.list[[s]]]) %*% (Y.list[[s]] - X[H.list[[s]], ] %*% beta[, s])

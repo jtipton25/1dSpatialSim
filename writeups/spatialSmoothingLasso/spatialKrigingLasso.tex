@@ -129,18 +129,18 @@ which is Normal with mean $ \bm{A}^{ - 1} \bm{b}$ and variance $\bm{A}^{ - 1}$ w
 % NEED TO WORK ON THIS ONE SOME MORE!!
 % !!!
 % !!
-\subsection{Full Conditional for $\gamma^2_i$}
-For $i = 1, \ldots, \tau$
+\subsection{Full Conditional for $\bm{\gamma}^2$}
 \begin{align*}
-[\gamma^2_i | \cdot] & \propto \prod_{t = 1}^T [\bm{\beta}_t | \sigma^2_\epsilon, \gamma^2_i] [\gamma^2_i | \lambda^2]\\
+[\bm{\gamma}^2 | \cdot] & \propto \prod_{t = 1}^T [\bm{\beta}_t | \sigma^2_\epsilon, \bm{\gamma}^2] \prod_{i = 1}^\tau [\gamma^2_i | \lambda^2]\\
  %
- & \propto \prod_{t = 1}^T |\sigma^2_\epsilon \gamma^2_i|^{ - \frac{1} {2}} \exp{ \left( - \frac{1} {2} \bm{\beta}_t^T (\frac{\sigma^2_\epsilon} {\gamma^2_i})^{ - 1} \bm{\beta}_t \right) } \exp{ \left(-\frac{\lambda^2} {2} \gamma^2_i \right) }\\
+ & \propto \prod_{t = 1}^T | \bm{\Sigma}_\beta |^{ - \frac{1} {2}} \exp{ \left( - \frac{1} {2} \bm{\beta}_t^T \bm{\Sigma}_\beta^{ - 1} \bm{\beta}_t \right) } \prod_{i = 1}^\tau \exp{ \left(-\frac{\lambda^2} {2} \gamma^2_i \right) }\\
 %
-& \propto (\gamma^2_i)^{ - \frac{T} {2}} \exp{ \left( - \gamma^2_i(\frac{\sum_{t = 1}^T \bm{\beta}_t^T \bm{\beta}_t} {2 \sigma^2_\epsilon} + \frac{\lambda^2} {2}) \right) }\\
+& \propto |\bm{D}_{\gamma^2}|^{ - \frac{T} {2}} \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T \bm{\beta}_t^T \bm{\Sigma}_\beta^{ - 1} \bm{\beta}_t \right) } \prod_{i = 1}^\tau \exp{ \left(-\frac{\lambda^2} {2} \gamma^2_i \right) }\\
 %
 \end{align*}
-
-
+%
+which can be sampled using a Metropolis-Hastings step.
+%
 \subsection{Full Conditional for $\sigma^2_\eta$}
 %
 \begin{align*}
@@ -156,7 +156,7 @@ which can be sampled using a Metropolis-Hastings step
 \subsection{Full Conditional for $\sigma^2_\epsilon$}
 %
 \begin{align*}
-[\sigma^2_\epsilon | \cdot] & \propto \prod_{t = 1}^T [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\bm{\beta}_t | \sigma^2_\eta, \bm{\gamma}] [\sigma^2_\epsilon]\\
+[\sigma^2_\epsilon | \cdot] & \propto \prod_{t = 1}^T [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\bm{\beta}_t | \sigma^2_\epsilon, \bm{\gamma}] [\sigma^2_\epsilon]\\
 %
 & \propto (\prod_{t = 1}^T |\bm{\Sigma}_t |^{ - \frac{1} {2}}) \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t)^T \bm{\Sigma}_t^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) \right) } |\bm{\Sigma}_\beta |^{ - \frac{1} {2}} \exp{ \left( - \frac{1} {2} \sum_{t = 1}^T \bm{\beta}_t^T \bm{\Sigma}_{\beta}^{ - 1} \bm{\beta}_t \right) }\\
 & \phantom{{}=1} \times (\sigma^2_\epsilon)^{ - \alpha_\epsilon - 1} \exp{ \left( - \frac{\beta_\epsilon} {\sigma^2_\epsilon} \right) }\\
@@ -182,12 +182,15 @@ which can be sampled using a Metropolis-Hastings step
 \subsection*{Full Conditional for $\lambda^2$}
 %
 \begin{align*}
-[\lambda^2 | \cdot] & \propto \prod_{t = 1}^T \prod_{j = 1}^\tau (\lambda^2) \exp{ \left( - \frac{\lambda^2 / 2} {1 / \gamma^2_j} \right) } (\frac{\lambda^2} {2})^{\alpha_\lambda - 1} \exp{ \left( - \beta_\lambda (\lambda^2 /2) \right) }\\
 %
-& \propto (\frac{\lambda^2} {2})^{\alpha_\lambda + \tau - 1} \exp{ \left( - \lambda^2(\beta_\lambda + \sum_{j = 1}^\tau \gamma^2_j / 2) \right) }
+[\lambda^2 | \cdot] & \propto \prod_{i = 1}^\tau [ \gamma^2_i | \lambda^2] [\lambda^2]\\
+%
+[\lambda^2 | \cdot] & \propto \prod_{i = 1}^\tau \left( \frac{\lambda^2} {2} \exp{ \left( - \frac{\lambda^2} {2} \gamma^2_i \right) } \right) (\frac{\lambda^2} {2})^{\alpha_\lambda - 1} \exp{ \left( - \beta_\lambda (\lambda^2 /2) \right) }\\
+%
+& \propto (\lambda^2)^{\alpha_\lambda + \tau - 1} \exp{ \left( - \lambda^2(\beta_\lambda / 2 + \sum_{j = 1}^\tau \gamma^2_j / 2) \right) }
 \end{align*}
 %
-which is Gamma($\alpha_\lambda + \tau, \beta_\lambda + \sum_{j = 1}^\tau \gamma^2_j / 2$)
+which is Gamma($\alpha_\lambda + \tau, \beta_\lambda / 2 + \sum_{j = 1}^\tau \gamma^2_j / 2$)
 %
 \section{Posterior Predictive Distribution}
 %

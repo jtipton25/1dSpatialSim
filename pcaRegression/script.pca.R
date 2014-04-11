@@ -4,23 +4,58 @@ set.seed(10)
 ##
 ## Libraries and Subroutines
 ##
-<<<<<<< HEAD
-setwd('~/1dSpatialSim/')
-source('~/1dSpatialSim/functions/dinvgamma.R')
-source('~/1dSpatialSim/functions/make.output.plot.R')
-=======
 
->>>>>>> 39e34f1dce0981c54eec954fea807c4ec8ad7950
 library(mvtnorm)
 source('~/1dSpatialSim/functions/dinvgamma.R')
-source('~/1dSpatialSim/plots/make.output.plot.ci.R')
+source('~/1dSpatialSim/plots/make.output.plot.pca.R')
 # source('make.spatial.field.pca.R')
 source('~/1dSpatialSim/functions/make.spatial.field.R')
-source('~/1dSpatialSim/pcaSpatialSmoothing/mcmc.pca.spatial.R')
+source('~/1dSpatialSim/pcaRegression/mcmc.pca.R')
 
 ##
 ## Simulate Data
 ##
+
+##
+## Plot of 1d spatial mcmc output
+##
+
+make.output.plot <- function(out){
+  n.burn <- floor(n.mcmc / 10)
+  #x11()
+  layout(matrix(1:16, nrow = 4))
+  #
+  matplot(t(out$mu.beta.save)[(n.burn + 1):n.mcmc, ], type = 'l')
+  abline(h = beta[1], col = 'black')
+  abline(h = beta[2], col = 'red')
+  #
+  plot(out$sigma.squared.beta.save[(n.burn + 1):n.mcmc], type = 'l')
+  #
+  plot(out$sigma.squared.epsilon.save[(n.burn + 1):n.mcmc], type = 'l')
+  abline(h = s2.e, col = 'red')
+  #
+  matplot(out$fort.raster, type = 'l')
+  #
+  plot.Z.field(Z.list.hist, locs = locs, main = "True Surface")
+  #
+  plot.Z.field(Z.list.pca, locs = locs, main = "Pallette of Signals")
+  #
+  plot.Y.field(Y.list, H.list, locs = locs)
+  #
+  hist(out$mu.beta.save[1, ][(n.burn + 1):n.mcmc])
+  abline(v = beta[1], col = 'red')
+  abline(v = quantile(out$mu.beta.save[1, ], probs = c(0.025, 0.975)), col = 'blue')
+  #
+  hist(out$mu.beta.save[2, ][(n.burn + 1):n.mcmc])
+  abline(v = beta[2], col = 'red')
+  abline(v = quantile(out$mu.beta.save[2, ], probs = c(0.025, 0.975)), col = 'blue')
+  #
+  MSPE <- (out$fort.raster - matrix(unlist(Z.list.hist), nrow = m, byrow = FALSE))^2
+  matplot(MSPE, type = 'l', main = 'MSPE')
+}
+
+
+
 
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
@@ -55,7 +90,6 @@ sigma.squared.0 <- 25
 Sigma.0 <- sigma.squared.0 * diag(num.pca)
 alpha.beta <- 20
 beta.beta <- 0.2
-curve(dinvgamma(x, alpha.beta, beta.beta))
 ##
 alpha.eta <- 12
 beta.eta <- 12
@@ -67,8 +101,8 @@ alpha.phi <- 10
 beta.phi <- 20
 ##
 sigma.squared.eta.tune <- 0.5
-sigma.squared.epsilon.tune <- 0.0575
-phi.tune <- 0.25
+sigma.squared.epsilon.tune <- 0.275
+phi.tune <- 0.5
 
 n.mcmc <- 5000
 
@@ -97,7 +131,6 @@ apply(out.pca$mu.beta.save[, (n.mcmc / 10 + 1):n.mcmc], 1, mean)
 make.MSPE <- function(s, out){
   (out$fort.raster[, s] - Z.list.hist[[s]])^2
 }
-MSPE.pca <- sapply(1:(reps / 2), make.MSPE, out = out.pca)
-matplot(MSPE.pca, type = 'l', main = 'MSPE')
-
+MSPE.pca <- sapply(1:(reps /  2), make.MSPE, out = out.pca)
+# matplot(MSPE.pca, type = 'l', main = 'MSPE')
 mean(MSPE.pca)

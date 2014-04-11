@@ -3,8 +3,13 @@
 ##
 
 ## make true spatial field
-make.Z.list <- function(reps, mu, Sig.s, m){
-  mu + t(chol(Sig.s)) %*% rnorm(m)
+## change the nugget effect
+# make.Z.list <- function(reps, mu, Sig.s, m){
+#   mu + t(chol(Sig.s)) %*% rnorm(m)
+# }
+
+make.Z.list <- function(reps, mu, Sig, m){
+  mu + t(chol(Sig)) %*% rnorm(m)
 }
 
 ## make sampling matrix H
@@ -12,9 +17,14 @@ make.H.list <- function(reps, samp, m){
   (1:m)[samp[[reps]]]
 }
 
+## change the nugget effect
 ## make sample data Y
-make.Y.list <- function(reps, Z.list, H.list, s2.e){
-  Z.list[[reps]][H.list[[reps]]] + rnorm(length(H.list[[reps]]), s2.e)
+# make.Y.list <- function(reps, Z.list, H.list, s2.e){
+#   Z.list[[reps]][H.list[[reps]]] + rnorm(length(H.list[[reps]]), s2.e)
+# }
+
+make.Y.list <- function(reps, Z.list, H.list){
+  Z.list[[reps]][H.list[[reps]]]
 }
 
 plot.Z.field <- function(Z.list, locs, main = "Observed Data", ylab = "Y", xlab = "X"){
@@ -51,11 +61,13 @@ make.spatial.field <- function(reps, X, beta, locs, param = c(s2.s, phi), method
     phi <- param[2]
     D <- as.matrix(dist(locs)) # distance matrix
     Sig.s <- s2.s * exp( - D / phi) # spatial covariance matrix
+    Sig <- Sig.s + s2.e * diag(dim(D)[2])
     Sig.s.inv <- solve(Sig.s) 
   }
 
   ## Simulate Random Field with nugget
-  Z.list <- lapply(1:reps, make.Z.list, mu = mu, Sig.s = Sig.s, m = m)
+#   Z.list <- lapply(1:reps, make.Z.list, mu = mu, Sig.s = Sig.s, m = m)
+    Z.list <- lapply(1:reps, make.Z.list, mu = mu, Sig = Sig, m = m)
            
   ##  Subsample Fields    
   #samp <- rep(list(sample(1:m, samp.size)), reps)
@@ -64,7 +76,8 @@ make.spatial.field <- function(reps, X, beta, locs, param = c(s2.s, phi), method
       samp[[i]] <- sample(1:m, sample(samp.size, 1))
   }
   H.list <- lapply(1:reps, make.H.list, samp = samp, m = m)
-  Y.list <- lapply(1:reps, make.Y.list, Z.list = Z.list, H.list = H.list, s2.e = s2.e)
+#   Y.list <- lapply(1:reps, make.Y.list, Z.list = Z.list, H.list = H.list, s2.e = s2.e)
+    Y.list <- lapply(1:reps, make.Y.list, Z.list = Z.list, H.list = H.list)
   ## write output
   list(Z.list = Z.list, Y.list = Y.list, H.list = H.list)
 }
