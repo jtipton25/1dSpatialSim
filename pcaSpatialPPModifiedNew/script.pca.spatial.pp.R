@@ -9,7 +9,7 @@ library(mvtnorm)
 source('~/1dSpatialSim/functions/dinvgamma.R')
 source('~/1dSpatialSim/plots/make.output.plot.ci.R')
 source('~/1dSpatialSim/functions/make.spatial.field.R')
-source('~/1dSpatialSim/pcaSpatialPP/mcmc.pca.spatial.pp.R')
+source('~/1dSpatialSim/pcaSpatialPPModifiedNew/mcmc.pca.spatial.pp.R')
 
 ##
 ## Simulate Data
@@ -27,16 +27,16 @@ samp.size <- 5:40
 
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
 
-layout(matrix(1:2, ncol = 2))
-plot.Y.field(field$Y.list[1:(reps / 2)], field$H.list[1:(reps / 2)], locs)
-plot.Z.field(field$Z.list[(reps / 2 + 1):reps], locs, main = "Full Data")
+# layout(matrix(1:2, ncol = 2))
+# plot.Y.field(field$Y.list[1:(reps / 2)], field$H.list[1:(reps / 2)], locs)
+# plot.Z.field(field$Z.list[(reps / 2 + 1):reps], locs, main = "Full Data")
 
 Y.list <- field$Y.list[1:(reps / 2)] 
 H.list <- field$H.list[1:(reps / 2)] 
 Z.list.hist <- field$Z.list[1:(reps / 2)]
 Z.list.pca <- field$Z.list[(reps / 2 + 1):reps]
 X <- matrix(unlist(Z.list.pca), ncol = reps / 2, byrow = FALSE)
-matplot(X, type = 'l')
+# matplot(X, type = 'l')
 num.pca <- 3 
 
 ##
@@ -64,13 +64,34 @@ beta.phi <- 20
 ## Knots for predictive process
 ##
 
-s.star <- seq(0.01, 0.99, 0.01)
+s.star <- seq(0.025, 0.975, 0.025)
 
-sigma.squared.eta.tune <- 0.275
-sigma.squared.epsilon.tune <- 0.0050
-phi.tune <- 15
+# sigma.squared.eta.tune <- 0.025
+# sigma.squared.epsilon.tune <- 0.00250
+# phi.tune <- 0.025
 
-n.mcmc <- 20000
+##
+## tuning for 99 knot locations
+##
+# sigma.squared.eta.tune <- 0.7
+# sigma.squared.epsilon.tune <- .062575
+# phi.tune <- 0.375
+
+##
+## tuning for 39 knot locations
+##
+sigma.squared.eta.tune <- 0.45
+sigma.squared.epsilon.tune <- .0380
+phi.tune <- 0.225
+
+##
+## tuning for 9 knot locations
+##
+# sigma.squared.eta.tune <- 0.085
+# sigma.squared.epsilon.tune <- .0085
+# phi.tune <- 0.035
+
+n.mcmc <-20000
 
 ##
 ## Fit spatial MCMC kriging model
@@ -90,7 +111,10 @@ finish
 ## Plot output
 ##
 
-# jpeg(file = '~/1dSpatialSim/plots/pcaRegressionSpatialPP_4_12_2014.jpeg', width = 6, height = 6, quality = 100, res  = 600, units = 'in')
+# jpeg(file = '~/1dSpatialSim/plots/pcaRegressionSpatialPPModified99knots_4_14_2014.jpeg', width = 6, height = 6, quality = 100, res  = 600, units = 'in')
+# jpeg(file = '~/1dSpatialSim/plots/pcaRegressionSpatialPPModified39knots_4_14_2014.jpeg', width = 6, height = 6, quality = 100, res  = 600, units = 'in')
+# jpeg(file = '~/1dSpatialSim/plots/pcaRegressionSpatialPPModified9knots_4_14_2014.jpeg', width = 6, height = 6, quality = 100, res  = 600, units = 'in')
+
 make.output.plot(out)
 # dev.off()
 

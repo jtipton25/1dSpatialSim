@@ -15,14 +15,23 @@ make.output.plot <- function(out){
   #
   plot(out$sigma.squared.beta.save[(n.burn + 1):n.mcmc], type = 'l', main = expression(paste("Trace plot for ", sigma[beta]^2)), ylab = expression(sigma[beta]^2), xlab = "MCMC iteration - burn in")
   #
-  plot(out$sigma.squared.epsilon.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$epsilon.accept, 2)), ylab = expression(sigma[epsilon]^2), xlab = "MCMC iteration - burn in")
-  abline(h = s2.e, col = 'red')
+  if(!is.null(out$epsilon.accept)){
+    plot(out$sigma.squared.epsilon.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$epsilon.accept, 2)), ylab = expression(sigma[epsilon]^2), xlab = "MCMC iteration - burn in")
+    abline(h = s2.e, col = 'red')
+  } else {
+    plot(out$sigma.squared.epsilon.save[(n.burn + 1):n.mcmc], type = 'l', main = expression(paste("Trace plot for ", sigma[epsilon]^2)), , ylab = expression(sigma[epsilon]^2), xlab = "MCMC iteration - burn in")
+  }
+
   #
-  plot(out$sigma.squared.eta.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$eta.accept, 2)), ylab = expression(sigma[eta]^2), xlab = "MCMC iteration - burn in")
-  abline(h = s2.s, col = 'red')
+  if(!is.null(out$sigma.squared.eta.save)){
+    plot(out$sigma.squared.eta.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$eta.accept, 2)), ylab = expression(sigma[eta]^2), xlab = "MCMC iteration - burn in")
+    abline(h = s2.s, col = 'red')
+  }
   #
-  plot(out$phi.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$phi.accept, 2)), ylab = expression(phi), xlab = "MCMC iteration - burn in")
-  abline(h = phi, col = 'red')
+  if(!is.null(out$phi.save)){
+    plot(out$phi.save[(n.burn + 1):n.mcmc], type = 'l', main = paste("accept rate", round(out$phi.accept, 2)), ylab = expression(phi), xlab = "MCMC iteration - burn in")
+    abline(h = phi, col = 'red')
+  }
   #
   matplot(out$fort.raster, type = 'l', ylim = c(min(out$fort.raster) - 2*max(sqrt(out$var.save)), max(out$fort.raster) + 2*max(sqrt(out$var.save))), col = 'black', main = "Fitted Data")
   for(i in 1:dim(out$var.save)[2]){

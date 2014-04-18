@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  28 FEB 2014 10:16
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  14 APR 2014 07:25
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -215,7 +215,7 @@ e
 Here is how much of TeX's memory you used:
  2541 strings out of 493315
  34031 string characters out of 6137904
- 110495 words of memory out of 5000000
+ 107495 words of memory out of 5000000
  5957 multiletter control sequences out of 15000+600000
  13934 words of font info for 49 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
@@ -241,7 +241,7 @@ nts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2013/texmf-dist/fonts
 pe1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2013/texmf-dist/fonts/typ
 e1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1
 /public/amsfonts/cm/cmsy7.pfb>
-Output written on spatialPredictiveProcessModified.pdf (4 pages, 196600 bytes).
+Output written on spatialPredictiveProcessModified.pdf (4 pages, 195939 bytes).
 
 PDF statistics:
  97 PDF objects out of 1000 (max. 8388607)

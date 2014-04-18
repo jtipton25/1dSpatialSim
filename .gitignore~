@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 writeups/spatialPredictiveProcess/spatialPredictiveProcessModified.aux
+pcaSpatialPPModified/mcmc.out.RData
+spatialSmoothingPPModified/.Rapp.history
+writeups/spatialPredictiveProcess/spatialPredictiveProcessModified.synctex.gz
+writeups/spatialSmoothing/spatialKriging.synctex.gz

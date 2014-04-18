@@ -28,9 +28,9 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   ## Libraries and Subroutines
   ##
 
-  make.mh <- function(s, beta, sigma.squared.epsilon, Sigma.inv, C.star, C.star.inv, c){
+  make.mh <- function(s, beta, Sigma.epsilon.inv, Sigma.epsilon, Sigma.inv, C.star, C.star.inv, c){
     cH.list <- c[, H.list[[s]]]
-    ( - 1 / 2) * (determinant(C.star + 1 / sigma.squared.epsilon * cH.list %*% t(cH.list), logarithm = TRUE)$modulus[1] + determinant(C.star.inv, logarithm = TRUE)$modulus[1] + nt[s] * log(sigma.squared.epsilon)) - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% (Sigma.inv[[s]]) %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
+    ( - 1 / 2) * (determinant(C.star + cH.list %*% Sigma.epsilon.inv[[s]] %*% t(cH.list), logarithm = TRUE)$modulus[1] + determinant(C.star.inv, logarithm = TRUE)$modulus[1] + determinant(Sigma.epsilon[[s]])$modulus[1]) - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% (Sigma.inv[[s]]) %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
   }
     
     make.identity.list <- function(s, nt){
@@ -45,12 +45,13 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
      t(beta[, s] - mu.beta) %*% Lambda.inv %*% (beta[, s] - mu.beta)
    }
   
-  make.Sigma.epsilon <- function(s, sigma.squared.epsilon, I.nt){
-    sigma.squared.epsilon * I.nt[[s]]
+  make.Sigma.epsilon <- function(s, sigma.squared.epsilon, sigma.squared.eta, c, C.star.inv, I.nt){
+    cH.list <- c[, H.list[[s]]]
+    (sigma.squared.epsilon + sigma.squared.eta - diag((t(cH.list) %*% C.star.inv %*% cH.list))) * I.nt[[s]]
   }
     
-  make.Sigma.epsilon.inv <- function(s, sigma.squared.epsilon, I.nt){
-    1 / sigma.squared.epsilon * I.nt[[s]]
+  make.Sigma.epsilon.inv <- function(s, Sigma.epsilon){
+    solve(Sigma.epsilon[[s]])
   }
   
   make.c <- function(sigma.squared.eta, phi){
@@ -131,18 +132,20 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   Lambda.determinant <- det(Lambda)
   Lambda.inv <- solve(Lambda)
 
-  sigma.squared.beta <- 1 / rgamma(1, alpha.beta, beta.beta)
+  sigma.squared.beta <- 0.00998
+#   sigma.squared.beta <- 1 / rgamma(1, alpha.beta, beta.beta)
   Sigma.beta <- sigma.squared.beta * Lambda
   Sigma.beta.inv <- 1 / sigma.squared.beta * Lambda.inv
   
-  sigma.squared.eta <- 1 / rgamma(1, alpha.eta, beta.eta)
-  phi <- 1 / rgamma(1, alpha.phi, beta.phi)
+  sigma.squared.eta <- 3.679
+  phi <- 1.041
+#   sigma.squared.eta <- 1 / rgamma(1, alpha.eta, beta.eta)
+#   phi <- 1 / rgamma(1, alpha.phi, beta.phi)
   D <- as.matrix(dist(locs))
     
-  sigma.squared.epsilon <- 1 / rgamma(1, alpha.epsilon, beta.epsilon)
+  sigma.squared.epsilon <- 0.0569
+#   sigma.squared.epsilon <- 1 / rgamma(1, alpha.epsilon, beta.epsilon)
   I.nt <- lapply(1:t, make.identity.list, nt = nt)
-  Sigma.epsilon <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
-  Sigma.epsilon.inv <- lapply(1:t, make.Sigma.epsilon.inv, sigma.squared.epsilon = sigma.squared.epsilon, I.nt = I.nt)
 
   Sigma.0.inv <- solve(Sigma.0)
 
@@ -151,12 +154,16 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   w.star <- rmvnorm(1, vec.0, C.star)
   C.star.inv <- make.C.star.inv(C.star)
   c <- make.c(sigma.squared.eta, phi)
+  Sigma.epsilon <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon, sigma.squared.eta = sigma.squared.eta, c = c, C.star.inv = C.star.inv, I.nt = I.nt)
+  Sigma.epsilon.inv <- lapply(1:t, make.Sigma.epsilon.inv, Sigma.epsilon = Sigma.epsilon)
+
   Sigma <- lapply(1:t, make.Sigma, Sigma.epsilon = Sigma.epsilon, C.star.inv = C.star.inv, c = c, H.list = H.list) 
   Sigma.inv <- lapply(1:t, make.Sigma.inv, Sigma.epsilon.inv = Sigma.epsilon.inv, C.star = C.star, c = c, H.list = H.list)
   
-  devs <- rnorm(tau)
-  Sigma.chol <- chol(Sigma.0)
-  mu.beta <- backsolve(Sigma.chol, backsolve(Sigma.0, mu.0, transpose = TRUE) + devs)
+#   devs <- rnorm(tau)
+#   Sigma.chol <- chol(Sigma.0)
+  mu.beta <- c(-0.159, 0.138, 0.00180)
+#   mu.beta <- backsolve(Sigma.chol, backsolve(Sigma.0, mu.0, transpose = TRUE) + devs)
 
   n.burn <- floor(n.mcmc / 5) + 1
   fort.raster.batch <- matrix(0, ncells, t)   
@@ -186,10 +193,13 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   fort.raster <- matrix(0, nrow = ncells, ncol = t)
   var.save <- matrix(0, nrow = ncells, ncol = t)
   var.save.temp <- array(dim = c(100, ncells, t))
-  phi.accept <- 0  
   eta.accept <- 0
+  eta.accept.tmp <- 0
   epsilon.accept <- 0
-  
+  epsilon.accept.tmp <- 0
+  phi.accept <- 0  
+  phi.accept.tmp <- 0  
+
   ##
   ## Begin MCMC loop
   ##
@@ -228,16 +238,27 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     ##
     ## Sample sigma.squared.eta
     ##
-  	
+
+    if(k %% 100 == 0){
+      if(eta.accept.tmp < 0.20){
+        sigma.squared.eta.tune <- sigma.squared.eta.tune * 0.75
+      } else if(eta.accept.tmp > 0.60){
+        sigma.squared.eta.tune <- sigma.squared.eta.tune * 1.25
+      }
+      eta.accept.tmp <- 0
+  	}
+    
     sigma.squared.eta.star <- rnorm(1, sigma.squared.eta, sigma.squared.eta.tune)
     if(sigma.squared.eta.star > 0){
       c.star <- make.c(sigma.squared.eta = sigma.squared.eta.star, phi = phi)
       C.star.star <- make.C.star(sigma.squared.eta = sigma.squared.eta.star, phi = phi)
       C.star.star.inv <- make.C.star.inv(C.star = C.star.star)
-      Sigma.star <- lapply(1:t, make.Sigma, Sigma.epsilon = Sigma.epsilon, C.star.inv = C.star.star.inv, c = c.star, H.list = H.list)
-      Sigma.star.inv <- lapply(1:t, make.Sigma.inv, Sigma.epsilon.inv = Sigma.epsilon.inv, C.star = C.star.star, c = c.star, H.list = H.list)
-      mh.eta.1 <- sum(sapply(1:t, make.mh, beta = beta, sigma.squared.epsilon = sigma.squared.epsilon, Sigma.inv = Sigma.star.inv, C.star = C.star.star, C.star.inv = C.star.star.inv, c = c.star)) + dinvgamma(sigma.squared.eta.star, alpha.eta, beta.eta, log = TRUE)
-      mh.eta.2 <- sum(sapply(1:t, make.mh, beta = beta, sigma.squared.epsilon = sigma.squared.epsilon, Sigma.inv = Sigma.inv, C.star = C.star, C.star.inv = C.star.inv, c = c)) + dinvgamma(sigma.squared.eta, alpha.eta, beta.eta, log = TRUE)
+      Sigma.epsilon.star <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon, sigma.squared.eta = sigma.squared.eta.star, c = c.star, C.star.inv = C.star.star.inv, I.nt = I.nt)
+      Sigma.epsilon.star.inv <- lapply(1:t, make.Sigma.epsilon.inv, Sigma.epsilon = Sigma.epsilon)
+      Sigma.star <- lapply(1:t, make.Sigma, Sigma.epsilon = Sigma.epsilon.star, C.star.inv = C.star.star.inv, c = c.star, H.list = H.list)
+      Sigma.star.inv <- lapply(1:t, make.Sigma.inv, Sigma.epsilon.inv = Sigma.epsilon.star.inv, C.star = C.star.star, c = c.star, H.list = H.list)
+      mh.eta.1 <- sum(sapply(1:t, make.mh, beta = beta, Sigma.epsilon.inv = Sigma.epsilon.star.inv, Sigma.epsilon = Sigma.epsilon.star, Sigma.inv = Sigma.star.inv, C.star = C.star.star, C.star.inv = C.star.star.inv, c = c.star)) + dinvgamma(sigma.squared.eta.star, alpha.eta, beta.eta, log = TRUE)
+      mh.eta.2 <- sum(sapply(1:t, make.mh, beta = beta, Sigma.epsilon.inv = Sigma.epsilon.inv, Sigma.epsilon = Sigma.epsilon, Sigma.inv = Sigma.inv, C.star = C.star, C.star.inv = C.star.inv, c = c)) + dinvgamma(sigma.squared.eta, alpha.eta, beta.eta, log = TRUE)
       mh.eta <- exp(mh.eta.1 - mh.eta.2)
     	  	
        if(mh.eta > runif(1)){
@@ -245,9 +266,12 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
          c <- c.star
          C.star <- C.star.star
          C.star.inv <- C.star.star.inv
+         Sigma.epsilon <- Sigma.epsilon.star
+         Sigma.epsilon.inv <- Sigma.epsilon.star.inv
          Sigma <- Sigma.star
          Sigma.inv <- Sigma.star.inv
          eta.accept <- eta.accept + 1 / n.mcmc
+         eta.accept.tmp <- eta.accept.tmp + 1 / 100
         }
       }
     
@@ -255,14 +279,23 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     ## Sample sigma.squared.epsilon
     ##
   	
+    if(k %% 100 == 0){
+      if(epsilon.accept.tmp < 0.20){
+        sigma.squared.epsilon.tune <- sigma.squared.epsilon.tune * 0.75
+      } else if(eta.accept.tmp > 0.60){
+        sigma.squared.epsilon.tune <- sigma.squared.epsilon.tune * 1.25
+      }
+      epsilon.accept.tmp <- 0
+    }
+    
     sigma.squared.epsilon.star <- rnorm(1, sigma.squared.epsilon, sigma.squared.epsilon.tune)
     if(sigma.squared.epsilon.star > 0){
-      Sigma.epsilon.star <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon.star, I.nt = I.nt)
-      Sigma.epsilon.star.inv <- lapply(1:t, make.Sigma.epsilon.inv, sigma.squared.epsilon = sigma.squared.epsilon.star, I.nt = I.nt)
+      Sigma.epsilon.star <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon.star, sigma.squared.eta = sigma.squared.eta, c = c, C.star.inv = C.star.inv, I.nt = I.nt)
+      Sigma.epsilon.star.inv <- lapply(1:t, make.Sigma.epsilon.inv, Sigma.epsilon = Sigma.epsilon)
       Sigma.star <- lapply(1:t, make.Sigma, Sigma.epsilon = Sigma.epsilon.star, C.star.inv = C.star.inv, c = c, H.list = H.list)
       Sigma.star.inv <- lapply(1:t, make.Sigma.inv, Sigma.epsilon.inv = Sigma.epsilon.star.inv, C.star = C.star, c = c, H.list = H.list)
-      mh.epsilon.1 <-  sum(sapply(1:t, make.mh, beta = beta, sigma.squared.epsilon = sigma.squared.epsilon.star, Sigma.inv = Sigma.star.inv, C.star = C.star, C.star.inv = C.star.inv, c = c)) + dinvgamma(sigma.squared.epsilon.star, alpha.epsilon, beta.epsilon, log = TRUE)
-      mh.epsilon.2 <- sum(sapply(1:t, make.mh, beta = beta, sigma.squared.epsilon = sigma.squared.epsilon, Sigma.inv = Sigma.inv, C.star = C.star, C.star.inv = C.star.inv, c = c)) + dinvgamma(sigma.squared.epsilon, alpha.epsilon, beta.epsilon, log = TRUE)
+      mh.epsilon.1 <-  sum(sapply(1:t, make.mh, beta = beta, Sigma.epsilon.inv = Sigma.epsilon.star.inv, Sigma.epsilon = Sigma.epsilon.star, Sigma.inv = Sigma.star.inv, C.star = C.star, C.star.inv = C.star.inv, c = c)) + dinvgamma(sigma.squared.epsilon.star, alpha.epsilon, beta.epsilon, log = TRUE)
+      mh.epsilon.2 <- sum(sapply(1:t, make.mh, beta = beta, Sigma.epsilon.inv = Sigma.epsilon.inv, Sigma.epsilon = Sigma.epsilon, Sigma.inv = Sigma.inv, C.star = C.star, C.star.inv = C.star.inv, c = c)) + dinvgamma(sigma.squared.epsilon, alpha.epsilon, beta.epsilon, log = TRUE)
       mh.epsilon <- exp(mh.epsilon.1 - mh.epsilon.2)
 
       if(mh.epsilon > runif(1)){
@@ -272,6 +305,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
      	  Sigma <- Sigma.star
        	Sigma.inv <- Sigma.star.inv
        	epsilon.accept <- epsilon.accept + 1 / n.mcmc
+       	epsilon.accept.tmp <- epsilon.accept.tmp + 1 / 100
       }
     }
     
@@ -279,15 +313,27 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     ## Sample phi
     ##
   	
+    if(k %% 100 == 0){
+      if(phi.accept.tmp < 0.20){
+        phi.tune <- phi.tune * 0.75
+      } else if(phi.accept.tmp > 0.60){
+        phi.tune <- phi.tune * 1.25
+      }
+      phi.accept.tmp <- 0
+    }
+        
     phi.star <- rnorm(1, phi, phi.tune)
     if(phi.star > 0){
       c.star <- make.c(sigma.squared.eta = sigma.squared.eta, phi = phi.star)
       C.star.star <- make.C.star(sigma.squared.eta = sigma.squared.eta, phi = phi.star)
       C.star.star.inv <- make.C.star.inv(C.star = C.star.star)
-      Sigma.star <- lapply(1:t, make.Sigma, Sigma.epsilon = Sigma.epsilon, C.star.inv = C.star.star.inv, c = c.star, H.list = H.list)
-      Sigma.star.inv <- lapply(1:t, make.Sigma.inv,  Sigma.epsilon.inv = Sigma.epsilon.inv, C.star = C.star.star, c = c.star, H.list = H.list)
-      mh.phi.1 <- sum(sapply(1:t, make.mh, beta = beta, sigma.squared.epsilon = sigma.squared.epsilon, Sigma.inv = Sigma.star.inv, C.star = C.star.star, C.star.inv = C.star.star.inv, c = c.star)) + dinvgamma(phi.star, alpha.phi, beta.phi, log = TRUE)
-      mh.phi.2 <- sum(sapply(1:t, make.mh, beta = beta, sigma.squared.epsilon = sigma.squared.epsilon, Sigma.inv = Sigma.inv, C.star = C.star, C.star.inv = C.star.inv, c = c)) + dinvgamma(phi, alpha.phi, beta.phi, log = TRUE)
+      Sigma.epsilon.star <- lapply(1:t, make.Sigma.epsilon, sigma.squared.epsilon = sigma.squared.epsilon, sigma.squared.eta = sigma.squared.eta, c = c.star, C.star.inv = C.star.star.inv, I.nt = I.nt)
+      Sigma.epsilon.star.inv <- lapply(1:t, make.Sigma.epsilon.inv, Sigma.epsilon = Sigma.epsilon)
+      
+      Sigma.star <- lapply(1:t, make.Sigma, Sigma.epsilon = Sigma.epsilon.star, C.star.inv = C.star.star.inv, c = c.star, H.list = H.list)
+      Sigma.star.inv <- lapply(1:t, make.Sigma.inv,  Sigma.epsilon.inv = Sigma.epsilon.star.inv, C.star = C.star.star, c = c.star, H.list = H.list)
+      mh.phi.1 <- sum(sapply(1:t, make.mh, beta = beta, Sigma.epsilon.inv = Sigma.epsilon.inv, Sigma.epsilon = Sigma.epsilon, Sigma.inv = Sigma.star.inv, C.star = C.star.star, C.star.inv = C.star.star.inv, c = c.star)) + dinvgamma(phi.star, alpha.phi, beta.phi, log = TRUE)
+      mh.phi.2 <- sum(sapply(1:t, make.mh, beta = beta, Sigma.epsilon.inv = Sigma.epsilon.inv, Sigma.epsilon = Sigma.epsilon, Sigma.inv = Sigma.inv, C.star = C.star, C.star.inv = C.star.inv, c = c)) + dinvgamma(phi, alpha.phi, beta.phi, log = TRUE)
       mh.phi <- exp(mh.phi.1 - mh.phi.2)
      	  
       if(mh.phi > runif(1)){
@@ -298,6 +344,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
      	  Sigma <- Sigma.star
        	Sigma.inv <- Sigma.star.inv
       	phi.accept <- phi.accept + 1 / n.mcmc
+        phi.accept.tmp <- phi.accept.tmp + 1 / 100
       }
     }
     
@@ -353,6 +400,6 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
 ## Write output
 ##
   
-list(beta.save = beta.save, sigma.squared.beta.save = sigma.squared.beta.save, sigma.squared.epsilon.save = sigma.squared.epsilon.save, sigma.squared.eta.save = sigma.squared.eta.save, mu.beta.save = mu.beta.save, n.mcmc = n.mcmc, fort.raster = fort.raster, phi.accept = phi.accept, eta.accept = eta.accept, epsilon.accept = epsilon.accept, phi.save = phi.save, var.save = var.save)#, MSPE.save = MSPE.save)
+list(beta.save = beta.save, sigma.squared.beta.save = sigma.squared.beta.save, sigma.squared.epsilon.save = sigma.squared.epsilon.save, sigma.squared.eta.save = sigma.squared.eta.save, mu.beta.save = mu.beta.save, n.mcmc = n.mcmc, fort.raster = fort.raster, phi.accept = phi.accept, eta.accept = eta.accept, epsilon.accept = epsilon.accept, phi.save = phi.save, var.save = var.save, sigma.squared.eta.tune = sigma.squared.eta.tune, sigma.squared.epsilon.tune = sigma.squared.epsilon.tune, phi.tune = phi.tune)#, MSPE.save = MSPE.save)
 }
 

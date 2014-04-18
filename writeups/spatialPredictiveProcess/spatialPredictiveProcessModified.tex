@@ -100,7 +100,7 @@ where $\bm{I}_\beta$ is the identity matrix of size $\tau \times \tau$ where $\t
 %
  & = (\bm{c}^T \bm{C}^{*^{ - 1}} \bm{c} + \bm{\Sigma}_{\tilde{\epsilon} + \epsilon})^{ - 1}\\
  %
- & = \bm{\Sigma}_{\tilde{\epsilon} + \epsilon}^{ - 1} + \bm{\Sigma}_{\tilde{\epsilon} + \epsilon}^{ - 1} \bm{c}^T \left(\bm{C}^* + \bm{c} \bm{\Sigma}_{\tilde{\epsilon} + \epsilon}^{ - 1} \bm{c}^T \right)^{ - 1} \bm{c} \bm{\Sigma}_{\tilde{\epsilon} + \epsilon}^{ - 1}\\
+ & = \bm{\Sigma}_{\tilde{\epsilon} + \epsilon}^{ - 1} - \bm{\Sigma}_{\tilde{\epsilon} + \epsilon}^{ - 1} \bm{c}^T \left(\bm{C}^* + \bm{c} \bm{\Sigma}_{\tilde{\epsilon} + \epsilon}^{ - 1} \bm{c}^T \right)^{ - 1} \bm{c} \bm{\Sigma}_{\tilde{\epsilon} + \epsilon}^{ - 1}\\
 \end{align*}
 and the determinant
 \begin{align*}
@@ -159,10 +159,10 @@ $(T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1})^{ - 1} (\sum_{t = 1}^T \bm{
 %
 & \propto (\prod_{t = 1}^T |\bm{\Sigma}_\beta|^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)} (\sigma^2_\beta)^{ - (\alpha_\beta + 1)} e^{ - \frac{\beta_\beta} {\sigma^2_\beta}}\\
 %
-& \propto (\sigma^2_\beta)^{ - (\alpha_\beta + \frac{t \tau} {2} + 1)} e^{ - \frac{1} {\sigma^2_\beta} (\frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)}
+& \propto (\sigma^2_\beta)^{ - (\alpha_\beta + \frac{t \tau} {2} + 1)} e^{ - \frac{1} {\sigma^2_\beta} (\frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Lambda}^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)}
 \end{align*}
 %
-which is IG$(\alpha_\beta + \frac{t \tau} {2}, \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)$ since the determinant $|\bm{\Sigma}_\beta| = (\sigma^2_\beta)^{\tau}$ and $\bm{\Sigma}_\beta^{ - 1} = \frac{1} {\sigma^2_\beta} \bm{I}_t$
+which is IG$(\alpha_\beta + \frac{t \tau} {2}, \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Lambda}^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)$ since the determinant $|\bm{\Sigma}_\beta| = (\sigma^2_\beta)^{\tau} | \bm{\Lambda} |$ and $\bm{\Sigma}_\beta^{ - 1} = \frac{1} {\sigma^2_\beta} \bm{\Lambda}^{ - 1}$
 %
 \subsection{Full Conditional for $\sigma^2_\eta$}
 %

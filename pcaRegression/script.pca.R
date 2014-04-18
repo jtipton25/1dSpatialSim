@@ -7,7 +7,7 @@ set.seed(10)
 
 library(mvtnorm)
 source('~/1dSpatialSim/functions/dinvgamma.R')
-source('~/1dSpatialSim/plots/make.output.plot.pca.R')
+source('~/1dSpatialSim/plots/make.output.plot.ci.R')
 # source('make.spatial.field.pca.R')
 source('~/1dSpatialSim/functions/make.spatial.field.R')
 source('~/1dSpatialSim/pcaRegression/mcmc.pca.R')
@@ -20,31 +20,31 @@ source('~/1dSpatialSim/pcaRegression/mcmc.pca.R')
 ## Plot of 1d spatial mcmc output
 ##
 
-make.output.plot <- function(out){
-  n.burn <- floor(n.mcmc / 10)
-  #x11()
-  layout(matrix(1:9, nrow = 3))
-  #
-  matplot(t(out$mu.beta.save)[(n.burn + 1):n.mcmc, ], type = 'l', main = expression(paste('Trace plot for ', beta)), ylab = expression(beta), xlab = 'MCMC iteration post burn-in')
-  abline(h = beta[1], col = 'black')
-  abline(h = beta[2], col = 'red')
-  #
-  plot(out$sigma.squared.beta.save[(n.burn + 1):n.mcmc], type = 'l', main = expression(paste('Trace plot for ', sigma[beta]^2)), ylab = expression(sigma[beta]^2), xlab = 'MCMC iteration post burn-in')
-  #
-  plot(out$sigma.squared.epsilon.save[(n.burn + 1):n.mcmc], type = 'l', main = expression(paste('Trace plot for ', sigma[epsilon]^2)), ylab = expression(sigma[epsilon]^2), xlab = 'MCMC iteration post burn-in')
-  abline(h = s2.e, col = 'red')
-  #
-  matplot(out$fort.raster, type = 'l', main = 'Fitted Values')
-  #
-  plot.Z.field(Z.list.hist, locs = locs, main = "True Surface")
-  #
-  plot.Z.field(Z.list.pca, locs = locs, main = "Pallette of Signals")
-  #
-  plot.Y.field(Y.list, H.list, locs = locs)
-  #
-  MSPE <- (out$fort.raster - matrix(unlist(Z.list.hist), nrow = m, byrow = FALSE))^2
-  matplot(MSPE, type = 'l', main = paste('MSPE = ', round(mean(MSPE), 4)))
-}
+# make.output.plot <- function(out){
+#  n.burn <- floor(n.mcmc / 10)
+#  #x11()
+#  layout(matrix(1:9, nrow = 3))
+#  #
+#  matplot(t(out$mu.beta.save)[(n.burn + 1):n.mcmc, ], type = 'l', main = expression(paste('Trace plot for ', beta)), ylab = expression(beta), xlab = 'MCMC iteration post burn-in')
+#  abline(h = beta[1], col = 'black')
+#  abline(h = beta[2], col = 'red')
+#  #
+#  plot(out$sigma.squared.beta.save[(n.burn + 1):n.mcmc], type = 'l', main = expression(paste('Trace plot for ', sigma[beta]^2)), ylab = expression(sigma[beta]^2), xlab = 'MCMC iteration post burn-in')
+#  #
+#  plot(out$sigma.squared.epsilon.save[(n.burn + 1):n.mcmc], type = 'l', main = expression(paste('Trace plot for ', sigma[epsilon]^2)), ylab = expression(sigma[epsilon]^2), xlab = 'MCMC iteration post burn-in')
+#  abline(h = s2.e, col = 'red')
+#  #
+#  matplot(out$fort.raster, type = 'l', main = 'Fitted Values')
+#  #
+#  plot.Z.field(Z.list.hist, locs = locs, main = "True Surface")
+#  #
+#  plot.Z.field(Z.list.pca, locs = locs, main = "Pallette of Signals")
+#  #
+#  plot.Y.field(Y.list, H.list, locs = locs)
+#  #
+#  MSPE <- (out$fort.raster - matrix(unlist(Z.list.hist), nrow = m, byrow = FALSE))^2
+#  matplot(MSPE, type = 'l', main = paste('MSPE = ', round(mean(MSPE), 4)))
+#}
 
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
