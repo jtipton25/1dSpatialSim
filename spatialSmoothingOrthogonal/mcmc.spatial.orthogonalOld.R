@@ -40,9 +40,32 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
   }
   
   make.Sigma.eta <- function(sigma.squared.eta, phi){
+    #   make.R.list <- function(s, sigma.squared.eta, phi, D.list, LtL.list){
+    #     sigma.squared.eta * LtL.list[[s]] %*% exp( - D.list[[s]] / phi) %*% LtL.list[[s]]
+    #     sigma.squared.eta * tL.list[[s]] %*% exp( - D.list[[s]] / phi) %*% L.list[[s]]
     sigma.squared.eta * t(L) %*% exp( - D / phi) %*% L
   }
   
+  #   make.L.list <- function(s, I.nt, HX.list, tHX.list){
+  #     e <- eigen(I.nt[[s]] - HX.list[[s]] %*% 
+  #     solve(tHX.list[[s]] %*% HX.list[[s]])
+  #      %*% tHX.list[[s]])
+  #     idx <- round(e$values, 4) == 1
+  #     return(e$vectors[, idx])
+  #   }
+  #   
+  #   make.tL.list <- function(s, L.list){
+  #     return(t(L.list[[s]]))
+  #   }
+  # 
+  #    make.LtL.list <- function(s, L.list, tL.list){
+  #      return(L.list[[s]] %*% tL.list[[s]])
+  #    }
+  #    
+  #    make.tLL.list <- function(s, L.list, tL.list){
+  #      return(tL.list[[s]] %*% L.list[[s]])
+  #    }
+  #   
   make.identity.list <- function(s, nt){
     if(length(nt) == 1){
       diag(nt)
