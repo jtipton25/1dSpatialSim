@@ -10,7 +10,7 @@ source('~/1dSpatialSim/functions/dinvgamma.R')
 source('~/1dSpatialSim/plots/make.output.plot.ci.R')
 source('~/1dSpatialSim/functions/make.spatial.field.R')
 setwd('~/1dSpatialSim/spatialSmoothingOrthogonal/')
-source('~/1dSpatialSim/spatialSmoothingOrthogonal/mcmc.spatial.orthogonal.R')
+source('~/1dSpatialSim/spatialSmoothingOrthogonal/mcmc.spatial.orthogonalEdit.R')
 
 ##
 ## Simulate Data
