@@ -64,7 +64,7 @@ beta.phi <- 20
 ## Knots for predictive process
 ##
 
-s.star <- seq(0.025, 0.975, 0.025)
+# s.star <- seq(0.025, 0.975, 0.025)
 
 # sigma.squared.eta.tune <- 0.025
 # sigma.squared.epsilon.tune <- 0.00250
@@ -73,23 +73,26 @@ s.star <- seq(0.025, 0.975, 0.025)
 ##
 ## tuning for 99 knot locations
 ##
-# sigma.squared.eta.tune <- 0.7
-# sigma.squared.epsilon.tune <- .062575
-# phi.tune <- 0.375
+s.star <- seq(0.01, 0.99, 0.01)
+sigma.squared.eta.tune <- 0.7
+sigma.squared.epsilon.tune <- .062575
+phi.tune <- 0.375
 
 ##
 ## tuning for 39 knot locations
 ##
-sigma.squared.eta.tune <- 0.45
-sigma.squared.epsilon.tune <- .0380
-phi.tune <- 0.225
+# s.star <- seq(0.025, 0.975, 0.025)
+# sigma.squared.eta.tune <- 0.70
+# sigma.squared.epsilon.tune <- .070
+# phi.tune <- 0.6
 
 ##
 ## tuning for 9 knot locations
 ##
-# sigma.squared.eta.tune <- 0.085
-# sigma.squared.epsilon.tune <- .0085
-# phi.tune <- 0.035
+# s.star <- seq(0.1, 0.9, 0.1)
+# sigma.squared.eta.tune <- 0.85
+# sigma.squared.epsilon.tune <- .085
+# phi.tune <- 0.35
 
 n.mcmc <-20000
 

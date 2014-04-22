@@ -62,12 +62,12 @@ beta.phi <- 20
 #curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 #abline(v = phi, col = 'red')
 ##
+sigma.squared.beta.tune <- 0.05
+sigma.squared.eta.tune <- 0.5
+sigma.squared.epsilon.tune <- 1
+phi.tune <- 1.0
 
-sigma.squared.eta.tune <- 0.000125
-sigma.squared.epsilon.tune <- 0.00125
-phi.tune <- 0.00125
-
-n.mcmc <- 20000
+n.mcmc <- 5000
 
 ##
 ## Fit spatial MCMC kriging model
@@ -75,7 +75,7 @@ n.mcmc <- 20000
 
 start <- Sys.time()
 # Rprof(filename = '~/1dSpatialSim/spatialOrthogonalRprof.out', line.profiling = TRUE)
-out <- mcmc.1d(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
+out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
 # Rprof(NULL)
 # summaryRprof(filename = '~/1dSpatialSim/spatialOrthogonalRprof.out', lines = 'show')
 
@@ -96,6 +96,6 @@ make.output.plot(out)
 #apply(out$mu.beta.save[, (n.mcmc / 10 + 1):n.mcmc], 1, mean)
 #matplot(out$fort.raster, type = 'l', main = 'Posterior Predictive')
 
-MSPE <- (out$fort.raster - matrix(unlist(Z.list.hist), nrow = m, byrow = FALSE))^2
-matplot(MSPE, type = 'l', main = 'MSPE')
+#MSPE <- (out$fort.raster - matrix(unlist(field$Z.list), nrow = m, byrow = FALSE))^2
+#matplot(MSPE, type = 'l', main = 'MSPE')
 
