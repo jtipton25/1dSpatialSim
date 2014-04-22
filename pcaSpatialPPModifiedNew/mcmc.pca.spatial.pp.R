@@ -60,16 +60,16 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     solve(Sigma.epsilon[[s]])
   }
 
+  make.c <- function(sigma.squared.eta, phi){
+    sigma.squared.eta * exp( - D.0 / phi)
+  }
+
   make.cH.list <- function(s, c){
     c[, H.list[[s]]]
   }
 
   make.tcH.list <- function(s, cH.list){
     t(cH.list[[s]])
-  }
-
-  make.c <- function(sigma.squared.eta, phi){
-    sigma.squared.eta * exp( - D.0 / phi)
   }
   
   make.C.star <- function(sigma.squared.eta, phi){
@@ -350,6 +350,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
      	  C.star <- C.star.star
      	  C.star.inv <- C.star.star.inv
         Sigma.eta <- Sigma.eta.star
+        Sigma.epsilon <- Sigma.epsilon.star
+        Sigma.epsilon.inv <- Sigma.epsilon.star.inv
      	  Sigma <- Sigma.star
        	Sigma.inv <- Sigma.star.inv
       	phi.accept <- phi.accept + 1 / n.mcmc
