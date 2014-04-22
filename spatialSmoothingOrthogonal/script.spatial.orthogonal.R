@@ -62,10 +62,9 @@ beta.phi <- 20
 #curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 #abline(v = phi, col = 'red')
 ##
-sigma.squared.beta.tune <- 0.05
-sigma.squared.eta.tune <- 0.5
-sigma.squared.epsilon.tune <- 1
-phi.tune <- 1.0
+sigma.squared.eta.tune <- 0.000075
+sigma.squared.epsilon.tune <- 0.0005
+phi.tune <- 0.0050
 
 n.mcmc <- 5000
 
