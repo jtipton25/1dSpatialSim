@@ -1,0 +1,191 @@
+\documentclass[fleqn]{article}
+\setlength{\topmargin}{0in} \setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in} \setlength{\headheight}{0in}
+\setlength{\headsep}{0in} \setlength{\textwidth}{6.5in}
+\setlength{\textheight}{9in}
+\setlength{\mathindent}{0pt}
+
+\usepackage[fleqn]{amsmath}
+\usepackage{dsfont}
+\usepackage{graphicx}
+\usepackage{url}
+%\usepackage{chicago}
+\usepackage{natbib}
+\def\bm#1{\mbox{\boldmath $#1$}}
+ 
+\title{Spatial Orthogonal Geostatistical Model}
+\author{John Tipton}
+\date{\today}
+\begin{document}
+\maketitle
+
+\section{Full Dimensional Model Statement}
+%
+\subsection{Data Model}
+\begin{align*}
+\bm{y}_t & = \bm{H}_t \bm{X} \bm{\beta}_t + \bm{\eta}_t + \bm{\epsilon}_t\\
+%
+\end{align*}
+%
+\subsection{Process Model}
+%
+\begin{align*}
+%
+\bm{\beta}_t & \sim N(\bm{\mu}_\beta, \bm{\Sigma}_\beta) & \bm{\Sigma}_\beta &  = \sigma^2_\beta \bm{I}_t\\
+%
+\bm{\eta}_t & \sim N(0, \bm{\Sigma}_\eta) & \bm{\Sigma}_\eta &  = \sigma^2_\eta \bm{R}(\phi) & \bm{R}(\phi) & = \exp{( - \bm{D}_t / \phi)}\\
+%
+\bm{\epsilon}_t & \sim N(0, \bm{\Sigma}_\epsilon) & \bm{\Sigma}_\epsilon &  = \sigma^2_\epsilon \bm{I}_t\\
+%
+\end{align*}
+%
+\subsection{Parameter Model}
+%
+\begin{align*}
+%
+\bm{\mu}_\beta & \sim N(\bm{\mu}_0, \bm{\Sigma}_0)\\
+%
+\sigma^2_\beta & \sim IG(\alpha_\beta, \beta_\beta)\\
+%
+\sigma^2_\eta & \sim IG(\alpha_\eta, \beta_\eta)\\
+%
+\sigma^2_\epsilon & \sim IG(\alpha_\epsilon, \beta_\epsilon)\\
+%
+\phi & \sim IG(\alpha_\phi, \beta_\phi)
+\end{align*}
+%
+where $\bm{I}_\beta$ is the identity matrix of size $\tau \times \tau$ where $\tau$ is the number of parameters in $\bm{\beta}_t$, $\bm{I}_t$ is the identity matrix of size $n_t \times n_t$ and $n_t$ is the number of samples of $y_t$ at time $t$ and $\bm{D}_t$ is the distance matrix between locations observed at time $t$. Define $\bm{\Sigma} = \bm{\Sigma}_\eta + \bm{\Sigma}_\epsilon$
+%
+\section{Orthogonalization}
+%
+To preserve the fixed effects from being influence by the spatial process that should be explicitly second order, we construct the perpendicular projection operator (PPO) 
+\begin{align*}
+\bm{P}^c_t & = \bm{I}_{n_t} - \bm{H}_t \bm{X}\left( (\bm{H}_t \bm{X})^T \bm{H}_t \bm{X} \right)^{ - 1} (\bm{H}_t \bm{X})^T. 
+\end{align*}
+%
+The singular value decomposition of $\bm{P}^c_t$ is given by
+\begin{align*}
+\bm{P}^c_t & = [\bm{L} | \bm{K}]^T \bm{\Phi} [\bm{L} | \bm{K}]
+\end{align*}
+%
+where $\bm{K}$ is a linear combination of the vectors of $\bm{L}$ (associated eignevalues of $\bm{L}$ are 0) and we can re-write our model as
+\begin{align*}
+\bm{y}_t & = \bm{H}_t \bm{X} \bm{\beta}_t + \bm{L} \bm{\eta}^*_t + \bm{\epsilon}_t\\
+\end{align*}
+where $\bm{\eta}^*_t \sim N(0, \sigma^2_{\eta} \bm{L}^T \bm{R}(\phi) \bm{L})$. Define $\bm{\Sigma}_t = \bm{\Sigma}_{\epsilon_t}$.
+%
+\section{Posterior}
+%
+\begin{align*}
+\prod_{t = 1}^T [\bm{\beta}_t, \bm{\eta}^*_t, \bm{\mu}_\beta, \sigma^2_\beta, \sigma^2_\eta, \sigma^2_\epsilon, \phi | \bm{y}_t] & \propto \prod_{t = 1}^T [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta] [\bm{\mu}_\beta] [\sigma^2_\beta] [\sigma^2_\eta] [\sigma^2_\epsilon] [\phi]
+\end{align*}
+%
+\section{Full Conditionals}
+%
+\subsection{Full Conditional for $\bm{\beta}_t$}
+%
+For $t = 1, \ldots, T$,
+\begin{align*}
+[\bm{\beta}_t | \cdot] & \propto [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \sigma^2_\epsilon, \phi] [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta]\\
+%
+& \propto e^{ - \frac{1} {2} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t - \bm{L} \bm{\eta}^*_t)^T \bm{\Sigma}_{\epsilon}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t - \bm{L} \bm{\eta}^*_t)} e^{ - \frac{1} {2} (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)}\\
+%
+& \propto e^{ - \frac{1} {2} \{\bm{\beta}_t^T (\bm{X}^T \bm{H}_t^T \bm{\Sigma}_\epsilon^{ - 1} \bm{H}_t \bm{X} + \bm{\Sigma}_\beta^{ - 1}) \bm{\beta}_t - 2 \bm{\beta}_t^T (\bm{X}^T \bm{H}_t^T \bm{\Sigma}_\epsilon^{ - 1} \left( \bm{y}_t - \bm{L} \bm{\eta}^*_t \right) + \bm{\Sigma}_\beta^{ - 1} \bm{\mu}_\beta) \} }
+\end{align*}
+%
+which is Normal with mean $ \bm{A}^{ - 1} \bm{b}$ and variance $\bm{A}^{ - 1}$ where
+\begin{align*}
+  \bm{A}^{ - 1} & = (\bm{X}^T \bm{H}_t^T \bm{\Sigma}_\epsilon^{ - 1} \bm{H}_t \bm{X} + \bm{\Sigma}_\beta^{ - 1})^{ - 1}\\
+  %
+  \bm{b} & = (\bm{X}^T \bm{H}_t^T \bm{\Sigma}_\epsilon^{ - 1} \left( \bm{y}_t - \bm{L} \bm{\eta}^*_t \right) + \bm{\Sigma}_\beta^{ - 1} \bm{\mu}_\beta)\\
+\end{align*}
+%
+\subsection{Full Conditional for $\bm{\mu}_\beta$}
+%
+\begin{align*}
+[\bm{\mu}_\beta | \cdot] & \propto \prod_{t = 1}^T [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta] [\bm{\mu}_\beta]\\
+%
+& \propto e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)} e^{ - \frac{1} {2} (\bm{\mu}_\beta - \bm{\mu}_0)^T \Sigma_0^{ - 1} (\bm{\mu}_\beta - \bm{\mu}_0)}\\
+%
+& \propto e^{ - \frac{1} {2} (
+\bm{\mu}_\beta^T (T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1}) \bm{\mu}_\beta - 2 \bm{\mu}_\beta^T (\sum_{t = 1}^T \bm{\Sigma}_\beta^{ - 1} \bm{\beta}_t + \bm{\Sigma}_0^{ - 1} \bm{\mu}_0) ) }
+\end{align*}
+%
+which is multivariate normal with mean
+$(T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1})^{ - 1} (\sum_{t = 1}^T \bm{\Sigma}_\beta^{ - 1} \bm{\beta}_t + \bm{\Sigma}_0^{ - 1} \bm{\mu}_0)$ and variance $(T \bm{\Sigma}_\beta^{ - 1} + \bm{\Sigma}_0^{ - 1})^{ - 1}$
+%
+\subsection{Full Conditional for $\sigma^2_\beta$}
+%
+\begin{align*}
+[\sigma^2_\beta | \cdot] & \propto \prod_{t = 1}^T [\bm{\beta}_t | \bm{\mu}_\beta, \sigma^2_\beta] [\sigma^2_\beta]\\
+%
+& \propto (\prod_{t = 1}^T |\bm{\Sigma}_\beta|^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Sigma}_\beta^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta)} (\sigma^2_\beta)^{ - (\alpha_\beta + 1)} e^{ - \frac{\beta_\beta} {\sigma^2_\beta}}\\
+%
+& \propto (\sigma^2_\beta)^{ - (\alpha_\beta + \frac{\sum_{t = 1}^T n_t} {2} + 1)} e^{ - \frac{1} {\sigma^2_\beta} (\frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Lambda}^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta) + \beta_\beta)}
+\end{align*}
+%
+which is IG$(\alpha_\beta + \frac{\sum_{t = 1}^T n_t} {2}, \beta_\beta + \frac{1} {2} \sum_{t = 1}^T (\bm{\beta}_t - \bm{\mu}_\beta)^T \bm{\Lambda}^{ - 1} (\bm{\beta}_t - \bm{\mu}_\beta))$ since the determinant $|\bm{\Sigma}_\beta| = (\sigma^2_\beta)^{n_t} | \bm{\Lambda} |$ and $\bm{\Sigma}_\beta^{ - 1} = \frac{1} {\sigma^2_\beta} \bm{\Lambda}^{ - 1}$
+%
+\subsection{Full Conditional for $\bm{\eta}^*_t$}
+%
+For $t = 1, \ldots, T$,
+\begin{align*}
+[\bm{\beta}_t | \cdot] & \propto [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \sigma^2_\epsilon, \phi] [\bm{\eta}^*_t | \sigma^2_\eta]\\
+%
+& \propto e^{ - \frac{1} {2} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t - \bm{L} \bm{\eta}^*_t)^T \bm{\Sigma}_{\epsilon}^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t - \bm{L} \bm{\eta}^*_t)} e^{ - \frac{1} {2} {\bm{\eta}^*_t}^T \bm{\Sigma}_{\eta^*}^{ - 1} \bm{\eta}^*_t }\\
+%
+& \propto e^{ - \frac{1} {2} \{{\bm{\eta}^*_t}^T (\bm{L}^T \bm{\Sigma}_\epsilon^{ - 1} \bm{L} + \bm{\Sigma}_{\eta^*}^{ - 1}) \bm{\eta}^*_t - 2 {\bm{\eta}^*_t}^T (\bm{L}^T \bm{\Sigma}_\epsilon^{ - 1} \left( \bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t \right) \} }
+\end{align*}
+%
+which is Normal with mean $ \bm{A}^{ - 1} \bm{b}$ and variance $\bm{A}^{ - 1}$ where
+\begin{align*}
+  \bm{A}^{ - 1} & = (\bm{L}^T \bm{\Sigma}_\epsilon^{ - 1} \bm{L} + \bm{\Sigma}_{\eta^*}^{ - 1})^{ - 1}\\
+  %
+  \bm{b} & = (\bm{L}^T \bm{\Sigma}_\epsilon^{ - 1} \left( \bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t \right)
+\end{align*}
+%
+\subsection{Full Conditional for $\sigma^2_\eta$}
+%
+\begin{align*}
+[\sigma^2_\eta | \cdot] & \propto \prod_{t = 1}^T [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\sigma^2_\eta]\\
+%
+& \propto (\prod_{t = 1}^T |\bm{\Sigma}_\epsilon |^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t - \bm{L} \bm{\eta}^*_t)^T \bm{\Sigma}_\epsilon^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t - \bm{L} \bm{\eta}^*_t)} (\sigma^2_\eta)^{ - \alpha_\eta + 1} e^{ - \frac{\beta_\eta} {\sigma^2_\eta}}\\
+%
+& \propto |\bm{\Sigma}_\epsilon |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t - \bm{L} \bm{\eta}^*_t)^T \bm{\Sigma}_\epsilon^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t - \bm{L} \bm{\eta}^*_t)} (\sigma^2_\eta)^{ - \alpha_\eta + 1} e^{ - \frac{\beta_\eta} {\sigma^2_\eta}}\\
+\end{align*}
+% 
+which can be sampled using a Metropolis-Hastings step
+%
+\subsection{Full Conditional for $\sigma^2_\epsilon$}
+%
+\begin{align*}
+[\sigma^2_\epsilon | \cdot] & \propto \prod_{t = 1}^T [\bm{y}_t | \bm{\beta}_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\sigma^2_\epsilon]\\
+%
+& \propto (\prod_{t = 1}^T |\bm{\Sigma} |^{ - \frac{1} {2}}) e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t - \bm{L} \bm{\eta}^*_t)^T \bm{\Sigma}_\epsilon^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t - \bm{L} \bm{\eta}^*_t)} (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}\\
+%
+& \propto |\bm{\Sigma}_\epsilon |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t - \bm{L} \bm{\eta}^*_t)^T \bm{\Sigma}_\epsilon^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t) - \bm{L} \bm{\eta}^*_t} (\sigma^2_\epsilon)^{ - \alpha_\epsilon + 1} e^{ - \frac{\beta_\epsilon} {\sigma^2_\epsilon}}\\
+\end{align*}
+% 
+which can be sampled using a Metropolis-Hastings step
+%
+\subsection{Full Conditional for $\phi$}
+%
+\begin{align*}
+  [\phi | \cdot] & \propto \prod_{t = 1}^T [y_t | \beta_t, \sigma^2_\eta, \phi, \sigma^2_\epsilon] [\phi]\\
+%
+& \propto \prod_{t = 1}^T | \bm{\Sigma}_\epsilon |^{ - \frac{1} {2}} e^{ - \frac{1} {2} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t - \bm{L} \bm{\eta}^*_t)^T \bm{\Sigma}_\epsilon^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t - \bm{\eta}^*_t)} \phi^{ - \alpha_\phi + 1} e^{ - \frac{\beta_\phi} {\phi}}\\
+%
+& \propto | \bm{\Sigma}_\epsilon |^{ - \frac{T} {2}} e^{ - \frac{1} {2} \sum_{t = 1}^T (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t - \bm{L} \bm{\eta}^*_t)^T \bm{\Sigma}_\epsilon^{ - 1} (\bm{y}_t - \bm{H}_t \bm{X} \bm{\beta}_t - \bm{L} \bm{\eta}^*_t)} \phi^{ - \alpha_\phi + 1} e^{ - \frac{\beta_\phi} {\phi}}\\
+\end{align*}
+% 
+which can be sampled using a Metropolis-Hastings step
+%
+\section{Posterior Predictive Distribution}
+%
+The posterior predictive distribution for $\bm{y}_t$ is sampled a each MCMC iteration $k$ by
+\begin{align*}
+  \bm{y}^{(k)}_t & \sim N(\bm{H_t} \bm{X} \bm{\beta}^{(k)}_t, \bm{\Sigma}^{(k)})
+\end{align*}
+
+
+\end{document}

@@ -62,9 +62,9 @@ beta.phi <- 20
 #curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 #abline(v = phi, col = 'red')
 ##
-sigma.squared.eta.tune <- 0.000075
-sigma.squared.epsilon.tune <- 0.0005
-phi.tune <- 0.0050
+sigma.squared.eta.tune <- 0.00005
+sigma.squared.epsilon.tune <- 0.00025
+phi.tune <- 0.00250
 
 n.mcmc <- 5000
 
@@ -74,7 +74,7 @@ n.mcmc <- 5000
 
 start <- Sys.time()
 # Rprof(filename = '~/1dSpatialSim/spatialOrthogonalRprof.out', line.profiling = TRUE)
-out <- mcmc.1d(field$Y.list, field$H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
+out <- mcmc.1d(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
 # Rprof(NULL)
 # summaryRprof(filename = '~/1dSpatialSim/spatialOrthogonalRprof.out', lines = 'show')
 

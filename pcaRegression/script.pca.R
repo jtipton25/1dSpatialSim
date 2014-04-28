@@ -80,18 +80,12 @@ Sigma.0 <- sigma.squared.0 * diag(num.pca)
 alpha.beta <- 20
 beta.beta <- 0.2
 ##
-alpha.eta <- 12
-beta.eta <- 12
-##
 alpha.epsilon <- 3
 beta.epsilon <- 2
 ##
 alpha.phi <- 10
 beta.phi <- 20
 ##
-sigma.squared.eta.tune <- 0.5
-sigma.squared.epsilon.tune <- 0.275
-phi.tune <- 0.5
 
 n.mcmc <- 20000
 
