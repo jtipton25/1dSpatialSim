@@ -71,9 +71,11 @@ make.spatial.field <- function(reps, X, beta, locs, param = c(s2.s, phi), method
            
   ##  Subsample Fields    
   #samp <- rep(list(sample(1:m, samp.size)), reps)
+  tmp.vec = sin(0.025 * (1:m))
+  p.vec = tmp.vec - min(tmp.vec)
   samp <- vector('list', length = reps)
   for(i in 1:reps){
-      samp[[i]] <- sample(1:m, sample(samp.size, 1))
+      samp[[i]] <- sample(1:m, sample(samp.size, 1), prob = p.vec)
   }
   H.list <- lapply(1:reps, make.H.list, samp = samp, m = m)
 #   Y.list <- lapply(1:reps, make.Y.list, Z.list = Z.list, H.list = H.list, s2.e = s2.e)

@@ -10,13 +10,13 @@ source('~/1dSpatialSim/functions/dinvgamma.R')
 source('~/1dSpatialSim/plots/make.output.plot.ci.R')
 source('~/1dSpatialSim/functions/make.spatial.field.R')
 setwd('~/1dSpatialSim/spatialSmoothingOrthogonal/')
-source('~/1dSpatialSim/spatialSmoothingOrthogonal/mcmc.spatial.orthogonalEdit.R')
+source('~/1dSpatialSim/spatialSmoothingOrthogonalCopy/mcmc.spatial.orthogonalEdit.R')
 
 ##
 ## Simulate Data
 ##
 
-m <- 250 # number of spatial locations
+m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
 reps <- 20 # number of spatial fields
@@ -40,9 +40,9 @@ num.pca <- 3
 ## Initialize priors and tuning paramteters
 ##
 
-mu.0 <- rep(0, num.pca)
+mu.0 <- rep(0, reps / 2)
 sigma.squared.0 <- 25
-Sigma.0 <- sigma.squared.0 * diag(num.pca)
+Sigma.0 <- sigma.squared.0 * diag(reps / 2)
 alpha.beta <- 20
 beta.beta <- 0.2
 #curve(dinvgamma(x, alpha.beta, beta.beta))
@@ -62,9 +62,9 @@ beta.phi <- 20
 #curve(dinvgamma(x, alpha.phi, beta.phi), from = 0, to = 6)
 #abline(v = phi, col = 'red')
 ##
-sigma.squared.eta.tune <- 0.0000005
-sigma.squared.epsilon.tune <- 0.00025
-phi.tune <- 0.0000250
+sigma.squared.eta.tune <- 0.25
+sigma.squared.epsilon.tune <- 0.0125
+phi.tune <- 4
 
 n.mcmc <- 5000
 
@@ -76,8 +76,7 @@ start <- Sys.time()
 # Rprof(filename = '~/1dSpatialSim/spatialOrthogonalRprof.out', line.profiling = TRUE)
 out <- mcmc.1d(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
 # Rprof(NULL)
-# summaryRprof(filename = '~/1dSpatialSim/spatialOrthogonalRprof.out', lines = 'show')
-
+summaryRprof(filename = '~/1dSpatialSim/spatialOrthogonalRprof.out', lines = 'show')
 finish <- Sys.time() - start
 finish #500 iterations takes 2.23 minutes for m = 100 and reps = 100
 #500 iterations takes 5.3 minutes for m = 1000 and reps = 100

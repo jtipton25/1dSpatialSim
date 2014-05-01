@@ -64,9 +64,9 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
 	  ( - 1 / 2) * determinant(Sigma[[s]], logarithm = TRUE)$modulus[1] - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% Sigma.inv[[s]] %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
 	}
 
-  make.fort.batch <- function(s, beta, c.Y, Sigma){
+  make.fort.batch <- function(s, beta, c.Y, Sigma, Sigma.inv){
     temp <- vector(length = ncells)
-    temp[ - H.list[[s]]] <- X[ - H.list[[s]], ] %*% beta[, s] + c.Y[ - H.list[[s]], H.list[[s]]] %*% solve(Sigma[[s]]) %*% (Y.list[[s]] - X[H.list[[s]], ] %*% beta[, s])
+    temp[ - H.list[[s]]] <- X[ - H.list[[s]], ] %*% beta[, s] + c.Y[ - H.list[[s]], H.list[[s]]] %*% Sigma.inv[[s]] %*% (Y.list[[s]] - X[H.list[[s]], ] %*% beta[, s])
     temp[H.list[[s]]] <- Y.list[[s]]
     return(temp)
   }
@@ -252,8 +252,8 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
     
     if(k > n.burn){
       if(k %% 10 == 0){
-        c.Y <- sigma.squared.eta * exp( - D / phi)
-        fort.raster.tmp <- sapply(1:t, make.fort.batch, beta = beta, c.Y = c.Y, Sigma = Sigma)
+        c.Y <- sigma.squared.eta * exp( - D / phi) + sigma.squared.epsilon * I.full
+        fort.raster.tmp <- sapply(1:t, make.fort.batch, beta = beta, c.Y = c.Y, Sigma = Sigma, Sigma.inv = Sigma.inv)
         fort.raster <- fort.raster + 10 / (n.mcmc - n.burn) * fort.raster.tmp
         if(k %% 1000 == 0){
           var.save.temp[100, , ] <- fort.raster.tmp

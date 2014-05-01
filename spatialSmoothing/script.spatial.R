@@ -5,6 +5,7 @@ set.seed(1)
 ## Libraries and Subroutines
 ##
 source('~/1dSpatialSim/functions/dinvgamma.R')
+source('~/1dSpatialSim/functions/rMVN.R')
 source('~/1dSpatialSim/functions/make.output.plot.ci.R')
 library(mvtnorm)
 source('~/1dSpatialSim/functions/make.spatial.field.R')
@@ -102,7 +103,7 @@ abline(v = phi, col = 'red')
 ##
 sigma.squared.beta.tune <- 0.025
 sigma.squared.eta.tune <- 0.25
-sigma.squared.epsilon.tune <- 0.075
+sigma.squared.epsilon.tune <- 0.5
 phi.tune <- 0.25
 
 n.mcmc <- 5000
@@ -121,5 +122,5 @@ finish
 ##
 ## Plot output
 ##
- x11()
+#  x11()
 make.output.plot(out.sp)
