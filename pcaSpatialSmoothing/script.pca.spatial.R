@@ -16,7 +16,7 @@ source('~/1dSpatialSim/pcaSpatialSmoothing/mcmc.pca.spatial.R')
 ## Simulate Data
 ##
 
-m <- 1000 # number of spatial locations
+m <- 20000#1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
 reps <- 20 # number of spatial fields
@@ -79,8 +79,8 @@ out.pca <- mcmc.1d(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon
 finish <- Sys.time() - start
 finish 
 
-#5000 iterations takes 12.15 minutes for m = 1000 and reps = 10
- 
+#5000 iterations takes 12.15 minutes for m = 20000 and reps = 20
+
 ##
 ## Plot output
 ##

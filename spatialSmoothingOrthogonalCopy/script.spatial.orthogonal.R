@@ -76,7 +76,7 @@ start <- Sys.time()
 # Rprof(filename = '~/1dSpatialSim/spatialOrthogonalRprof.out', line.profiling = TRUE)
 out <- mcmc.1d(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune)
 # Rprof(NULL)
-summaryRprof(filename = '~/1dSpatialSim/spatialOrthogonalRprof.out', lines = 'show')
+# summaryRprof(filename = '~/1dSpatialSim/spatialOrthogonalRprof.out', lines = 'show')
 finish <- Sys.time() - start
 finish #500 iterations takes 2.23 minutes for m = 100 and reps = 100
 #500 iterations takes 5.3 minutes for m = 1000 and reps = 100
