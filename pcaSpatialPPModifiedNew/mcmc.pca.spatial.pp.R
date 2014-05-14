@@ -31,7 +31,7 @@ mcmc.1d <- function(Y.list, H.list, X, locs, n.mcmc, mu.0, Sigma.0, alpha.epsilo
 #   make.mh <- function(s, beta, Sigma.epsilon, Sigma.epsilon.inv, Sigma.inv, C.star, C.star.inv, c){
   make.mh <- function(s, beta, Sigma.epsilon, Sigma.epsilon.inv, Sigma.inv, C.star, C.star.inv, cH.list, tcH.list){
 #     cH.list <- c[, H.list[[s]]]
-    ( - 1 / 2) * (determinant(C.star + cH.list[[s]] %*% Sigma.epsilon.inv[[s]] %*% tcH.list[[s]], logarithm = TRUE)$modulus[1] + determinant(C.star.inv, logarithm = TRUE)$modulus[1] + determinant(Sigma.epsilon[[s]])$modulus[1]) - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% (Sigma.inv[[s]]) %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
+    ( - 1 / 2) * (determinant(C.star + cH.list[[s]] %*% Sigma.epsilon.inv[[s]] %*% tcH.list[[s]], logarithm = TRUE)$modulus[1] + determinant(C.star.inv, logarithm = TRUE)$modulus[1] + determinant(Sigma.epsilon[[s]], logarithm = TRUE)$modulus[1]) - 1 / 2 * t(Y.list[[s]] - HX.list[[s]] %*% beta[, s]) %*% (Sigma.inv[[s]]) %*% (Y.list[[s]] - HX.list[[s]] %*% beta[, s])
   }
   
     
