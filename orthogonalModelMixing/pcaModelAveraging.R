@@ -13,7 +13,7 @@ source('~/1dSpatialSim/functions/rMVN.R')
 ## simulate the data
 source('~/1dSpatialSim/functions/make.spatial.field.R')
 ## load the ODA mcmc code
-source('~/1dSpatialSim/modelAveraging/mcmc.pcaModelAveraging.no.intercept.R')
+source('~/1dSpatialSim/modelAveraging/mcmc.ODA.R')
 ## code for plotting the output
 source('~/1dSpatialSim/plots/make.output.plot.ci.R')
 
@@ -59,11 +59,12 @@ Z.list.pca <- field$Z.list[(reps / 2 + 1):reps]
 X <- matrix(unlist(Z.list.pca), ncol = reps / 2, byrow = FALSE)
 X.new <- matrix(unlist(Z.list.hist), ncol = reps / 2, byrow = FALSE)
 scaled <- scale.predictor(X)
-X.o <- scaled$X ## no intercept
+# X.o <- scaled$X
 # X.o <- cbind(rep(1, m), scaled$X)
 # X.o <- cbind(1:m, scaled$X)
 # X.o <- cbind(rep(1, m), (1:m - mean(1:m)) / (sqrt(m / (m - 1)) * sd(1:m)), scaled$X)
-p <- dim(X.o)[2]
+X.o <- X
+p <- dim(X.o)[2] ## for a model with intercept us p <- dim(X.o)[2] - 1
 matplot(X, type = 'l')
 matplot(X.o, type = 'l')
 # X.pred <- X.new
@@ -71,13 +72,11 @@ matplot(X.o, type = 'l')
 #   X.pred[, i] <- (X.new[, i] - scaled$scale[i, 1]) / scaled$scale[i, 2]
 # }
 
-
 # D <- diag(rep(max(eigen(t(X.o) %*% X.o)$values), dim(X.o)[2])) + 0.0001
 # X.a <- chol(D - t(X.o) %*% X.o)
 
 # X.c <- rbind(X.o, X.a)
 # t(X.c) %*% X.c
-
 
 ##
 ## Initialize priors and tuning paramteters
@@ -89,11 +88,14 @@ pi.prior <- rep( 1 / 2, p)
 epsilon = 0.001
 n.mcmc <- 50000
 lambda <- c(0, rep(1, p))
+mu.0 <- rep(0, p)
+v <- 5
+psi <- 3
 # lambda <- rep(1, p)
 n.burn <- n.mcmc / 5
 
 params <- list('vector')
-params <- list(n.mcmc, alpha, pi.prior, lambda)
+params <- list(n.mcmc, alpha, pi.prior, lambda, mu.0)
 
 ##
 ## fit mcmc using ODA model
@@ -104,7 +106,7 @@ params <- list(n.mcmc, alpha, pi.prior, lambda)
 # X.pca.scale <- pca.scale$X
 # matplot(X.pca.scale, type = 'l')
 
-out <- mcmc.pcaMA(Y.list = Y.list, X.o = X.o, H.list = H.list, params = params)
+out <- mcmc.oda(Y.list = Y.list, X.o = X.o, H.list = H.list, params = params)
 
 ## Rao-blackwell estimates
 
