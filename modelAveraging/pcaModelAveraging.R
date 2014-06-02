@@ -88,8 +88,8 @@ alpha <- 2
 pi.prior <- rep( 1 / 2, p)
 epsilon = 0.001
 n.mcmc <- 50000
-lambda <- c(0, rep(1, p))
-# lambda <- rep(1, p)
+# lambda <- c(0, rep(1, p))
+lambda <- rep(1, p)
 n.burn <- n.mcmc / 5
 
 params <- list('vector')
@@ -108,17 +108,17 @@ out <- mcmc.pcaMA(Y.list = Y.list, X.o = X.o, H.list = H.list, params = params)
 
 ## Rao-blackwell estimates
 
-beta.fit <- matrix(nrow = p + 1, ncol = reps / 2)
+beta.fit <- matrix(nrow = p, ncol = reps / 2)
 for(i in 1:(reps / 2)){
-  for(j in 1:(p + 1)){
-    if(j == 1){
+  for(j in 1:p){
+#     if(j == 1){
 #       beta.fit[j, i] <- apply(out$beta.save[j, i, ], 1, mean)
-        beta.fit[j, i] <- mean(out$beta.save[j, i, ])
-    } else {
+#         beta.fit[j, i] <- mean(out$beta.save[j, i, ])
+#     } else {
 #       beta.fit[j, i] <- apply(
-        beta.fit[j, i] <- mean(out$rho.save[j - 1, i, ] * out$delta.save[[i]] / (out$delta.save[[i]] + lambda[2:(p + 1)][j - 1]) * out$beta.save[j - 1, i, ])
+        beta.fit[j, i] <- mean(out$rho.save[j, i, ] * out$delta.save[i] / (out$delta.save[i] + lambda[j]) * out$beta.save[j, i, ])
         #, 1, mean)  
-    }  
+#     }  
   }
 }
 
@@ -135,3 +135,6 @@ MSPE <- mean((Y.pred - X.new)^2)
 MSPE
 # log.score <- mean(out$log.score.save[(n.burn + 1):n.mcmc])
 
+
+matplot(apply(out$Y.pred[, 3, ], 1, mean), type = 'l')
+apply(out$gamma.save, 1, mean)

@@ -202,7 +202,7 @@ which is $\mbox{IG} \left( \frac{n_o + p_{\bm{\gamma}}} {2}, \frac{\left( \bm{y}
 %%
 \subsection{Full Conditional for $\gamma_j$}
 %
-For $j = 1, \ldots, p$ and using the fact that $\bm{X}_i^T \bm{X}_j = 0$ (by orthogonality of principal components), %$\beta_j = \left( \bm{X}_{j}^T \bm{X}_{j} \right)^{ - 1} \bm{X}_{j}^T \bm{y}_c$ and $\bm{X}_{j}^T \bm{X}_{j} = \delta_j$ 
+For $j = 1, \ldots, p$ and using the fact that $\bm{X}_i^T \bm{X}_j = 0$ (by orthogonality of principal components), $\hat{\beta}_j = \left( \left( \bm{X}^T \bm{X} \right)^{ - 1} \bm{X}^T \bm{y}_c \right)_j$ is the $j^{th}$ element of the vector $\hat{\bm{\beta}}$ and $\left( \bm{X}^T \bm{X} \right)_{j} = \delta_j$is the $j^{th}$ element of the diagonal matrix. 
 %
 \begin{align*}
 %
@@ -213,6 +213,8 @@ For $j = 1, \ldots, p$ and using the fact that $\bm{X}_i^T \bm{X}_j = 0$ (by ort
 & \propto \exp{ \left\{ - \frac{1} {2 \sigma^2} \left( \bm{y}_c - \bm{X}_{j} \gamma_j \beta_j \right)^T \left( \bm{y}_c - \bm{X}_{j} \gamma_j \beta_j \right) \right\} } \left( \frac{\sigma^2} {\lambda_j} \right)^{ - \frac{\gamma_j} {2} } \exp{ \left\{ - \frac{\gamma_j \lambda_j \beta_j^2} {2 \sigma^2} \right\} } \pi^{\gamma_j} \left( 1 - \pi \right)^{1 - \gamma_j} \\
 %
 & \propto \left[ \left( \frac{\lambda_j} {\sigma^2} \right)^{ \frac{1} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2} \left[ \beta_j^2 \left( \bm{X}_{j}^T \bm{X}_{j} + \lambda_j \right) - 2 \beta_j \bm{X}_{j}^T \bm{y}_c \right] \right\} } \frac{\pi} {1 - \pi }\right]^{\gamma_j} \\
+%
+& \propto \left[ \left( \frac{\lambda_j} {\sigma^2} \right)^{ \frac{1} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2} \left[ \beta_j^2 \left( \bm{X}_{j}^T \bm{X}_{j} + \lambda_j \right) - 2 \beta_j \delta_j \left( \bm{X}^T \bm{X} \right)^{ - 1}_j \bm{X}_{j}^T \bm{y}_c \right] \right\} } \frac{\pi} {1 - \pi }\right]^{\gamma_j} \\
 %
 & \propto \left[ \left( \frac{\lambda_j} {\sigma^2} \right)^{ \frac{1} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2} \left[ \beta_j^2 \left( \delta_j + \lambda_j \right) - 2 \delta_j \beta_j^2 \right] \right\} } \frac{\pi} {1 - \pi } \right]^{\gamma_j} \\
 %
