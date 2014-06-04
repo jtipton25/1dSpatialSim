@@ -13,7 +13,7 @@ source('~/1dSpatialSim/functions/rMVN.R')
 ## simulate the data
 source('~/1dSpatialSim/functions/make.spatial.field.R')
 ## load the ODA mcmc code
-source('~/1dSpatialSim/modelAveraging/mcmc.pcaModelAveraging.no.intercept.R')
+source('~/1dSpatialSim/modelAveraging/mcmc.pcaModelAveraging.spatial.R')
 ## code for plotting the output
 source('~/1dSpatialSim/plots/make.output.plot.ci.R')
 
@@ -47,6 +47,7 @@ scale.predictor <- function(X){
 }
 
 field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponential', s2.e, samp.size)
+D <- as.matrix(dist(locs))
 
 layout(matrix(1:2, ncol = 2))
 plot.Y.field(field$Y.list[1:(reps / 2)], field$H.list[1:(reps / 2)], locs)
@@ -87,13 +88,24 @@ matplot(X.o, type = 'l')
 alpha <- 2
 pi.prior <- rep( 1 / 2, p)
 epsilon = 0.001
-n.mcmc <- 1000 #50000
+n.mcmc <- 5000 #50000
 # lambda <- c(0, rep(1, p))
 lambda <- rep(1, p)
 n.burn <- n.mcmc / 5
+alpha.eta <- 1
+beta.eta <- 1
+phi.lower <- 0.01
+phi.upper <- 100
 
-params <- list('vector')
-params <- list(n.mcmc, alpha, pi.prior, lambda)
+# params <- list('vector')
+params <- list(n.mcmc = n.mcmc, alpha = alpha, pi.prior = pi.prior, lambda = lambda, alpha.eta = alpha.eta, beta.eta = beta.eta, phi.lower = phi.lower, phi.upper = phi.upper, D = D)
+
+sigma.tune <- 1
+phi.tune <- 1
+sigma.eta.tune <- 50
+gamma.tune <- 0.025
+tune <- list(phi.tune = phi.tune, sigma.eta.tune = sigma.eta.tune, gamma.tune = gamma.tune)
+# tune <- list(sigma.tune = sigma.tune, phi.tune = phi.tune, sigma.eta.tune = sigma.eta.tune)
 
 ##
 ## fit mcmc using ODA model
@@ -104,33 +116,33 @@ params <- list(n.mcmc, alpha, pi.prior, lambda)
 # X.pca.scale <- pca.scale$X
 # matplot(X.pca.scale, type = 'l')
 
-out <- mcmc.pcaMA(Y.list = Y.list, X.o = X.o, H.list = H.list, params = params)
+out <- mcmc.pcaMA(Y.list = Y.list, X.o = X.o, H.list = H.list, params = params, tune = tune)
 
 ## Rao-blackwell estimates
-
-beta.fit <- matrix(nrow = p, ncol = reps / 2)
-for(i in 1:(reps / 2)){
-  for(j in 1:p){
-#     beta.fit[j, i] <- apply(
-      beta.fit[j, i] <- mean(out$rho.save[j, i, ] * out$delta.save[i] / (out$delta.save[i] + lambda[j]) * out$beta.save[j, i, ])
-      #, 1, mean)  
-  }
-}
-
-X.pca <- prcomp(X.o)$x
-Y.pred <- matrix(nrow = m, ncol = reps / 2)
-for(i in 1:(reps / 2)){
-  Y.pred[, i] <- X.pca %*% beta.fit[, i]  
-#     Y.pred[, i] <- X.pca.scale %*% beta.fit[, i]  
-}
-
-matplot(Y.pred, type = 'l')
-matplot((Y.pred - X.new)^2, type = 'l')
-## mean square prediction error
-MSPE.RB <- mean((Y.pred - X.new)^2)
-MSPE.RB
-# log.score <- mean(out$log.score.save[(n.burn + 1):n.mcmc])
-
+# 
+# beta.fit <- matrix(nrow = p, ncol = reps / 2)
+# for(i in 1:(reps / 2)){
+#   for(j in 1:p){
+# #     beta.fit[j, i] <- apply(
+#       beta.fit[j, i] <- mean(out$rho.save[j, i, ] * out$delta.save[i] / (out$delta.save[i] + lambda[j]) * out$beta.save[j, i, ])
+#       #, 1, mean)  
+#   }
+# }
+# 
+# X.pca <- prcomp(X.o)$x
+# Y.pred <- matrix(nrow = m, ncol = reps / 2)
+# for(i in 1:(reps / 2)){
+#   Y.pred[, i] <- X.pca %*% beta.fit[, i]  
+# #     Y.pred[, i] <- X.pca.scale %*% beta.fit[, i]  
+# }
+# 
+# matplot(Y.pred, type = 'l')
+# matplot((Y.pred - X.new)^2, type = 'l')
+# ## mean square prediction error
+# MSPE.RB <- mean((Y.pred - X.new)^2)
+# MSPE.RB
+# # log.score <- mean(out$log.score.save[(n.burn + 1):n.mcmc])
+# 
 
 out.Y.pred <- matrix(nrow = m, ncol = (reps / 2))
 for(i in 1:(reps / 2)){
@@ -143,3 +155,9 @@ matplot((out.Y.pred - X.new)^2, type = 'l')
 
 MSPE <- mean((out.Y.pred - X.new)^2)
 MSPE
+
+out$gamma.accept
+matplot(out$sigma.squared.save, type = 'l')
+matplot(out$sigma.squared.eta.save, type = 'l', main = round(out$eta.accept, digits = 4))
+matplot(out$phi.save, type = 'l', main = round(out$phi.accept, digits = 4))
+
