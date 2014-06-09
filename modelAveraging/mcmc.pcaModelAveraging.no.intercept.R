@@ -122,7 +122,8 @@ mcmc.pcaMA <- function(Y.list, X.o, H.list, params, epsilon = 0.001){ #Y.new, X.
         Y.u[[i]] <- rnorm(n.u[i], mean = 0, sd = sigma.squared)
       } else {
         mn = HX.u.list[[i]][, gamma[[i]] == 1] %*% beta.tilde.gamma[[i]]
-        sig.chol = chol(sigma.squared * (I.u[[i]] + HX.u.list[[i]][, gamma[[i]] == 1] %*% solve( 1000 * diag(delta[gamma[[i]] == 1]) + Lambda.gamma[[i]]) %*% tHX.u.list[[i]][gamma[[i]] == 1, ]))
+        sig.chol = chol(sigma.squared * (I.u[[i]] + HX.u.list[[i]][, gamma[[i]] == 1] %*% solve( 1000 * diag(delta[gamma[[i]] == 1]) + Lambda.gamma[[i]]) %*% tHX.u.list[[i]][gamma[[i]] == 1, ])) ## 1000 is from the spatial dimension m??
+        sig = sigma.squared * (I.u[[i]] + HX.u.list[[i]][, gamma[[i]] == 1] %*% solve( 1000 * diag(delta[gamma[[i]] == 1]) + Lambda.gamma[[i]]) %*% tHX.u.list[[i]][gamma[[i]] == 1, ]) ## 1000 is from the spatial dimension m??
         devs <- rnorm(n.u[i])
         Y.u[[i]] <- sig.chol %*% devs + mn
       }
