@@ -222,17 +222,17 @@ If $H_t X_t$ has orthogonal columns (e.g $X_t^T H_t^T H_t X_t$ is diagonal) then
 %
 \left[ \gamma_j \middle| \cdot \right] & \propto \prod_{t = 1}^T \left[ y_t, \middle| \beta_j, \gamma_j, \sigma^2_\epsilon \right] \left[ \beta_j \middle| \gamma_j, \sigma^2 \right] \left[ \gamma_j \right] \\
 %
-& \propto \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \left( y_t - \bm{H}_{t j} \bm{X}_{t j} \gamma_j \beta_j \right)^2 \right\} } \left( \frac{\sigma^2_\epsilon} {\lambda_j} \right)^{ - \frac{\gamma_j} {2} } \exp{ \left\{ - \frac{\gamma_j \lambda_j \beta_j^2} {2 \sigma^2} \right\} } \pi^{\gamma_j} \left( 1 - \pi \right)^{1 - \gamma_j} \\
+& \propto \prod_{t = 1}^T \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \left( y_t - \bm{H}_{t j} \bm{X}_{t j} \gamma_j \beta_j \right)^2 \right\} } \left( \frac{\sigma^2_\epsilon} {\lambda_j} \right)^{ - \frac{\gamma_j} {2} } \exp{ \left\{ - \frac{\gamma_j \lambda_j \beta_j^2} {2 \sigma^2} \right\} } \pi^{\gamma_j} \left( 1 - \pi \right)^{1 - \gamma_j} \\
 %
-& \propto \left( \frac{\sigma^2_\epsilon} {\lambda_j} \right)^{ - \frac{\gamma_j} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \gamma_j \left( \beta_j^2 \left( \bm{X}_{t j}^T \bm{H}_{t j}^T \bm{H}_{t j} \bm{X}_{t j} \lambda_j \right) - 2 y_t \bm{H}_{t j} \bm{X}_{t j} \beta_j \right) \right\} } \pi^{\gamma_j} \left( 1 - \pi \right)^{1 - \gamma_j} \\
+& \propto \left( \frac{\sigma^2_\epsilon} {\lambda_j} \right)^{ - \frac{\gamma_j} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \gamma_j \left( \beta_j^2 \left( \sum_{t = 1}^T \bm{X}_{t j}^T \bm{H}_{t j}^T \bm{H}_{t j} \bm{X}_{t j} \lambda_j \right) - 2 \sum_{t = 1}^T y_t \bm{H}_{t j} \bm{X}_{t j} \beta_j \right) \right\} } \pi^{\gamma_j} \left( 1 - \pi \right)^{1 - \gamma_j} \\
 %
-& \propto \left( \left( \frac{\sigma^2_\epsilon} {\lambda_j} \right)^{ - \frac{1} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \left( \beta_j^2 \left( \bm{X}_{t j}^T \bm{H}_{t j}^T \bm{H}_{t j} \bm{X}_{t j} \lambda_j \right) - 2 y_t \bm{H}_{t j} \bm{X}_{t j} \beta_j \right) \right\} } \frac{\pi_j} {1 - \pi_j} \right)^{\gamma_j} \\
+& \propto \left( \left( \frac{\sigma^2_\epsilon} {\lambda_j} \right)^{ - \frac{1} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \left( \beta_j^2 \left(\sum_{t = 1}^T \bm{X}_{t j}^T \bm{H}_{t j}^T \bm{H}_{t j} \bm{X}_{t j} \lambda_j \right) - 2 \sum_{t = 1}^T y_t \bm{H}_{t j} \bm{X}_{t j} \beta_j \right) \right\} } \frac{\pi_j} {1 - \pi_j} \right)^{\gamma_j} \\
 %
 & \propto \Psi^{\gamma_j}
 %
 \end{align*}
 %
-so $\gamma_j$ is Bern$\left( \frac{\Psi_j} {1 + \Psi_j} \right)$ where $\Psi_j =  \left( \frac{\lambda_j} {\sigma^2} \right)^{ \frac{1} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2} \left[ \beta_j^2 \left( \delta_j + \lambda_j \right) - 2 \delta_j \beta_j^2 \right] \right\} } \frac{\pi} {1 - \pi }$
+so $\gamma_j$ is Bern$\left( \frac{\Psi_j} {1 + \Psi_j} \right)$ where $\Psi_j =   \left( \frac{\sigma^2_\epsilon} {\lambda_j} \right)^{ - \frac{1} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \left( \beta_j^2 \left(\sum_{t = 1}^T \bm{X}_{t j}^T \bm{H}_{t j}^T \bm{H}_{t j} \bm{X}_{t j} \lambda_j \right) - 2 \sum_{t = 1}^T y_t \bm{H}_{t j} \bm{X}_{t j} \beta_j \right) \right\} } \frac{\pi_j} {1 - \pi_j}$
 %
 %%
 %%

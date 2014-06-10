@@ -11,13 +11,13 @@
 \usepackage{natbib}
 \def\bm#1{\mbox{\boldmath $#1$}}
 
-\title{BMA with principal components and no intercept}
+\title{BMA with for tree ring reconstruction}
 
 \begin{document}
 %%
 %%
 %%
-\section{The Model - starting with only one year...}
+\section{The Model}
 %%
 %%
 \subsection{Data Model}
@@ -26,31 +26,50 @@
 %
 \begin{align*}
 %
-\left[ \bm{y}_{o} \middle| \bm{\beta}_{\bm{\gamma}}, \bm{\gamma}, \sigma^2 \right] & \sim \mbox{N}\left( \bm{H}_o \bm{X} \bm{\beta}_{\bm{\gamma}}, \sigma^2 \bm{I}_o \right)
+\left[ y_t \middle| \bm{\beta}, \bm{\gamma}, \sigma^2_\epsilon \right] & \sim \mbox{N}\left( \bm{H}_t \bm{X}_t \bm{\beta}_{\bm{\gamma}}, \sigma^2_\epsilon \right)
 %
 \end{align*}
+%
+where $\bm{\beta}_{\bm{\gamma}} = \left[ \begin{array}{c}
+\beta_0 \\
+\beta_1 \gamma_1 \\
+\vdots \\
+\beta_p \gamma_p \\
+\end{array} \right] $ and $\bm{y} = \left[ \begin{array}{c}
+y_1 \\
+y_2 \\
+\vdots \\
+y_T \\
+\end{array} \right]$.
 %%
 %%
-\subsection{Process Model - Unobserved data - needed for the model selection step}
+\subsection{Process Model - climate variable of interest is AR(1) in time}
 %
 \begin{align*}
 %
-\left[ \bm{y}_{u} \middle| \bm{\beta}_{\bm{\gamma}}, \bm{\gamma}, \sigma^2 \right] & \sim \mbox{N}\left( \bm{H}_u \bm{X} \bm{\beta}_{\bm{\gamma}}, \sigma^2 \bm{I}_u \right)
+\left[ y_t - \mu \middle| y_{t - 1}, \alpha, \sigma^2_\eta \right] & \sim \mbox{N}\left( \alpha \left( y_{t - 1} - \mu \right), \sigma^2_\eta \right)
 %
 \end{align*}
 %
-where $\bm{y}_c \equiv \left( \bm{y}_o, \bm{y}_u \right)^T$.
+where $\mu$ is an intercept term, assumed to be known for the PDSI drought index ($\mu = 0$)
 %%
 %%
 \subsection{Parameter Model}
 %%
 \begin{align*}
 %
-\left[ \beta_{j} \middle| \sigma^2, \gamma_j \right] & \stackrel{iid} {\sim} \begin{cases} 0 & \mbox{if } \gamma_j = 0\\ \mbox{N}\left( 0, \frac{\sigma^2} {\lambda_j} \right) & \mbox{if } \gamma_j = 1 \end{cases} & \mbox{for } j = 1, \ldots , p \\
+\left[ \beta_0 \right] & \propto 1 \\
 %
-\left[ \sigma^2 \right] & \propto \frac{1} {\sigma^2} \\
+\left[ \beta_{j} \middle| \sigma^2_\epsilon, \gamma_j \right] & \stackrel{iid} {\sim} 
+\mbox{N}\left( 0, \frac{\sigma^2_\epsilon \gamma_j} {\lambda_j} \right) & \mbox{for } j = 1, \ldots , p \\
 %
-\left[ \gamma_{j} \right] & \propto \mbox{Bern} \left( \pi_j \right) & \mbox{for } j = 1, \ldots, p\\
+\left[ \sigma^2_\epsilon \right] & \propto \frac{1} {\sigma^2_\epsilon} \\
+%
+\left[ \sigma^2_\eta \right] & \propto \frac{1} {\sigma^2_\eta} \\
+%
+\left[ \gamma_{j} \right] & \propto \mbox{Bern} \left( \pi_j \right) & \mbox{for } j = 1, \ldots, p \\
+%
+\left[ \alpha \right] & \propto \mbox{Unif} \left( 0, 1 \right) \\
 %
 \end{align*}
 where $\pi_j$ and $\lambda_j$ are fixed hyperpriors for $j = 1, \ldots, p$. 
@@ -60,169 +79,160 @@ where $\pi_j$ and $\lambda_j$ are fixed hyperpriors for $j = 1, \ldots, p$.
 %
 \begin{align*}
 %
-\left[ \bm{\beta}_{\bm{\gamma}}, \bm{\gamma}, \sigma^2 \middle| \bm{y}_o \right] & = \int \left[ \bm{y}_u, \bm{\beta}_{\bm{\gamma}}, \bm{\gamma},  \sigma^2 \middle| \bm{y}_o \right] \,d \bm{y}_u\\
-%
-& = \int \left[ \bm{y}_{o} \middle| \bm{\beta}_{\bm{\gamma}}, \bm{\gamma}, \sigma^2 \right] \left[ \bm{y}_{u} \middle| \bm{\beta}_{\bm{\gamma}}, \bm{\gamma}, \sigma^2 \right] \prod_{j = 1}^p \left[ \beta_j \middle| \gamma_j, \sigma^2 \right] \left[ \gamma_j \right] \left[ \sigma^2 \right] \,d \bm{y}_u \\
+\left[ \bm{\beta}_{\bm{\gamma}}, \bm{\gamma}, \sigma^2_\epsilon, \sigma^2_\eta, \alpha \middle| \bm{y} \right] & = \left(\prod_{t = 1}^T \left[ y_t, \middle| \bm{\beta}, \bm{\gamma}, \sigma^2_\epsilon \right] \right) \left(\prod_{t = 2}^T \left[ y_t - \mu, \middle| y_{t - 1}, \alpha, \sigma^2_\eta \right] \right) \left[ \bm{\beta} \middle| \sigma^2_\epsilon, \bm{\gamma} \right] \left[ \sigma^2_\epsilon \right] \left[ \sigma^2_\eta \right] \left( \prod_{j = 1}^p \left[ \gamma_j \right] \right) \left[ \alpha \right]\\
 %
 \end{align*}
 %
-%%
-%%
-% \section{Posteriors}
-% %%
-% %%
-% \subsection{Posterior for $\bm{\beta}_{\bm{\gamma}_t}$}
-% %
-% For $t = 1, \ldots, T$, 
-% %
-% \begin{align*}
-% %
-% \left[ \bm{\beta}_{\bm{\gamma}_t} \middle| \sigma^2, \bm{\gamma}_t, \bm{y}_{o t} \right] & \propto \left[ \bm{y}_{o t} \middle| \bm{\beta}_{\bm{\gamma} t}, \sigma^2, \bm{\gamma}_t \right] \left[ \bm{\beta}_{\bm{\gamma} t} \middle| \sigma^2, \bm{\gamma}_t \right] \\
-% %
-% & \propto \exp{ \left\{ - \frac{1} {2 \sigma^2} \left( \bm{y}_{o t} - \bm{H}_t \bm{X}_{o \bm{\gamma}_t} \bm{\beta}_{\bm{\gamma}_t} \right)^T \left( \bm{y}_{o t} - \bm{H}_t \bm{X}_{o \bm{\gamma}_t} \bm{\beta}_{\bm{\gamma}_t} \right) \right\} } \exp{ \left\{ - \frac{1} {2 \sigma^2} \bm{\beta}_{\bm{\gamma}_t}^T \bm{\Delta}_{\bm{\gamma}_t} \bm{\beta}_{\bm{\gamma}_t} \right\} } \\
-% %
-% & \propto \exp{ \left\{ - \frac{1} {2 \sigma^2} \left[ \bm{\beta}_{\bm{\gamma}_t}^T \left( \bm{X}_{o \bm{\gamma}_t}^T \bm{H}_t^T \bm{H}_t \bm{X}_{o \bm{\gamma}_t} + \bm{\Delta}_{\bm{\gamma}_t} \right) \bm{\beta}_{\bm{\gamma}_t} - 2 \bm{\beta}_{\bm{\gamma}_t}^T \bm{X}_{o \bm{\gamma}_t}^T \bm{H}_t^T \bm{y}_{o t} \right] \right\} } \\
-% %
-% \end{align*}
-% %
-% which is MVN$\left( \tilde{\bm{\beta}}_{\bm{\gamma}_t}, \bm{V}_{\bm{\beta}_t} \right)$ where $\tilde{\bm{\beta}}_{\bm{\gamma}_t} = \left( \bm{X}_{o \bm{\gamma}_t}^T \bm{H}_t^T \bm{H}_t \bm{X}_{o \bm{\gamma}_t} + \bm{\Delta}_{\bm{\gamma}_t} \right)^{ - 1}\bm{X}_{o \bm{\gamma}_t}^T \bm{H}_t^T \bm{y}_{o t}$ and $\bm{V}_{\bm{\beta}_t} = \left( \bm{X}_{o \bm{\gamma}_t}^T \bm{H}_t^T \bm{H}_t \bm{X}_{o \bm{\gamma}_t} + \bm{\Delta}_{\bm{\gamma}_t} \right)^{ - 1}$.
-% %%
-% %%
-% \subsection{Posterior for $\sigma^2$}
-% %
-% \begin{align*}
-% %
-% \left[ \sigma^2 \middle| \bm{\gamma}_t, \bm{y}_{o t} \right] & = \frac{\left[ \sigma^2, \bm{\beta}_{\bm{\gamma}_t} \middle| \bm{\gamma}_t, \bm{y}_{o t} \right]} {\left[ \bm{\beta}_{\bm{\gamma}_t} \middle| \sigma^2, \bm{\gamma}_t, \bm{y}_{o t} \right]}
-% %
-% \end{align*}
-% %
-% First consider the numerator of the above equation
-% %
-% \begin{align*}
-% %
-% \left[ \sigma^2, \bm{\beta}_{\bm{\gamma}_t} \middle| \bm{\gamma}_t, \bm{y}_{o t} \right] & \propto \left[ \bm{y}_{o t} \middle| \bm{\beta}_{\bm{\gamma}_t}, \sigma^2, \bm{\gamma}_t \right] \left[ \bm{\beta}_{\bm{\gamma}_t} \middle| \sigma^2, \bm{\gamma}_t \right] \left[ \sigma^2 \right]\\
-% %
-% & \propto \left( \sigma^2 \right)^{ - \frac{n_o} {2}} \exp{ \left\{ - \frac{1} {2 \sigma^2} \left( \bm{y}_{o t} - \bm{H}_t \bm{X}_{o \bm{\gamma}_t} \bm{\beta}_{\bm{\gamma}_t} \right)^T \left( \bm{y}_{o t} - \bm{H}_t \bm{X}_{o \bm{\gamma}_t} \bm{\beta}_{\bm{\gamma}_t} \right) \right\} } \left( \sigma^2 \left| \bm{\Delta}_{\bm{\gamma}_t}^+ \right| \right)^{ - \frac{1} {2}} \exp{ \left\{ - \frac{1} {2 \sigma^2} \bm{\beta}_{\bm{\gamma}_t}^T \bm{\Delta}_{\bm{\gamma}_t} \bm{\beta}_{\bm{\gamma}_t} \right\} } \frac{1} {\sigma^2}\\
-% %
-% & \propto \left( \sigma^2 \right)^{ - \frac{n_o - 1} {2} - 1} \exp{ \left\{ - \frac{1} {\sigma^2} \frac{ \left( \bm{y}_{o t} - \bm{H}_t \bm{X}_{o \bm{\gamma}_t} \bm{\beta}_{\bm{\gamma}_t} \right)^T \left( \bm{y}_{o t} - \bm{H}_t \bm{X}_{o \bm{\gamma}_t} \bm{\beta}_{\bm{\gamma}_t} \right) + \bm{\beta}_{\bm{\gamma}_t}^T \bm{\Delta}_{\bm{\gamma}_t} \bm{\beta}_{\bm{\gamma}_t} } {2} \right\} } \\
-% %
-% \end{align*}
-% %
-% Now we average over $\bm{\beta}_{\bm{\gamma}_t}$ by replacing $\bm{\beta}_{\bm{\gamma}_t}$ with its posterior mean $\tilde{\bm{\beta}}_{\bm{\gamma}_t} = \left( \bm{X}_{o \bm{\gamma}_t}^T \bm{H}_t^T \bm{H}_t \bm{X}_{o \bm{\gamma}_t} + \bm{\Delta}_{\bm{\gamma}_t} \right)^{ - 1} \bm{H}_t^T \bm{X}_{o \bm{\gamma}_t}^T \bm{y}_{o t}$ to get the posterior distribution
-% %
-% \begin{align*}
-% %
-% \left[ \sigma^2 \middle| \bm{\gamma}_t, \bm{y}_{o t} \right] & \propto  \left( \sigma^2 \right)^{ - \frac{n_o - 1} {2} - 1} \exp{ \left\{ - \frac{1} {\sigma^2} \frac{ \left( \bm{y}_{o t} - \bm{H}_t \bm{X}_{o \bm{\gamma}_t} \tilde{\bm{\beta}}_{\bm{\gamma}_t} \right)^T \left( \bm{y}_{o t} - \bm{H}_t \bm{X}_{o \bm{\gamma}_t} \tilde{\bm{\beta}}_{\bm{\gamma}_t} \right) + \tilde{\bm{\beta}}_{\bm{\gamma}_t}^T \bm{\Delta}_{\bm{\gamma}_t} \tilde{\bm{\beta}}_{\bm{\gamma}_t} } {2} \right\} } \\
-% %
-% \end{align*}  
-% %
-% which is IG$\left( \frac{n_o - 1} {2}, \frac{ \left( \bm{y}_{o t} - \bm{H}_t \bm{X}_{o \bm{\gamma}_t} \tilde{\bm{\beta}}_{\bm{\gamma}_t} \right)^T \left( \bm{y}_{o t} - \bm{H}_t \bm{X}_{o \bm{\gamma}_t} \tilde{\bm{\beta}}_{\bm{\gamma}_t} \right) + \tilde{\bm{\beta}}_{\bm{\gamma}_t}^T \bm{\Delta}_{\bm{\gamma}_t} \tilde{\bm{\beta}}_{\bm{\gamma}_t} } {2} \right)$. Now consider the quadratic term 
-% %
-% \begin{align*}
-% %
-% \left( \bm{y}_{o t} - \bm{H}_t \bm{X}_{o \bm{\gamma}_t} \tilde{\bm{\beta}}_{\bm{\gamma}_t} \right)^T \left( \bm{y}_{o t} - \bm{H}_t \bm{X}_{o \bm{\gamma}_t} \tilde{\bm{\beta}}_{\bm{\gamma}_t} \right) & = \bm{y}_{o t}^T \bm{y}_{o t} - 2 \tilde{\bm{\beta}}_{\bm{\gamma}_t}^T \bm{H}_t^T \bm{X}_{o \bm{\gamma}_t}^T \bm{y}_{o t} + \tilde{\bm{\beta}}_{\bm{\gamma}_t}^T \left( \bm{X}_{o \bm{\gamma}_t}^T \bm{H}_t^T \bm{H}_t \bm{X}_{o \bm{\gamma}_t} + \bm{\Delta}_{\bm{\gamma}_t} \right) \tilde{\bm{\beta}}_{\bm{\gamma}_t}
-% %
-% \end{align*}
-% %
-% % Note: Somehow $\tilde{\bm{\beta}}_{\bm{\gamma}_t}^T \bm{X}_{o \bm{\gamma}_t}^T \bm{y}_{o t} = \bm{y}_{o t}^T \bm{X}_{o \bm{\gamma}_t} \left( \bm{X}_{ o \bm{\gamma}_t}^T \bm{X}_{o \bm{\gamma}_t} + \bm{\Delta}_{\bm{\gamma}_t} \right)^{ - 1} \bm{X}_{o \bm{\gamma}_t}^T \bm{y}_{o t} = 0$???
-% %%
-% %%
-% \subsection{Posterior for $\bm{y}_{a t}$}
-% %
-% This posterior is calculated in the same fashion as a posterior predictive distribution of new observations $\tilde{\bm{y}}$ given new covariates $\tilde{\bm{X}}$ for simple linear regression as shown $\left[ \tilde{\bm{y}} \middle| \sigma^2, \bm{y}, \tilde{\bm{X}} \right] \sim \mbox{N}\left( \tilde{\bm{X}} \hat{\bm{\beta}}, \sigma^2 \left( \bm{I} + \tilde{\bm{X}} \bm{V}_{\bm{\beta}} \tilde{\bm{X}}^T \right) \right)
-% $
-% which is  
-% %
-% \begin{align*}
-% %
-% \left[ \bm{y}_{a t} \middle| \sigma^2, \bm{\gamma}_t, \bm{y}_{o t} \right] \sim \mbox{N}\left( \bm{X}_{a \bm{\gamma}_t} \tilde{\bm{\beta}}_{\bm{\gamma}_t}, \sigma^2 \left( \bm{I}_{n_a} + \bm{X}_{a \bm{\gamma}_t} \left( \bm{X}_{o \bm{\gamma}_t}^T \bm{H}_t^T \bm{H}_t \bm{X}_{o \bm{\gamma}_t} + \bm{\Delta}_{\bm{\gamma}_t} \right)^{ - 1} \bm{X}_{a \bm{\gamma}_t}^T \right) \right)
-% %
-% \end{align*}
-% %%
-% %%
-% \subsection{Posterior for $\gamma_{j t}, j = 1, \ldots, p$}
-% %
-% Flush this out once you have a full derivation of the posterior.
-% %
-% \begin{align*}
-% %
-% \left[ \gamma_{j t} \middle| \sigma^2, \bm{y}_c \right] & \propto \mbox{Bern}\left( \frac{\Psi_{j t}} {1 + \Psi_{j t}} \right)
-% %
-% \end{align*}
-% %
-% where $\Psi_{j t} = \frac{\pi_j} {1 - \pi_j} \left( \frac{
-%
-%%
 %%
 %%
 \section{Full Conditionals}
 %%
 %%
-\subsection{Full Conditional for $\bm{y}_u$}
+\subsection{Full Conditional for unobserved $y_t$}
+%
+For $t = 1$, 
 %
 \begin{align*}
 %
-\left[ \bm{y}_u \middle| \cdot \right] & \propto \left[ \bm{y}_u \middle| \bm{\beta}_{\bm{\gamma}}, \bm{\gamma}, \sigma^2 \right] \\
+\left[ y_1 \middle| \cdot \right] & \propto \left[ y_1 \middle| \bm{\beta}, \bm{\gamma}, \sigma^2_\epsilon \right] \left[ y_2 - \mu \middle| y_1, \alpha, \sigma^2_\eta \right] \\
+%
+& \propto \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \left( y_1 - \bm{H}_{1 \bm{\gamma}} \bm{X}_{1 \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right)^2 \right\} } \exp{ \left\{ - \frac{1} {2 \sigma^2_\eta} \left( \left( y_2 - \mu \right) - \alpha \left( y_1 - \mu \right) \right)^2 \right\} } \\
+%
+& \propto \exp{ \left\{ - \frac{1} {2} \left( y_1^2 \left( \frac{1} {\sigma^2_\epsilon} + \frac{\alpha^2} {\sigma^2_\eta} \right) - 2 y_1 \left( \frac{\bm{H}_{1 \bm{\gamma}} \bm{X}_{1 \bm{\gamma}} \bm{\beta}_{\bm{\gamma}}} {\sigma^2_\epsilon} + \frac{\alpha \left( y_2 - \left( 1 - \alpha \right) \mu  \right) } {\sigma^2_\eta} \right) \right)( \right\} } \\
 %
 \end{align*}
 %
-which is $\mbox{N}\left( \bm{H}_u \bm{X} \bm{\beta}_{\bm{\gamma}}, \sigma^2 \bm{I}_u \right)$
+which is $\mbox{N}\left( A^{ - 1} b, A^{ - 1} \right)$ where $A^{ - 1} = \left( \frac{1} {\sigma^2_\epsilon} + \frac{\alpha^2} {\sigma^2_\eta} \right)^{ - 1}$ and $b = \frac{\bm{H}_{1 \bm{\gamma}} \bm{X}_{1 \bm{\gamma}} \bm{\beta}_{\bm{\gamma}}} {\sigma^2_\epsilon} + \frac{\alpha \left( y_2 - \left( 1 - \alpha \right) \mu  \right) } {\sigma^2_\eta}$\\
+\\
 %%
 %%
-\subsection{Full Conditional for $\bm{\beta}_{\bm{\gamma}}$}
+For $t = 2, \ldots, T - 1$, 
 %
 \begin{align*}
 %
-\left[ \bm{\beta}_{\bm{\gamma}} \middle| \cdot \right] & \propto \left[ \bm{y}_o \middle| \bm{\beta}_{\bm{\gamma}}, \bm{\gamma}, \sigma^2 \right] \left[ \bm{\beta}_{\bm{\gamma}} \middle|  \bm{\gamma}, \sigma^2 \right] \\
+\left[ y_t \middle| \cdot \right] & \propto \left[ y_t \middle| \bm{\beta}, \bm{\gamma}, \sigma^2_\epsilon \right] \left[ y_t - \mu \middle| y_{t - 1}, \alpha, \sigma^2_\eta \right] \left[ y_{t + 1} - \mu \middle| y_t, \alpha, \sigma^2_\eta \right] \\
 %
- & \propto \exp{ \left\{ - \frac{1} {2 \sigma^2} \left( \bm{y}_o - \bm{H}_o \bm{X}_{o \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right)^T \left( \bm{y}_o - \bm{H}_o \bm{X}_{o \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right) \right\} } \exp{ \left\{ - \frac{1} {2 \sigma^2} \bm{\beta}_{\bm{\gamma}}^T \bm{\Delta}_{\bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right\} } \\
+& \propto \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \left( y_t - \bm{H}_{t \bm{\gamma}} \bm{X}_{t \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right)^2 \right\} } \exp{ \left\{ - \frac{1} {2 \sigma^2_\eta} \left( \left( y_t - \mu \right) - \alpha \left( y_{t - 1} - \mu \right) \right)^2 \right\} } \exp{ \left\{ - \frac{1} {2 \sigma^2_\eta} \left( \left( y_{t + 1} - \mu \right) - \alpha \left( y_t - \mu \right) \right)^2 \right\} } \\
 %
- & \propto \exp{ \left\{ - \frac{1} {2 \sigma^2} \left[ \bm{\beta}_{\bm{\gamma}}^T \left(\bm{X}_{o \bm{\gamma}}^T \bm{H}_o^T \bm{H}_o \bm{X}_{o \bm{\gamma}} + \bm{\Delta}_{\bm{\gamma}} \right) \bm{\beta}_{\bm{\gamma}} - 2 \bm{\beta}_{\bm{\gamma}}^T \left( \bm{X}_{o \bm{\gamma}}^T \bm{H}_o^T \bm{y}_o \right) \right] \right\} } \\
+& \propto \exp{ \left\{ - \frac{1} {2} \left( y_t^2 \left( \frac{1} {\sigma^2_\epsilon} + \frac{\alpha^2 + 1} {\sigma^2_\eta} \right) - 2 y_{t - 1} \left( \frac{\bm{H}_{t \bm{\gamma}} \bm{X}_{t \bm{\gamma}} \bm{\beta}_{\bm{\gamma}}} {\sigma^2_\epsilon} + \frac{\alpha y_{t - 1} + \left( 1 - \alpha \right) \mu } {\sigma^2_\eta} + \frac{\alpha \left( y_{t + 1} - \left( 1 - \alpha \right) \mu  \right) } {\sigma^2_\eta} \right) \right) \right\} } \\
 %
 \end{align*}
 %
-which is MVN $\left( \bm{A}^{ - 1} \bm{b}, \bm{A}^{ - 1} \right)$ where $\bm{A}^{ - 1} = \left( \bm{X}_{o \bm{\gamma}}^T \bm{H}_o^T \bm{H}_o \bm{X}_{o \bm{\gamma}} + \bm{\Delta}_{\bm{\gamma}} \right)^{ - 1}$ and $\bm{b} = \bm{X}_{o \bm{\gamma}}^T \bm{H}_o^T \bm{y}_o$
-%
+which is $\mbox{N}\left( A^{ - 1} b, A^{ - 1} \right)$ where $A^{ - 1} = \left( \frac{1} {\sigma^2_\epsilon} + \frac{\alpha^2 + 1} {\sigma^2_\eta} \right)^{ - 1}$ and $b = \frac{\bm{H}_{t \bm{\gamma}} \bm{X}_{t \bm{\gamma}} \bm{\beta}_{\bm{\gamma}}} {\sigma^2_\epsilon} + \frac{\alpha y_{t - 1} + \left( 1 - \alpha \right) \mu } {\sigma^2_\eta} + \frac{\alpha \left( y_{t + 1} - \left( 1 - \alpha \right) \mu  \right) } {\sigma^2_\eta}$. \\
+\\
 %%
 %%
-\subsection{Full Conditional for $\sigma^2$}
+For $t = T$, 
 %
 \begin{align*}
 %
-\left[ \sigma^2 \middle| \cdot \right] & \propto \left[ \bm{y}_o, \middle| \bm{\beta}_{\bm{\gamma}}, \bm{\gamma}, \sigma^2 \right] \left[ \bm{\beta}_{\bm{\gamma}} \middle| \bm{\gamma}, \sigma^2 \right] \left[ \sigma^2 \right] \\
+\left[ y_T \middle| \cdot \right] & \propto \left[ y_T \middle| \bm{\beta}, \bm{\gamma}, \sigma^2_\epsilon \right] \left[ y_T - \mu \middle| y_{T - 1}, \alpha, \sigma^2_\eta \right] \\
 %
- & \propto \left( \sigma^2 \right)^{ - \frac{n_o} {2}} \exp{\left\{ - \frac{1} {\sigma^2} \frac{ \left( \bm{y}_o - \bm{H}_o \bm{X}_{o \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right)^T \left( \bm{y}_o - \bm{H}_o \bm{X}_{o \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right) } {2} \right\} } \left( \sigma^2 \right)^{ - \frac{p_{\bm{\gamma}}} {2}} \exp{ \left\{ - \frac{1} {\sigma^2} \frac{\bm{\beta}_{\bm{\gamma}}^T \bm{\Lambda}_{\bm{\gamma}} \bm{\beta}_{\bm{\gamma}}} {2} \right\} } \left( \sigma^2 \right)^{ - 1}\\
+& \propto \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \left( y_T - \bm{H}_{T \bm{\gamma}} \bm{X}_{T \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right)^2 \right\} } \exp{ \left\{ - \frac{1} {2 \sigma^2_\eta} \left( \left( y_T - \mu \right) - \alpha \left( y_{T - 1} - \mu \right) \right)^2 \right\} } \\
 %
- & \propto \left( \sigma^2 \right)^{ - \frac{n_o + p_{\bm{\gamma}}} {2} - 1} \exp{\left\{ - \frac{1} {\sigma^2} \frac{ \left( \bm{y}_o - \bm{H}_o \bm{X}_{o \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right)^T \left( \bm{y}_o - \bm{H}_o \bm{X}_{o \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right) + \bm{\beta}_{\bm{\gamma}}^T \bm{\Lambda}_{\bm{\gamma}} \bm{\beta}_{\bm{\gamma}} } {2} \right\} } 
+& \propto \exp{ \left\{ - \frac{1} {2} \left( y_T^2 \left( \frac{1} {\sigma^2_\epsilon} + \frac{1} {\sigma^2_\eta} \right) - 2 y_T \left( \frac{\bm{H}_{T \bm{\gamma}} \bm{X}_{T \bm{\gamma}} \bm{\beta}_{\bm{\gamma}}} {\sigma^2_\epsilon} + \frac{\alpha y_{T - 1} + \left( 1 - \alpha \right) \mu } {\sigma^2_\eta} \right) \right) \right\} } \\
 %
 \end{align*}
 %
-which is $\mbox{IG} \left( \frac{n_o + p_{\bm{\gamma}}} {2}, \frac{\left( \bm{y}_o - \bm{H}_o \bm{X}_{o \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right)^T \left( \bm{y}_o - \bm{H}_o \bm{X}_{o \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right) + \bm{\beta}_{\bm{\gamma}}^T \bm{\Lambda}_{\bm{\gamma}} \bm{\beta}_{\bm{\gamma}}} {2} \right)$
+which is $\mbox{N}\left( A^{ - 1} b, A^{ - 1} \right)$ where $A^{ - 1} = \left( \frac{1} {\sigma^2_\epsilon} + \frac{1} {\sigma^2_\eta} \right)^{ - 1}$ and $b = \frac{\bm{H}_{T \bm{\gamma}} \bm{X}_{T \bm{\gamma}} \bm{\beta}_{\bm{\gamma}}} {\sigma^2_\epsilon} + \frac{\alpha y_{T - 1} + \left( 1 - \alpha \right) \mu } {\sigma^2_\eta}$. \\
+\\
+%%
+%%
+\subsection{Full Conditional for $\bm{\beta}$}
+%
+\begin{align*}
+%
+\left[ \bm{\beta} \middle| \cdot \right] & \propto \prod_{t = 1}^T \left[ y_t \middle| \bm{\beta}, \bm{\gamma}, \sigma^2_\epsilon \right] \left[ \bm{\beta} \middle|  \bm{\gamma}, \sigma^2_\eta \right] \\
+%
+ & \propto \prod_{t = 1}^T \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \left( y_t - \bm{H}_{t \bm{\gamma}} \bm{X}_{t \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right)^2 \right\} } \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \bm{\beta}_{\bm{\gamma}}^T \bm{\Lambda}_{\bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right\} } \\
+%
+ & \propto \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \left[ \bm{\beta}_{\bm{\gamma}}^T \left(\sum_{t = 1}^T \bm{X}_{t \bm{\gamma}}^T \bm{H}_{t \bm{\gamma}}^T \bm{H}_{t \bm{\gamma}} \bm{X}_{t \bm{\gamma}} + \bm{\Lambda}_{\bm{\gamma}} \right) \bm{\beta}_{\bm{\gamma}} - 2 \bm{\beta}_{\bm{\gamma}}^T \left( \sum_{t = 1}^T \bm{X}_{t \bm{\gamma}}^T \bm{H}_{t \bm{\gamma}}^T y_t \right) \right] \right\} } \\
+%
+\end{align*}
+%
+which is MVN $\left( \bm{A}^{ - 1} \bm{b}, \bm{A}^{ - 1} \right)$ where $\bm{A}^{ - 1} = \left( \frac{\bm{X}_{t \bm{\gamma}}^T \bm{H}_{t \bm{\gamma}}^T \bm{H}_{t \bm{\gamma}} \bm{X}_{t \bm{\gamma}} + \bm{\Lambda}_{\bm{\gamma}}} {\sigma^2_\epsilon} \right)^{ - 1}$ and $\bm{b} = \frac{\bm{X}_{t \bm{\gamma}}^T \bm{H}_{t \bm{\gamma}}^T \bm{y}_t} {\sigma^2_\epsilon}$
+%
+%%
+%%
+\subsection{Full Conditional for $\sigma^2_\epsilon$}
+%
+\begin{align*}
+%
+\left[ \sigma^2_\epsilon \middle| \cdot \right] & \propto \prod_{t = 1}^T \left[ y_t \middle| \bm{\beta}, \bm{\gamma}, \sigma^2_\epsilon \right] \left[ \bm{\beta} \middle| \bm{\gamma}, \sigma^2_\epsilon \right] \left[ \sigma^2_\epsilon \right] \\
+%
+ & \propto \prod_{t = 1}^T \left( \sigma^2_\epsilon \right)^{ - \frac{1} {2}} \exp{ \left \{ - \frac{1} {\sigma^2_\epsilon} \frac{ \left( y_t - \bm{H}_{t \bm{\gamma}} \bm{X}_{t \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right)^2 } {2} \right\} } \left| \sigma^2_\epsilon \bm{\Lambda}_{\bm{\gamma}} \right|^{ - \frac{1} {2}} \exp{ \left\{ - \frac{1} {\sigma^2_\epsilon} \frac{\bm{\beta}_{\bm{\gamma}}^T \bm{\Lambda}_{\bm{\gamma}} \bm{\beta}_{\bm{\gamma}}} {2} \right\} } \left( \sigma^2_\epsilon \right)^{ - 1}\\
+%
+ & \propto \left( \sigma^2_\epsilon \right)^{ - \frac{T + p_{\bm{\gamma}}} {2} - 1} \exp{\left\{ - \frac{1} {\sigma^2_\epsilon} \frac{ \sum_{t = 1}^T \left( y_t - \bm{H}_{t \bm{\gamma}} \bm{X}_{t \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right)^2 + \bm{\beta}_{\bm{\gamma}}^T \bm{\Lambda}_{\bm{\gamma}} \bm{\beta}_{\bm{\gamma}} } {2} \right\} } 
+%
+\end{align*}
+%
+which is $\mbox{IG} \left( \frac{T + p_{\bm{\gamma}}} {2}, \frac{\sum_{t = 1}^T \left( y_t - \bm{H}_{t \bm{\gamma}} \bm{X}_{t \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right)^2 + \bm{\beta}_{\bm{\gamma}}^T \bm{\Lambda}_{\bm{\gamma}} \bm{\beta}_{\bm{\gamma}}} {2} \right)$
+%%
+%%
+\subsection{Full Conditional for $\sigma^2_\eta$}
+%
+\begin{align*}
+%
+\left[ \sigma^2_\eta \middle| \cdot \right] & \propto \prod_{t = 2}^T \left[ y_t \middle| y_{t - 1}, \alpha, \sigma^2_\eta \right] \left[ \sigma^2_\eta \right] \\
+%
+ & \propto \prod_{t = 2}^T \left( \sigma^2_\eta \right)^{ - \frac{1} {2}} \exp{\left\{ - \frac{1} {\sigma^2_\eta} \frac{ \left( \left(y_t - \mu \right) - \alpha \left( y_{t - 1} - \mu \right) \right)^2} {2} \right\} } \left( \sigma^2_\eta \right)^{ - 1}\\
+%
+ & \propto \left( \sigma^2_\eta \right)^{ - \frac{T - 1} {2} - 1} \exp{\left\{ - \frac{1} {\sigma^2_\eta} \frac{ \sum_{t = 2}^T \left( \left(y_t - \mu \right) - \alpha \left( y_{t - 1} - \mu \right) \right)^2} {2} \right\} } \\
+%
+\end{align*}
+%
+which is $\mbox{IG} \left( \frac{T - 1} {2}, 
+\frac{ \sum_{t = 2}^T \left( \left(y_t - \mu \right) - \alpha \left( y_{t - 1} - \mu \right) \right)^2} {2} \right)$
+%%
+%%
+\subsection{Full Conditional for $\alpha$}
+%
+\begin{align*}
+%
+\left[ \alpha \middle| \cdot \right] & \propto \prod_{t = 2}^T \left[ y_t \middle| y_{t - 1}, \alpha, \sigma^2_\eta \right] \left[ \alpha \right]\\
+%
+& \propto \prod_{t = 2}^T \exp{ \left\{ - \frac{1} {2 \sigma^2_\eta} \left( \left( y_t - \mu \right) - \alpha \left( y_{t - 1} - \mu \right) \right)^2 \right\} } \bm{I}\left\{ \alpha \in \left( 0, 1 \right) \right\} \\
+%
+& \propto \exp{ \left\{ - \frac{1} {2} \left( \alpha^2 \frac{ \sum_{t = 2}^T \left( y_{t - 1} - \mu \right)^2} {\sigma^2_\eta} - 2 \alpha \frac{ \sum_{t = 2}^T \left( y_{t - 1} - \mu \right) \left( y_t - \mu \right)} {\sigma^2_\eta} \right) \right\} } \bm{I}\left\{ \alpha \in \left( 0, 1 \right) \right\} \\
+%
+\end{align*}
+%
+which is $\mbox{Truncated Normal}\left( A^{ - 1} b, A^{ - 1} \right)$ where $A^{ - 1} =  \left( \frac{ \sum_{t = 2}^T \left( y_{t - 1} - \mu \right)^2} {\sigma^2_\eta} \right)^{  -1}$ and $b = \frac{ \sum_{t = 2}^T \left( y_{t - 1} - \mu \right) \left( y_t - \mu \right)} {\sigma^2_\eta}$ restricted to the interval $\left(0, 1 \right)$.
 %%
 %%
 \subsection{Full Conditional for $\gamma_j$}
 %
-For $j = 1, \ldots, p$ and using the fact that $\bm{X}_i^T \bm{X}_j = 0$ (by orthogonality of principal components), $\hat{\beta}_j = \left( \left( \bm{X}^T \bm{X} \right)^{ - 1} \bm{X}^T \bm{y}_c \right)_j$ is the $j^{th}$ element of the vector $\hat{\bm{\beta}}$ and $\left( \bm{X}^T \bm{X} \right)_{j} = \delta_j$is the $j^{th}$ element of the diagonal matrix. 
+\begin{align*}
+%
+\left[ \bm{\gamma} \middle| \cdot \right] & \propto \prod_{t = 1}^T \left[ y_t \middle| \bm{\beta}, \bm{\gamma}, \sigma^2_\epsilon \right] \left[ \bm{\gamma} \right] \\
+%
+& \propto \prod_{t = 1}^T \left( \sigma^2 \right)^{ - \frac{1} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \left( y_t - \bm{H}_{t \bm{\gamma}} \bm{X}_{t \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right)^2 \right\} } \left| \sigma^2_\epsilon \bm{\Lambda}_{\bm{\gamma}} \right|^{ - \frac{1} {2}} \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \bm{\beta}_{\bm{\gamma}}^T \bm{\Lambda}_{\bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right\} } \left( \prod_{j = 1}^p \pi_j^{\gamma_j} \left( 1 - \pi_j \right)^{ \left( 1 - \gamma_j \right) } \right) \\
+%
+& \propto \left( \sigma^2 \right)^{ - \frac{T + p_{\bm{\gamma}}} {2} } \left| \bm{\Lambda}_{\bm{\gamma}} \right|^{ - \frac{1} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \left( y_t - \bm{H}_{t \bm{\gamma}} \bm{X}_{t \bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right)^2 \right\} } \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \bm{\beta}_{\bm{\gamma}}^T \bm{\Lambda}_{\bm{\gamma}} \bm{\beta}_{\bm{\gamma}} \right\} } \left( \prod_{j = 1}^p \pi_j^{\gamma_j} \left( 1 - \pi_j \right)^{ \left( 1 - \gamma_j \right) } \right) \\
+%
+\end{align*}
+%
+which can be sampled using a Metropolis Hastings proposal. This requires a smart choice of proposal distribution.\\
+\\
+%
+%For $j = 1, \ldots, p$ and using the fact that $\bm{X}_i^T \bm{X}_j = 0$ (by orthogonality of principal components), $\hat{\beta}_j = \left( \left( \bm{X}^T \bm{X} \right)^{ - 1} \bm{X}^T \bm{y}_c \right)_j$ is the $j^{th}$ element of the vector $\hat{\bm{\beta}}$ and $\left( \bm{X}^T \bm{X} \right)_{j} = \delta_j$is the $j^{th}$ element of the diagonal matrix. 
+If $H_t X_t$ has orthogonal columns (e.g $X_t^T H_t^T H_t X_t$ is diagonal) then \textbf{ADD IN A SUM OVER ALL T}
 %
 \begin{align*}
 %
-\left[ \gamma_j \middle| \cdot \right] & \propto \left[ \bm{y}_c, \middle| \bm{\beta}_{\bm{\gamma}}, \bm{\gamma}, \sigma^2 \right] \left[ \beta_j \middle| \gamma_j, \sigma^2 \right] \left[ \gamma_j \right] \\
+\left[ \gamma_j \middle| \cdot \right] & \propto \prod_{t = 1}^T \left[ y_t, \middle| \beta_j, \gamma_j, \sigma^2_\epsilon \right] \left[ \beta_j \middle| \gamma_j, \sigma^2 \right] \left[ \gamma_j \right] \\
 %
-& \propto \exp{ \left\{ - \frac{1} {2 \sigma^2} \left( \bm{y}_c - \bm{X} \bm{\gamma} \bm{\beta} \right)^T \left( \bm{y}_c - \bm{X} \bm{\gamma} \bm{\beta} \right) \right\} } \left( \frac{\sigma^2} {\lambda_j} \right)^{ - \frac{\gamma_j} {2} } \exp{ \left\{ - \frac{\gamma_j \lambda_j \beta_j^2} {2 \sigma^2} \right\} } \pi^{\gamma_j} \left( 1 - \pi \right)^{1 - \gamma_j} \\
+& \propto \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \left( y_t - \bm{H}_{t j} \bm{X}_{t j} \gamma_j \beta_j \right)^2 \right\} } \left( \frac{\sigma^2_\epsilon} {\lambda_j} \right)^{ - \frac{\gamma_j} {2} } \exp{ \left\{ - \frac{\gamma_j \lambda_j \beta_j^2} {2 \sigma^2} \right\} } \pi^{\gamma_j} \left( 1 - \pi \right)^{1 - \gamma_j} \\
 %
-& \propto \exp{ \left\{ - \frac{1} {2 \sigma^2} \left( \bm{y}_c - \bm{X}_{j} \gamma_j \beta_j \right)^T \left( \bm{y}_c - \bm{X}_{j} \gamma_j \beta_j \right) \right\} } \left( \frac{\sigma^2} {\lambda_j} \right)^{ - \frac{\gamma_j} {2} } \exp{ \left\{ - \frac{\gamma_j \lambda_j \beta_j^2} {2 \sigma^2} \right\} } \pi^{\gamma_j} \left( 1 - \pi \right)^{1 - \gamma_j} \\
+& \propto \left( \frac{\sigma^2_\epsilon} {\lambda_j} \right)^{ - \frac{\gamma_j} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \gamma_j \left( \beta_j^2 \left( \bm{X}_{t j}^T \bm{H}_{t j}^T \bm{H}_{t j} \bm{X}_{t j} \lambda_j \right) - 2 y_t \bm{H}_{t j} \bm{X}_{t j} \beta_j \right) \right\} } \pi^{\gamma_j} \left( 1 - \pi \right)^{1 - \gamma_j} \\
 %
-& \propto \left[ \left( \frac{\lambda_j} {\sigma^2} \right)^{ \frac{1} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2} \left[ \beta_j^2 \left( \bm{X}_{j}^T \bm{X}_{j} + \lambda_j \right) - 2 \beta_j \bm{X}_{j}^T \bm{y}_c \right] \right\} } \frac{\pi} {1 - \pi }\right]^{\gamma_j} \\
-%
-& \propto \left[ \left( \frac{\lambda_j} {\sigma^2} \right)^{ \frac{1} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2} \left[ \beta_j^2 \left( \bm{X}_{j}^T \bm{X}_{j} + \lambda_j \right) - 2 \beta_j \delta_j \left( \bm{X}^T \bm{X} \right)^{ - 1}_j \bm{X}_{j}^T \bm{y}_c \right] \right\} } \frac{\pi} {1 - \pi }\right]^{\gamma_j} \\
-%
-& \propto \left[ \left( \frac{\lambda_j} {\sigma^2} \right)^{ \frac{1} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2} \left[ \beta_j^2 \left( \delta_j + \lambda_j \right) - 2 \delta_j \beta_j^2 \right] \right\} } \frac{\pi} {1 - \pi } \right]^{\gamma_j} \\
+& \propto \left( \left( \frac{\sigma^2_\epsilon} {\lambda_j} \right)^{ - \frac{1} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2_\epsilon} \left( \beta_j^2 \left( \bm{X}_{t j}^T \bm{H}_{t j}^T \bm{H}_{t j} \bm{X}_{t j} \lambda_j \right) - 2 y_t \bm{H}_{t j} \bm{X}_{t j} \beta_j \right) \right\} } \frac{\pi_j} {1 - \pi_j} \right)^{\gamma_j} \\
 %
 & \propto \Psi^{\gamma_j}
 %
 \end{align*}
 %
-which is Bern$\left( \frac{\Psi_j} {1 + \Psi_j} \right)$ where $\Psi_j =  \left( \frac{\lambda_j} {\sigma^2} \right)^{ \frac{1} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2} \left[ \beta_j^2 \left( \delta_j + \lambda_j \right) - 2 \delta_j \beta_j^2 \right] \right\} } \frac{\pi} {1 - \pi }$
+so $\gamma_j$ is Bern$\left( \frac{\Psi_j} {1 + \Psi_j} \right)$ where $\Psi_j =  \left( \frac{\lambda_j} {\sigma^2} \right)^{ \frac{1} {2} } \exp{ \left\{ - \frac{1} {2 \sigma^2} \left[ \beta_j^2 \left( \delta_j + \lambda_j \right) - 2 \delta_j \beta_j^2 \right] \right\} } \frac{\pi} {1 - \pi }$
 %
 %%
 %%

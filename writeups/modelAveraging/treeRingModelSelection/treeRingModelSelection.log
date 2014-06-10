@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  9 JUN 2014 17:45
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  10 JUN 2014 13:09
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -245,6 +245,17 @@ Underfull \hbox (badness 10000) in paragraph at lines 213--221
 
  []
 
+
+Overfull \hbox (0.34058pt too wide) in paragraph at lines 233--233
+[] 
+ []
+
+
+Overfull \hbox (27.24698pt too wide) in paragraph at lines 233--239
+\OT1/cmr/m/n/10 so $\OML/cmm/m/it/10 ^^M[]$ \OT1/cmr/m/n/10 is Bern$[]$ where $
+	[] = [][] [] [][]$ 
+ []
+
 [4] (./treeRingModelSelection.aux) ) 
 Here is how much of TeX's memory you used:
  2465 strings out of 493315
@@ -272,7 +283,7 @@ onts/cm/cmr8.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfont
 s/cm/cmsy10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts
 /cm/cmsy5.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/c
 m/cmsy7.pfb>
-Output written on treeRingModelSelection.pdf (4 pages, 180700 bytes).
+Output written on treeRingModelSelection.pdf (4 pages, 180755 bytes).
 PDF statistics:
  85 PDF objects out of 1000 (max. 8388607)
  61 compressed objects within 1 object stream
