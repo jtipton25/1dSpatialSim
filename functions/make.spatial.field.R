@@ -31,7 +31,7 @@ plot.Z.field <- function(Z.list, locs, main = "Observed Data", ylab = "Y", xlab 
   reps <- length(Z.list)
   min.Z <- min(unlist(lapply(Z.list, min)))
   max.Z <- max(unlist(lapply(Z.list, max)))
-  plot(Z.list[[1]] ~ locs, type = 'l', ylim = c(min.Z, max.Z), main = main, ylab = ylab, xlab = xlab)
+  plot(Z.list[[1]] ~ locs, type = 'l', ylim = c(min.Z, max.Z), main = main, ylab = ylab, xlab = xlab, col = 1)
   for(t in 2:reps){
     lines(Z.list[[t]] ~ locs, type = 'l', col = t)
   }

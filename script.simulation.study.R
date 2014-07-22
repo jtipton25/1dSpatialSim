@@ -30,7 +30,7 @@ make.sim.plot <- function(out){
 m <- 1000 # number of spatial locations
 locs <- seq(0, 1, , m) # spatial coordinate
 X <- cbind(rep(1, m), locs)
-reps <- 20 # number of spatial fields
+reps <- 75 # number of spatial fields
 beta <- c(0, 2) # beta
 s2.s <- 1
 phi <- 0.25
@@ -43,11 +43,11 @@ field <- make.spatial.field(reps, X, beta, locs, c(s2.s, phi), method = 'exponen
 ## Plot simulated data
 ##
 
-jpeg(file = paste('~/1dSpatialSim/plots/SimulationStudy', date(), '.jpeg', sep = ''), width = 12, height = 4, quality = 100, res  = 600, units = 'in')
+# jpeg(file = paste('~/1dSpatialSim/plots/SimulationStudy', date(), '.jpeg', sep = ''), width = 12, height = 4, quality = 100, res  = 600, units = 'in')
 layout(matrix(1:2, nrow = 1))
-plot.Y.field(field$Y.list[1:(reps / 2)], field$H.list[1:(reps / 2)], locs, ylab = 'T', xlab = 'location')
 plot.Z.field(field$Z.list[(reps / 2 + 1):reps], locs, main = 'Full Data', ylab = 'T', xlab = 'location')
-dev.off()
+plot.Y.field(field$Y.list[1:(reps / 2)], field$H.list[1:(reps / 2)], locs, ylab = 'T', xlab = 'location')
+# dev.off()
 
 Y.list <- field$Y.list[1:(reps / 2)] 
 H.list <- field$H.list[1:(reps / 2)] 
@@ -71,14 +71,14 @@ Sigma.0 <- sigma.squared.0 * diag(num.pca)
 alpha.beta <- 100
 beta.beta <- 0.1
 ##
-alpha.epsilon <- 0.1
-beta.epsilon <- 0.1 
+alpha.epsilon <- 3 #0.1
+beta.epsilon <- 2 #0.1 
 ##
-alpha.phi <- 0.1 
-beta.phi <- 0.1 
+alpha.phi <- 10 #0.1 
+beta.phi <- 20 #0.1 
 ##
 
-n.mcmc <- 25000
+n.mcmc <- 5000
 n.burn <- floor(n.mcmc / 5)
 
 ##
@@ -110,8 +110,8 @@ source('~/1dSpatialSim/spatialSmoothing/mcmc.spatial.R')
 mu.0 <- rep(0, dim(X)[2])
 Sigma.0 <- sigma.squared.0 * diag(dim(X)[2])
 ##
-alpha.eta <- 0.1
-beta.eta <- 0.1
+alpha.eta <- 12 #0.1
+beta.eta <- 12 #0.1
 ##
 sigma.squared.beta.tune <- 0.025
 sigma.squared.eta.tune <- 0.25
@@ -183,4 +183,20 @@ out <- mcmc.pp(Y.list, H.list, X, locs, D, n.mcmc, mu.0, Sigma.0, alpha.epsilon,
 jpeg(file = paste('~/1dSpatialSim/plots/PPSimulation9knots', date(), '.jpeg', sep = ''), width = 12, height = 4, quality = 100, res  = 600, units = 'in')
 make.sim.plot(out)
 dev.off()
+
+
+##
+## tuning for 199 knot locations
+##
+s.star <- seq(0.005, 0.995, 0.005)
+sigma.squared.eta.tune <- 0.85
+sigma.squared.epsilon.tune <- .085
+phi.tune <- 0.35
+
+out <- mcmc.pp(Y.list, H.list, X, locs, D, n.mcmc, mu.0, Sigma.0, alpha.epsilon, beta.epsilon, alpha.beta, beta.beta, alpha.phi, beta.phi, mu.beta, sigma.squared.eta.tune, sigma.squared.epsilon.tune, phi.tune, s.star)
+
+jpeg(file = paste('~/1dSpatialSim/plots/PPSimulation999knots', date(), '.jpeg', sep = ''), width = 12, height = 4, quality = 100, res  = 600, units = 'in')
+make.sim.plot(out)
+dev.off()
+
 
