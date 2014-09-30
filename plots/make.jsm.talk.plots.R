@@ -27,9 +27,9 @@ load('~/1dSpatialSim/data/pcaRegression.RData')
 
 names(out)
 
-jpeg(file = paste('~/1dSpatialSim/plots/pcaRegression', date(), '.jpeg', sep = ''), width = 12, height = 4, quality = 100, res  = 600, units = 'in')
+# jpeg(file = paste('~/1dSpatialSim/plots/pcaRegression', date(), '.jpeg', sep = ''), width = 12, height = 4, quality = 100, res  = 600, units = 'in')
 matplot(out$fort.raster[, 1:20], type = 'l', main = "EOF regression", ylab = "T", xlab = 'location')
-dev.off()
+# dev.off()
 mean((out$fort.raster - matrix(unlist(field$Z.list), nrow = 1000)[, 1:36])^2)
 
 ## 
@@ -37,9 +37,9 @@ mean((out$fort.raster - matrix(unlist(field$Z.list), nrow = 1000)[, 1:36])^2)
 ##
 
 load('~/1dSpatialSim/data/spatialRegression.RData')
-jpeg(file = paste('~/1dSpatialSim/plots/spatialRegression', date(), '.jpeg', sep = ''), width = 12, height = 4, quality = 100, res  = 600, units = 'in')
+# jpeg(file = paste('~/1dSpatialSim/plots/spatialRegression', date(), '.jpeg', sep = ''), width = 12, height = 4, quality = 100, res  = 600, units = 'in')
 matplot(out$fort.raster[, 1:20], type = 'l', main = "EOF regression with spatial random effect", ylab = "T", xlab = 'location')
-dev.off()
+# dev.off()
 mean((out$fort.raster - matrix(unlist(field$Z.list), nrow = 1000)[, 1:37])^2)
 matplot((out$fort.raster - matrix(unlist(field$Z.list), nrow = 1000)[, 1:37])^2, type = 'l')
 
@@ -48,20 +48,21 @@ matplot((out$fort.raster - matrix(unlist(field$Z.list), nrow = 1000)[, 1:37])^2,
 ##
 
 load('~/1dSpatialSim/data/PPspatialRegression9knots.RData')
-jpeg(file = paste('~/1dSpatialSim/plots/PPSimulation9knots', date(), '.jpeg', sep = ''), width = 12, height = 4, quality = 100, res  = 600, units = 'in')
+# jpeg(file = paste('~/1dSpatialSim/plots/PPSimulation9knots', date(), '.jpeg', sep = ''), width = 12, height = 4, quality = 100, res  = 600, units = 'in')
 matplot(out$fort.raster[, 1:20], type = 'l', main = "EOF regression with predictive process - 9 knots", ylab = "T", xlab = 'location')
 dev.off()
 mean((out$fort.raster - matrix(unlist(field$Z.list), nrow = 1000)[, 1:37])^2)
   matplot((out$fort.raster - matrix(unlist(field$Z.list), nrow = 1000)[, 1:37])^2, type = 'l')
+
 
 ## 
 ## pp regression - 39 knots
 ##
 
 load('~/1dSpatialSim/data/PPspatialRegression39knots.RData')
-jpeg(file = paste('~/1dSpatialSim/plots/PPSimulation39knots', date(), '.jpeg', sep = ''), width = 12, height = 4, quality = 100, res  = 600, units = 'in')
+# jpeg(file = paste('~/1dSpatialSim/plots/PPSimulation39knots', date(), '.jpeg', sep = ''), width = 12, height = 4, quality = 100, res  = 600, units = 'in')
 matplot(out$fort.raster[, 1:20], type = 'l', main = "EOF regression with predictive process - 39 knots", ylab = "T", xlab = 'location')
-dev.off()
+# dev.off()
 mean((out$fort.raster - matrix(unlist(field$Z.list), nrow = 1000)[, 1:37])^2)
 
 ## 
@@ -69,7 +70,7 @@ mean((out$fort.raster - matrix(unlist(field$Z.list), nrow = 1000)[, 1:37])^2)
 ##
 
 load('~/1dSpatialSim/data/PPspatialRegression39knots.RData')
-jpeg(file = paste('~/1dSpatialSim/plots/PPSimulation99knots', date(), '.jpeg', sep = ''), width = 12, height = 4, quality = 100, res  = 600, units = 'in')
+# jpeg(file = paste('~/1dSpatialSim/plots/PPSimulation99knots', date(), '.jpeg', sep = ''), width = 12, height = 4, quality = 100, res  = 600, units = 'in')
 matplot(out$fort.raster[, 1:20], type = 'l', main = "EOF regression with predictive process - 99 knots", ylab = "T", xlab = 'location')
-dev.off()
+# dev.off()
 mean((out$fort.raster - matrix(unlist(field$Z.list), nrow = 1000)[, 1:37])^2)
